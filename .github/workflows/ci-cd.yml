@@ -80,7 +80,22 @@ jobs:
             --update-env-vars "^#^ALLOWED_ORIGINS=https://${{ secrets.GCP_PROJECT_ID }}.web.app,https://${{ secrets.GCP_PROJECT_ID }}.firebaseapp.com" \
             --allow-unauthenticated
 
+      # Set up Node.js & Compile Frontend build for deployment
+      - name: Set up Node.js for Frontend Build
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build Frontend static assets
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+
       # Deploy Frontend to Firebase Hosting (Production Channel)
       - name: Deploy Frontend to Firebase Hosting
         run: |
           npx firebase-tools deploy --only hosting --token "${{ secrets.FIREBASE_TOKEN }}" --project portfolio2049
+
