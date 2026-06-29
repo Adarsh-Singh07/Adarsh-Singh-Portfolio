@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "portfolio2049"
+  },
+  "targets": {
+    "portfolio2049": {
+      "hosting": {
+        "portfolio-main": [
+          "adarshsingh-portfolio"
+        ]
+      }
+    }
+  }
+}

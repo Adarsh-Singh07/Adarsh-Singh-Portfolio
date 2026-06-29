@@ -1,0 +1,37 @@
+# Node.js dependencies and builds
+node_modules/
+dist/
+build/
+coverage/
+.yarn/
+.pnpm-store/
+
+# Python Virtual Environment and cache
+backend/.venv/
+.venv/
+venv/
+ENV/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Databases and transient client-generated records
+backend/data/portfolio.db
+backend/data/contact_messages.json
+backend/data/files_hash.json
+
+# Local Environment secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# OS metadata and logs
+.DS_Store
+Thumbs.db
+*.log
+.firebase/
+

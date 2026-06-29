@@ -1,0 +1,26 @@
+# Ignore virtual environments, local databases, and temporary caches during gcloud upload
+.gcloudignore
+.git
+.gitignore
+
+# Exclude virtual environment
+.venv/
+
+# Exclude python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Exclude local SQLite databases and message backups
+data/portfolio.db
+data/contact_messages.json
+data/files_hash.json
+
+# Exclude environment secrets
+.env
+.env*
+
+# Exclude test files
+tests/
+test_*.py

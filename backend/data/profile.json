@@ -1,0 +1,1701 @@
+{
+  "general": {
+    "hero": {
+      "badge": "AI & Data Engineering Innovator",
+      "titleName": "Adarsh Singh",
+      "headline": "Architecting Intelligent Futures: Bridging Generative AI, Machine Learning, and Scalable Data Engineering for Transformative Solutions",
+      "subtext": "A Software Engineer with expertise in Python, Generative AI, RAG, LLMs, and Azure cloud platforms, dedicated to building robust, scalable AI systems and large language model applications that drive innovation and deliver tangible business value.",
+      "trustRow": [
+        "Python",
+        "Generative AI",
+        "Azure Cloud",
+        "Data Engineering",
+        "LLMs & RAG"
+      ]
+    },
+    "projects": [
+      {
+        "id": "on-demand-service-platform-agentic-ai-rag",
+        "title": "On-Demand Service Platform with Agentic AI & RAG",
+        "description": "Architected a distributed microservices system leveraging REST APIs, Docker, and WebSockets to support concurrent users at scale. Integrated Agentic AI and Retrieval-Augmented Generation (RAG) for dynamic pricing based on live data, projecting an 18% revenue uplift. Developed an LLM-powered chatbot for automated customer support, reducing manual query response time by 60%, and implemented real-time event-driven updates.",
+        "technologies": [
+          "Python",
+          "Microservices",
+          "REST APIs",
+          "Docker",
+          "Agentic AI",
+          "RAG",
+          "LLMs",
+          "WebSocket"
+        ],
+        "metrics": [
+          {
+            "label": "Projected Revenue Uplift",
+            "value": "18%"
+          },
+          {
+            "label": "Customer Support Time Reduction",
+            "value": "60%"
+          }
+        ],
+        "githubUrl": "https://github.com/Adarsh-Singh07/on-demand-service-platform",
+        "demoUrl": null,
+        "status": "Beta",
+        "featured": true,
+        "priority": {
+          "general": 1,
+          "data-engineer": 2,
+          "ai-engineer": 1
+        }
+      },
+      {
+        "id": "intelligent-email-campaign-automation-openai",
+        "title": "Intelligent Email Campaign Automation with OpenAI",
+        "description": "Developed a Python-based automated email campaign tool integrating the OpenAI API for LLM-driven personalization at scale. Built a GUI dashboard for campaign scheduling, template management, and delivery analytics, utilizing Google Sheets API as a live backend.",
+        "technologies": [
+          "Python",
+          "OpenAI API",
+          "Google Sheets API",
+          "Matplotlib",
+          "Tkinter",
+          "SMTP"
+        ],
+        "metrics": [],
+        "githubUrl": "https://github.com/Adarsh-Singh07/email-campaign-automation",
+        "demoUrl": null,
+        "status": "Deployed",
+        "featured": false,
+        "priority": {
+          "general": 3,
+          "data-engineer": 3,
+          "ai-engineer": 2
+        }
+      },
+      {
+        "id": "indian-sign-language-ml-translation",
+        "title": "Indian Sign Language Real-Time ML Translation System",
+        "description": "Engineered a real-time ML inference pipeline for Indian Sign Language (ISL) to text and speech translation using TensorFlow and OpenCV. Optimized model inference for low-latency processing on resource-constrained devices, demonstrating practical application of machine learning for accessibility.",
+        "technologies": [
+          "Python",
+          "TensorFlow",
+          "OpenCV",
+          "NLP",
+          "Google TTS"
+        ],
+        "metrics": [],
+        "githubUrl": "https://github.com/Adarsh-Singh07/isl-translation-system",
+        "demoUrl": null,
+        "status": "Deployed",
+        "featured": false,
+        "priority": {
+          "general": 4,
+          "data-engineer": 99,
+          "ai-engineer": 3
+        }
+      },
+      {
+        "id": "financial-lakehouse-etl",
+        "title": "Financial Data Lakehouse ETL Pipeline on Azure",
+        "description": "Architected and engineered an automated medallion ETL pipeline (Bronze -> Silver -> Gold) using Azure Databricks and PySpark. Implemented ACID transactions via Delta Lake and Z-Ordering on account keys, optimizing query latency by 40% for financial data lake BI systems.",
+        "technologies": [
+          "Python",
+          "PySpark",
+          "Azure Databricks",
+          "Delta Lake",
+          "Azure Data Factory",
+          "SQL",
+          "Power BI"
+        ],
+        "metrics": [
+          {
+            "label": "Ingestion Rate",
+            "value": "1.2M req/m"
+          },
+          {
+            "label": "Query Latency",
+            "value": "<2.5s"
+          },
+          {
+            "label": "Data Volume",
+            "value": "12TB+"
+          }
+        ],
+        "githubUrl": "https://github.com/Adarsh-Singh07/financial-lakehouse-etl",
+        "demoUrl": null,
+        "status": "Deployed",
+        "featured": false,
+        "priority": {
+          "general": 2,
+          "data-engineer": 1,
+          "ai-engineer": 99
+        }
+      }
+    ],
+    "skills": [
+      {
+        "title": "Languages",
+        "skills": [
+          {
+            "name": "Python",
+            "level": "Expert"
+          },
+          {
+            "name": "C++",
+            "level": "Proficient"
+          },
+          {
+            "name": "SQL",
+            "level": "Expert"
+          }
+        ],
+        "priority": {
+          "general": 1,
+          "data-engineer": 1,
+          "ai-engineer": 1,
+          "ml-engineer": 1
+        }
+      },
+      {
+        "title": "AI / ML & GenAI",
+        "skills": [
+          {
+            "name": "Generative AI",
+            "level": "Expert"
+          },
+          {
+            "name": "Large Language Models (LLMs)",
+            "level": "Expert"
+          },
+          {
+            "name": "Transformers",
+            "level": "Proficient"
+          },
+          {
+            "name": "Agentic AI",
+            "level": "Proficient"
+          },
+          {
+            "name": "RAG",
+            "level": "Expert"
+          },
+          {
+            "name": "PyTorch",
+            "level": "Proficient"
+          },
+          {
+            "name": "TensorFlow",
+            "level": "Proficient"
+          },
+          {
+            "name": "Sci-Kit Learn",
+            "level": "Proficient"
+          },
+          {
+            "name": "NLP",
+            "level": "Proficient"
+          },
+          {
+            "name": "OpenCV",
+            "level": "Proficient"
+          },
+          {
+            "name": "Machine Learning",
+            "level": "Expert"
+          }
+        ],
+        "priority": {
+          "general": 1,
+          "data-engineer": 3,
+          "ai-engineer": 1,
+          "ml-engineer": 1
+        }
+      },
+      {
+        "title": "Cloud & Platforms",
+        "skills": [
+          {
+            "name": "Microsoft Azure (Databricks, Data Factory)",
+            "level": "Expert"
+          },
+          {
+            "name": "GCP (BigQuery, Vertex AI)",
+            "level": "Proficient"
+          },
+          {
+            "name": "Docker",
+            "level": "Proficient"
+          },
+          {
+            "name": "REST APIs",
+            "level": "Expert"
+          }
+        ],
+        "priority": {
+          "general": 2,
+          "data-engineer": 1,
+          "ai-engineer": 2,
+          "ml-engineer": 2
+        }
+      },
+      {
+        "title": "Data Engineering",
+        "skills": [
+          {
+            "name": "ETL Pipelines",
+            "level": "Expert"
+          },
+          {
+            "name": "Data Transformation",
+            "level": "Expert"
+          },
+          {
+            "name": "Azure Databricks",
+            "level": "Expert"
+          },
+          {
+            "name": "Distributed Data Processing",
+            "level": "Proficient"
+          }
+        ],
+        "priority": {
+          "general": 1,
+          "data-engineer": 1,
+          "ai-engineer": 2,
+          "ml-engineer": 3
+        }
+      },
+      {
+        "title": "Dev Practices",
+        "skills": [
+          {
+            "name": "Agile",
+            "level": "Proficient"
+          },
+          {
+            "name": "CI/CD",
+            "level": "Proficient"
+          },
+          {
+            "name": "Git",
+            "level": "Expert"
+          },
+          {
+            "name": "Microservices",
+            "level": "Proficient"
+          },
+          {
+            "name": "Distributed Systems",
+            "level": "Proficient"
+          }
+        ],
+        "priority": {
+          "general": 2,
+          "data-engineer": 2,
+          "ai-engineer": 2,
+          "ml-engineer": 2
+        }
+      },
+      {
+        "title": "Visualization",
+        "skills": [
+          {
+            "name": "Power BI",
+            "level": "Proficient"
+          },
+          {
+            "name": "Matplotlib",
+            "level": "Proficient"
+          },
+          {
+            "name": "Seaborn",
+            "level": "Proficient"
+          },
+          {
+            "name": "Looker",
+            "level": "Intermediate"
+          },
+          {
+            "name": "Tableau",
+            "level": "Intermediate"
+          }
+        ],
+        "priority": {
+          "general": 3,
+          "data-engineer": 2,
+          "ai-engineer": 4,
+          "ml-engineer": 4
+        }
+      },
+      {
+        "title": "Soft Skills",
+        "skills": [
+          {
+            "name": "Problem-Solving",
+            "level": "Expert"
+          },
+          {
+            "name": "Stakeholder Communication",
+            "level": "Proficient"
+          },
+          {
+            "name": "Team Collaboration",
+            "level": "Expert"
+          },
+          {
+            "name": "Fast Learner",
+            "level": "Expert"
+          },
+          {
+            "name": "Adaptability",
+            "level": "Expert"
+          }
+        ],
+        "priority": {
+          "general": 1,
+          "data-engineer": 1,
+          "ai-engineer": 1,
+          "ml-engineer": 1
+        }
+      }
+    ],
+    "certifications": [
+      {
+        "id": "aws-certified-ai-practitioner",
+        "title": "AWS Certified AI Practitioner",
+        "issuer": "Amazon Web Services",
+        "code": null,
+        "date": "Mar 2026",
+        "credentialUrl": "https://www.credly.com/badges/c178772b-f8b4-4744-9f36-29e86e6fee3b",
+        "badgeUrl": null,
+        "featured": true,
+        "priority": {
+          "general": 2,
+          "data-engineer": 3,
+          "ai-engineer": 1,
+          "ml-engineer": 2
+        }
+      },
+      {
+        "id": "associate-data-practitioner-google-cloud",
+        "title": "Associate Data Practitioner Certification",
+        "issuer": "Google Cloud",
+        "code": "9a4b5db3b2ec4d17a5e2d6731098616d",
+        "date": "Mar 2026",
+        "credentialUrl": "https://www.credly.com/badges/3dfaa7cd-d9f7-492f-adfe-91907b346c8c",
+        "badgeUrl": null,
+        "featured": true,
+        "priority": {
+          "general": 1,
+          "data-engineer": 1,
+          "ai-engineer": 2,
+          "ml-engineer": 2
+        }
+      },
+      {
+        "id": "professional-cloud-developer-google-cloud",
+        "title": "Professional Cloud Developer Certification",
+        "issuer": "Google Cloud",
+        "code": "a1c842e7ec1744d6a809d8c042381948",
+        "date": "Jan 2026",
+        "credentialUrl": "https://www.credly.com/badges/552f04a0-a307-4dfb-ac23-af9301b280e4",
+        "badgeUrl": null,
+        "featured": true,
+        "priority": {
+          "general": 2,
+          "data-engineer": 1,
+          "ai-engineer": 2,
+          "ml-engineer": 2
+        }
+      },
+      {
+        "id": "generative-ai-leader-google-cloud",
+        "title": "Generative AI Leader Certification",
+        "issuer": "Google Cloud",
+        "code": "6767488012b148009660d4c6c3da0ffe",
+        "date": "Dec 2025",
+        "credentialUrl": "https://www.credly.com/badges/e2556efe-eb9c-492e-945c-393fefacae26",
+        "badgeUrl": null,
+        "featured": true,
+        "priority": {
+          "general": 1,
+          "data-engineer": 3,
+          "ai-engineer": 1,
+          "ml-engineer": 1
+        }
+      },
+      {
+        "id": "google-data-analytics-professional-certificate",
+        "title": "Google Data Analytics Professional Certificate",
+        "issuer": "Coursera",
+        "code": null,
+        "date": "Dec 2024",
+        "credentialUrl": "https://www.credly.com/badges/625312be-058a-4739-9c41-6db9551a1e63",
+        "badgeUrl": null,
+        "featured": true,
+        "priority": {
+          "general": 3,
+          "data-engineer": 2,
+          "ai-engineer": 4,
+          "ml-engineer": 4
+        }
+      },
+      {
+        "id": "python-for-data-science-and-ai",
+        "title": "Python for Data Science and AI",
+        "issuer": "Coursera",
+        "code": null,
+        "date": "Sep 2024",
+        "credentialUrl": "https://www.credly.com/badges/9c024776-05ed-42b3-922c-c3416a51a934",
+        "badgeUrl": null,
+        "featured": false,
+        "priority": {
+          "general": 4,
+          "data-engineer": 4,
+          "ai-engineer": 3,
+          "ml-engineer": 3
+        }
+      },
+      {
+        "id": "ai-102-azure-ai-solutions",
+        "title": "Microsoft Certified: Azure AI Engineer Associate (AI-102)",
+        "issuer": "Microsoft",
+        "code": null,
+        "date": "Mar 2026",
+        "credentialUrl": "https://learn.microsoft.com/api/credentials/share/en-us/AdarshSingh2049/79DE2DEF41234156?sharingId=8D4E75A61B7B7717",
+        "badgeUrl": null,
+        "featured": true,
+        "priority": {
+          "general": 1,
+          "data-engineer": 2,
+          "ai-engineer": 1,
+          "ml-engineer": 1
+        }
+      },
+      {
+        "id": "az-900-azure-fundamentals",
+        "title": "Microsoft Certified: Azure Fundamentals (AZ-900)",
+        "issuer": "Microsoft",
+        "code": null,
+        "date": "Feb 2026",
+        "credentialUrl": "https://learn.microsoft.com/api/credentials/share/en-us/AdarshSingh2049/CF6A9CFE5207BE7E?sharingId=8D4E75A61B7B7717",
+        "badgeUrl": null,
+        "featured": false,
+        "priority": {
+          "general": 4,
+          "data-engineer": 4,
+          "ai-engineer": 4,
+          "ml-engineer": 4
+        }
+      },
+      {
+        "id": "ai-900-azure-ai-fundamentals",
+        "title": "Microsoft Certified: Azure AI Fundamentals (AI-900)",
+        "issuer": "Microsoft",
+        "code": null,
+        "date": "Nov 2025",
+        "credentialUrl": "https://learn.microsoft.com/api/credentials/share/en-us/AdarshSingh2049/7DAAC3F8980CED77?sharingId=8D4E75A61B7B7717",
+        "badgeUrl": null,
+        "featured": false,
+        "priority": {
+          "general": 3,
+          "data-engineer": 4,
+          "ai-engineer": 3,
+          "ml-engineer": 3
+        }
+      }
+    ],
+    "journey": [
+      {
+        "id": "analyst-ai-data-engineering-capgemini",
+        "era": "Professional Experience",
+        "title": "Analyst – AI & Data Engineering",
+        "subtitle": "Capgemini",
+        "description": "Building automated ETL pipelines and data transformation workflows using Python and Azure Databricks for an enterprise-scale Financial Data Lake (FDL) BI engagement. Integrating Retrieval-Augmented Generation (RAG) and Generative AI techniques to enhance data querying and insight generation on large structured datasets. Developing Power BI dashboards tracking key performance metrics and working with Azure cloud-native services for scalable distributed data processing and ML model deployment.",
+        "period": "Aug 2025 – Present",
+        "emphasis": {
+          "general": true,
+          "data-engineer": true,
+          "ai-engineer": true,
+          "ml-engineer": true
+        }
+      },
+      {
+        "id": "software-engineering-intern-capgemini",
+        "era": "Professional Experience",
+        "title": "Software Engineering Intern – Python & RAG",
+        "subtitle": "Capgemini",
+        "description": "Developed Python-based backend services and integrated RAG pipelines to power intelligent document retrieval and response generation. Built and tested REST API endpoints, contributing to end-to-end feature delivery in an Agile sprint-based environment. Collaborated with cross-functional teams on deploying AI-powered features, gaining exposure to CI/CD workflows and distributed service architecture.",
+        "period": "Apr 2025 – Jun 2025",
+        "emphasis": {
+          "general": true,
+          "data-engineer": true,
+          "ai-engineer": true,
+          "ml-engineer": true
+        }
+      },
+      {
+        "id": "mca-lovely-professional-university",
+        "era": "Education",
+        "title": "Master of Computer Applications – Computer Science",
+        "subtitle": "Lovely Professional University (Jalandhar, India)",
+        "description": "Completed Master of Computer Applications with a CGPA of 8.35, focusing on advanced computer science concepts relevant to modern software development and data-intensive applications.",
+        "period": "Aug 2023 – Jul 2025",
+        "emphasis": {
+          "general": true,
+          "data-engineer": true,
+          "ai-engineer": true,
+          "ml-engineer": true
+        }
+      },
+      {
+        "id": "bsc-deen-dayal-upadhyay-gorakhpur-university",
+        "era": "Education",
+        "title": "Bachelor of Science – Mathematics & Computer Science",
+        "subtitle": "Deen Dayal Upadhyay Gorakhpur University (Gorakhpur, UP, India)",
+        "description": "Graduated with a Bachelor of Science degree, building a strong foundation in mathematics and computer science principles essential for analytical and technical roles.",
+        "period": "Apr 2018 – Sep 2021",
+        "emphasis": {
+          "general": true,
+          "data-engineer": true,
+          "ai-engineer": true,
+          "ml-engineer": true
+        }
+      }
+    ],
+    "blogs": [
+      {
+        "id": "scalable-etl-azure-databricks",
+        "title": "Building Scalable ETL Pipelines with Azure Databricks for Financial Data Lakes",
+        "excerpt": "Explore the architecture and implementation of robust ETL pipelines using Python and Azure Databricks, specifically tailored for handling large-scale financial datasets and enabling advanced BI analytics.",
+        "readTime": "7 min read",
+        "category": "Data Engineering",
+        "date": "2024-07-15",
+        "url": "#",
+        "priority": {
+          "general": 2,
+          "data-engineer": 1,
+          "ai-engineer": 99
+        }
+      },
+      {
+        "id": "agentic-ai-rag-dynamic-pricing",
+        "title": "Leveraging Agentic AI and RAG for Dynamic Pricing in On-Demand Services",
+        "excerpt": "Dive into how Agentic AI and Retrieval-Augmented Generation (RAG) can be integrated into microservices architectures to enable real-time, data-driven dynamic pricing and enhance customer support through LLM-powered chatbots.",
+        "readTime": "9 min read",
+        "category": "Generative AI",
+        "date": "2024-06-20",
+        "url": "#",
+        "priority": {
+          "general": 1,
+          "data-engineer": 2,
+          "ai-engineer": 1
+        }
+      },
+      {
+        "id": "personalizing-email-openai-llm",
+        "title": "Personalizing Email Campaigns with OpenAI: A Practical Guide to LLM Integration",
+        "excerpt": "Learn how to build an automated email campaign tool using Python and the OpenAI API to generate personalized content at scale, improving engagement and campaign effectiveness.",
+        "readTime": "6 min read",
+        "category": "AI/ML",
+        "date": "2024-05-10",
+        "url": "#",
+        "priority": {
+          "general": 3,
+          "data-engineer": 3,
+          "ai-engineer": 2
+        }
+      },
+      {
+        "id": "real-time-isl-translation-ml",
+        "title": "Real-Time Indian Sign Language Translation: An ML Pipeline with TensorFlow & OpenCV",
+        "excerpt": "Discover the technical challenges and solutions in developing a low-latency, real-time machine learning system for Indian Sign Language translation, from model optimization to deployment.",
+        "readTime": "8 min read",
+        "category": "Machine Learning",
+        "date": "2024-04-01",
+        "url": "#",
+        "priority": {
+          "general": 4,
+          "data-engineer": 99,
+          "ai-engineer": 3
+        }
+      }
+    ],
+    "philosophy": "My passion lies at the intersection of data and intelligence, where complex data ecosystems meet cutting-edge AI. I am driven by the challenge of transforming raw data into actionable insights and building intelligent systems that not only solve real-world problems but also scale efficiently. From architecting robust ETL pipelines to deploying advanced Generative AI and Machine Learning models, I believe in a holistic approach that combines engineering rigor with innovative AI capabilities to create truly transformative solutions."
+  },
+  "data-engineer": {
+    "hero": {
+      "badge": "Data Engineering Virtuoso",
+      "titleName": "Adarsh Singh",
+      "headline": "Architecting Scalable Data Lakes & Intelligent ETL Pipelines for Enterprise AI",
+      "subtext": "A dedicated Data Engineer specializing in Python, Azure Databricks, and Generative AI, building robust data foundations that power advanced analytics and intelligent applications.",
+      "trustRow": [
+        "Azure Databricks Expert",
+        "Medallion ETL Architect",
+        "Generative AI Integration",
+        "Scalable Data Solutions"
+      ]
+    },
+    "projects": [
+      {
+        "id": "on-demand-service-platform-agentic-ai-rag",
+        "title": "On-Demand Service Platform with Agentic AI & RAG",
+        "description": "Architected a distributed microservices system leveraging REST APIs, Docker, and WebSockets to support concurrent users at scale. Integrated Agentic AI and Retrieval-Augmented Generation (RAG) for dynamic pricing based on live data, projecting an 18% revenue uplift. Developed an LLM-powered chatbot for automated customer support, reducing manual query response time by 60%, and implemented real-time event-driven updates.",
+        "technologies": [
+          "Python",
+          "Microservices",
+          "REST APIs",
+          "Docker",
+          "Agentic AI",
+          "RAG",
+          "LLMs",
+          "WebSocket"
+        ],
+        "metrics": [
+          {
+            "label": "Projected Revenue Uplift",
+            "value": "18%"
+          },
+          {
+            "label": "Customer Support Time Reduction",
+            "value": "60%"
+          }
+        ],
+        "githubUrl": "https://github.com/Adarsh-Singh07/on-demand-service-platform",
+        "demoUrl": null,
+        "status": "Beta",
+        "featured": false,
+        "priority": {
+          "general": 1,
+          "data-engineer": 2,
+          "ai-engineer": 1
+        }
+      },
+      {
+        "id": "intelligent-email-campaign-automation-openai",
+        "title": "Intelligent Email Campaign Automation with OpenAI",
+        "description": "Developed a Python-based automated email campaign tool integrating the OpenAI API for LLM-driven personalization at scale. Built a GUI dashboard for campaign scheduling, template management, and delivery analytics, utilizing Google Sheets API as a live backend.",
+        "technologies": [
+          "Python",
+          "OpenAI API",
+          "Google Sheets API",
+          "Matplotlib",
+          "Tkinter",
+          "SMTP"
+        ],
+        "metrics": [],
+        "githubUrl": "https://github.com/Adarsh-Singh07/email-campaign-automation",
+        "demoUrl": null,
+        "status": "Deployed",
+        "featured": false,
+        "priority": {
+          "general": 3,
+          "data-engineer": 3,
+          "ai-engineer": 2
+        }
+      },
+      {
+        "id": "financial-lakehouse-etl",
+        "title": "Financial Data Lakehouse ETL Pipeline on Azure",
+        "description": "Architected and engineered an automated medallion ETL pipeline (Bronze -> Silver -> Gold) using Azure Databricks and PySpark. Implemented ACID transactions via Delta Lake and Z-Ordering on account keys, optimizing query latency by 40% for financial data lake BI systems.",
+        "technologies": [
+          "Python",
+          "PySpark",
+          "Azure Databricks",
+          "Delta Lake",
+          "Azure Data Factory",
+          "SQL",
+          "Power BI"
+        ],
+        "metrics": [
+          {
+            "label": "Ingestion Rate",
+            "value": "1.2M req/m"
+          },
+          {
+            "label": "Query Latency",
+            "value": "<2.5s"
+          },
+          {
+            "label": "Data Volume",
+            "value": "12TB+"
+          }
+        ],
+        "githubUrl": "https://github.com/Adarsh-Singh07/financial-lakehouse-etl",
+        "demoUrl": null,
+        "status": "Deployed",
+        "featured": true,
+        "priority": {
+          "general": 2,
+          "data-engineer": 1,
+          "ai-engineer": 99
+        }
+      }
+    ],
+    "skills": [
+      {
+        "title": "Data Engineering & Cloud Platforms",
+        "skills": [
+          {
+            "name": "Azure Databricks",
+            "level": "Expert"
+          },
+          {
+            "name": "Azure Data Factory (ADF)",
+            "level": "Proficient"
+          },
+          {
+            "name": "ETL Pipelines",
+            "level": "Expert"
+          },
+          {
+            "name": "Data Transformation",
+            "level": "Expert"
+          },
+          {
+            "name": "Distributed Data Processing",
+            "level": "Proficient"
+          },
+          {
+            "name": "Delta Lake",
+            "level": "Proficient"
+          },
+          {
+            "name": "Apache Spark",
+            "level": "Proficient"
+          },
+          {
+            "name": "Microsoft Azure",
+            "level": "Proficient"
+          },
+          {
+            "name": "GCP BigQuery",
+            "level": "Intermediate"
+          },
+          {
+            "name": "Docker",
+            "level": "Proficient"
+          }
+        ],
+        "priority": {
+          "general": 1,
+          "data-engineer": 1,
+          "ai-engineer": 2,
+          "ml-engineer": 3
+        }
+      },
+      {
+        "title": "Programming & Databases",
+        "skills": [
+          {
+            "name": "Python",
+            "level": "Expert"
+          },
+          {
+            "name": "SQL",
+            "level": "Expert"
+          },
+          {
+            "name": "C++",
+            "level": "Intermediate"
+          }
+        ],
+        "priority": {
+          "general": 2,
+          "data-engineer": 1,
+          "ai-engineer": 1,
+          "ml-engineer": 1
+        }
+      },
+      {
+        "title": "Dev Practices & Tools",
+        "skills": [
+          {
+            "name": "Agile",
+            "level": "Proficient"
+          },
+          {
+            "name": "CI/CD",
+            "level": "Proficient"
+          },
+          {
+            "name": "Git",
+            "level": "Expert"
+          },
+          {
+            "name": "Microservices",
+            "level": "Proficient"
+          },
+          {
+            "name": "Distributed Systems",
+            "level": "Proficient"
+          },
+          {
+            "name": "REST APIs",
+            "level": "Proficient"
+          }
+        ],
+        "priority": {
+          "general": 3,
+          "data-engineer": 2,
+          "ai-engineer": 3,
+          "ml-engineer": 3
+        }
+      },
+      {
+        "title": "Data Visualization & BI",
+        "skills": [
+          {
+            "name": "Power BI",
+            "level": "Proficient"
+          },
+          {
+            "name": "Matplotlib",
+            "level": "Proficient"
+          },
+          {
+            "name": "Seaborn",
+            "level": "Proficient"
+          },
+          {
+            "name": "Looker",
+            "level": "Intermediate"
+          },
+          {
+            "name": "Tableau",
+            "level": "Intermediate"
+          }
+        ],
+        "priority": {
+          "general": 4,
+          "data-engineer": 2,
+          "ai-engineer": 4,
+          "ml-engineer": 4
+        }
+      },
+      {
+        "title": "Soft Skills",
+        "skills": [
+          {
+            "name": "Problem-Solving",
+            "level": "Expert"
+          },
+          {
+            "name": "Stakeholder Communication",
+            "level": "Proficient"
+          },
+          {
+            "name": "Team Collaboration",
+            "level": "Expert"
+          },
+          {
+            "name": "Fast Learner",
+            "level": "Expert"
+          },
+          {
+            "name": "Adaptability",
+            "level": "Expert"
+          }
+        ],
+        "priority": {
+          "general": 1,
+          "data-engineer": 1,
+          "ai-engineer": 1,
+          "ml-engineer": 1
+        }
+      }
+    ],
+    "certifications": [
+      {
+        "id": "aws-certified-ai-practitioner",
+        "title": "AWS Certified AI Practitioner",
+        "issuer": "Amazon Web Services",
+        "code": null,
+        "date": "Mar 2026",
+        "credentialUrl": "https://www.credly.com/badges/c178772b-f8b4-4744-9f36-29e86e6fee3b",
+        "badgeUrl": null,
+        "featured": true,
+        "priority": {
+          "general": 2,
+          "data-engineer": 3,
+          "ai-engineer": 1,
+          "ml-engineer": 2
+        }
+      },
+      {
+        "id": "associate-data-practitioner-google-cloud",
+        "title": "Associate Data Practitioner Certification",
+        "issuer": "Google Cloud",
+        "code": "9a4b5db3b2ec4d17a5e2d6731098616d",
+        "date": "Mar 2026",
+        "credentialUrl": "https://www.credly.com/badges/3dfaa7cd-d9f7-492f-adfe-91907b346c8c",
+        "badgeUrl": null,
+        "featured": true,
+        "priority": {
+          "general": 1,
+          "data-engineer": 1,
+          "ai-engineer": 2,
+          "ml-engineer": 2
+        }
+      },
+      {
+        "id": "professional-cloud-developer-google-cloud",
+        "title": "Professional Cloud Developer Certification",
+        "issuer": "Google Cloud",
+        "code": "a1c842e7ec1744d6a809d8c042381948",
+        "date": "Jan 2026",
+        "credentialUrl": "https://www.credly.com/badges/552f04a0-a307-4dfb-ac23-af9301b280e4",
+        "badgeUrl": null,
+        "featured": true,
+        "priority": {
+          "general": 2,
+          "data-engineer": 1,
+          "ai-engineer": 2,
+          "ml-engineer": 2
+        }
+      },
+      {
+        "id": "generative-ai-leader-google-cloud",
+        "title": "Generative AI Leader Certification",
+        "issuer": "Google Cloud",
+        "code": "6767488012b148009660d4c6c3da0ffe",
+        "date": "Dec 2025",
+        "credentialUrl": "https://www.credly.com/badges/e2556efe-eb9c-492e-945c-393fefacae26",
+        "badgeUrl": null,
+        "featured": true,
+        "priority": {
+          "general": 1,
+          "data-engineer": 3,
+          "ai-engineer": 1,
+          "ml-engineer": 1
+        }
+      },
+      {
+        "id": "google-data-analytics-professional-certificate",
+        "title": "Google Data Analytics Professional Certificate",
+        "issuer": "Coursera",
+        "code": null,
+        "date": "Dec 2024",
+        "credentialUrl": "https://www.credly.com/badges/625312be-058a-4739-9c41-6db9551a1e63",
+        "badgeUrl": null,
+        "featured": true,
+        "priority": {
+          "general": 3,
+          "data-engineer": 2,
+          "ai-engineer": 4,
+          "ml-engineer": 4
+        }
+      },
+      {
+        "id": "python-for-data-science-and-ai",
+        "title": "Python for Data Science and AI",
+        "issuer": "Coursera",
+        "code": null,
+        "date": "Sep 2024",
+        "credentialUrl": "https://www.credly.com/badges/9c024776-05ed-42b3-922c-c3416a51a934",
+        "badgeUrl": null,
+        "featured": false,
+        "priority": {
+          "general": 4,
+          "data-engineer": 4,
+          "ai-engineer": 3,
+          "ml-engineer": 3
+        }
+      },
+      {
+        "id": "ai-102-azure-ai-solutions",
+        "title": "Microsoft Certified: Azure AI Engineer Associate (AI-102)",
+        "issuer": "Microsoft",
+        "code": null,
+        "date": "Mar 2026",
+        "credentialUrl": "https://learn.microsoft.com/api/credentials/share/en-us/AdarshSingh2049/79DE2DEF41234156?sharingId=8D4E75A61B7B7717",
+        "badgeUrl": null,
+        "featured": true,
+        "priority": {
+          "general": 1,
+          "data-engineer": 2,
+          "ai-engineer": 1,
+          "ml-engineer": 1
+        }
+      },
+      {
+        "id": "az-900-azure-fundamentals",
+        "title": "Microsoft Certified: Azure Fundamentals (AZ-900)",
+        "issuer": "Microsoft",
+        "code": null,
+        "date": "Feb 2026",
+        "credentialUrl": "https://learn.microsoft.com/api/credentials/share/en-us/AdarshSingh2049/CF6A9CFE5207BE7E?sharingId=8D4E75A61B7B7717",
+        "badgeUrl": null,
+        "featured": false,
+        "priority": {
+          "general": 4,
+          "data-engineer": 4,
+          "ai-engineer": 4,
+          "ml-engineer": 4
+        }
+      },
+      {
+        "id": "ai-900-azure-ai-fundamentals",
+        "title": "Microsoft Certified: Azure AI Fundamentals (AI-900)",
+        "issuer": "Microsoft",
+        "code": null,
+        "date": "Nov 2025",
+        "credentialUrl": "https://learn.microsoft.com/api/credentials/share/en-us/AdarshSingh2049/7DAAC3F8980CED77?sharingId=8D4E75A61B7B7717",
+        "badgeUrl": null,
+        "featured": false,
+        "priority": {
+          "general": 3,
+          "data-engineer": 4,
+          "ai-engineer": 3,
+          "ml-engineer": 3
+        }
+      }
+    ],
+    "journey": [
+      {
+        "id": "capgemini-analyst",
+        "era": "Professional Experience",
+        "title": "Analyst – AI & Data Engineering",
+        "subtitle": "Capgemini",
+        "description": "Building automated ETL pipelines and data transformation workflows using Python and Azure Databricks for an enterprise-scale Financial Data Lake (FDL) BI engagement. Integrating Retrieval-Augmented Generation (RAG) and Generative AI techniques to enhance data querying and insight generation on large structured datasets. Developing Power BI dashboards tracking key performance metrics and working with Azure cloud-native services for scalable distributed data processing and ML model deployment.",
+        "period": "Aug 2025 – Present",
+        "emphasis": {
+          "general": true,
+          "data-engineer": true,
+          "ai-engineer": true,
+          "ml-engineer": false
+        }
+      },
+      {
+        "id": "capgemini-intern",
+        "era": "Professional Experience",
+        "title": "Software Engineering Intern – Python & RAG",
+        "subtitle": "Capgemini",
+        "description": "Developed Python-based backend services and integrated RAG pipelines to power intelligent document retrieval and response generation. Built and tested REST API endpoints, contributing to end-to-end feature delivery in an Agile sprint-based environment. Collaborated with cross-functional teams on deploying AI-powered features, gaining exposure to CI/CD workflows and distributed service architecture.",
+        "period": "Apr 2025 – Jun 2025",
+        "emphasis": {
+          "general": true,
+          "data-engineer": true,
+          "ai-engineer": true,
+          "ml-engineer": false
+        }
+      },
+      {
+        "id": "mca-lpu",
+        "era": "Education",
+        "title": "Master of Computer Applications – Computer Science",
+        "subtitle": "Lovely Professional University (Jalandhar, India)",
+        "description": "Completed Master of Computer Applications with a CGPA of 8.35, focusing on advanced computer science concepts relevant to software and data engineering.",
+        "period": "Aug 2023 – Jul 2025",
+        "emphasis": {
+          "general": true,
+          "data-engineer": true,
+          "ai-engineer": true,
+          "ml-engineer": true
+        }
+      },
+      {
+        "id": "bsc-ddugu",
+        "era": "Education",
+        "title": "Bachelor of Science – Mathematics & Computer Science",
+        "subtitle": "Deen Dayal Upadhyay Gorakhpur University (Gorakhpur, UP, India)",
+        "description": "Graduated with a Bachelor of Science, building foundational knowledge in mathematics and computer science.",
+        "period": "Apr 2018 – Sep 2021",
+        "emphasis": {
+          "general": true,
+          "data-engineer": false,
+          "ai-engineer": false,
+          "ml-engineer": false
+        }
+      }
+    ],
+    "blogs": [
+      {
+        "id": "scalable-etl-azure-databricks",
+        "title": "Building Scalable ETL Pipelines with Azure Databricks for Financial Data Lakes",
+        "excerpt": "Explore the architecture and implementation of robust ETL pipelines using Python and Azure Databricks, specifically tailored for handling large-scale financial datasets and enabling advanced BI analytics.",
+        "readTime": "7 min read",
+        "category": "Data Engineering",
+        "date": "2024-07-15",
+        "url": "#",
+        "priority": {
+          "general": 2,
+          "data-engineer": 1,
+          "ai-engineer": 99
+        }
+      },
+      {
+        "id": "agentic-ai-rag-dynamic-pricing",
+        "title": "Leveraging Agentic AI and RAG for Dynamic Pricing in On-Demand Services",
+        "excerpt": "Dive into how Agentic AI and Retrieval-Augmented Generation (RAG) can be integrated into microservices architectures to enable real-time, data-driven dynamic pricing and enhance customer support through LLM-powered chatbots.",
+        "readTime": "9 min read",
+        "category": "Generative AI",
+        "date": "2024-06-20",
+        "url": "#",
+        "priority": {
+          "general": 1,
+          "data-engineer": 2,
+          "ai-engineer": 1
+        }
+      },
+      {
+        "id": "personalizing-email-openai-llm",
+        "title": "Personalizing Email Campaigns with OpenAI: A Practical Guide to LLM Integration",
+        "excerpt": "Learn how to build an automated email campaign tool using Python and the OpenAI API to generate personalized content at scale, improving engagement and campaign effectiveness.",
+        "readTime": "6 min read",
+        "category": "AI/ML",
+        "date": "2024-05-10",
+        "url": "#",
+        "priority": {
+          "general": 3,
+          "data-engineer": 3,
+          "ai-engineer": 2
+        }
+      }
+    ],
+    "philosophy": "My philosophy as a Data Engineer is to forge robust, scalable, and intelligent data foundations that empower informed decision-making and fuel the next generation of AI applications. I am passionate about architecting efficient ETL pipelines, leveraging Azure Databricks, Apache Spark, and Delta Lake to transform raw data into a trusted, accessible asset. My goal is to build data ecosystems that are not only performant and reliable but also seamlessly integrate with advanced analytics and Generative AI, driving innovation and tangible business value."
+  },
+  "ai-engineer": {
+    "hero": {
+      "badge": "Generative AI & LLM Systems Engineer",
+      "titleName": "Adarsh Singh",
+      "headline": "Engineering Intelligent Agentic Architectures & Generative AI Systems",
+      "subtext": "Software Analyst at Capgemini specializing in Large Language Models, Retrieval-Augmented Generation (RAG) pipelines, and low-latency computer vision gesture translation.",
+      "trustRow": [
+        "Generative AI Practitioner",
+        "LLMs & RAG Architect",
+        "Computer Vision ML",
+        "Python Specialist"
+      ]
+    },
+    "projects": [
+      {
+        "id": "on-demand-service-platform-agentic-ai-rag",
+        "title": "On-Demand Service Platform with Agentic AI & RAG",
+        "description": "Architected a distributed microservices system leveraging REST APIs, Docker, and WebSockets to support concurrent users at scale. Integrated Agentic AI and Retrieval-Augmented Generation (RAG) for dynamic pricing based on live data, projecting an 18% revenue uplift. Developed an LLM-powered chatbot for automated customer support, reducing manual query response time by 60%, and implemented real-time event-driven updates.",
+        "technologies": [
+          "Python",
+          "Microservices",
+          "REST APIs",
+          "Docker",
+          "Agentic AI",
+          "RAG",
+          "LLMs",
+          "WebSocket"
+        ],
+        "metrics": [
+          {
+            "label": "Projected Revenue Uplift",
+            "value": "18%"
+          },
+          {
+            "label": "Customer Support Time Reduction",
+            "value": "60%"
+          }
+        ],
+        "githubUrl": "https://github.com/Adarsh-Singh07/on-demand-service-platform",
+        "demoUrl": null,
+        "status": "Beta",
+        "featured": true,
+        "priority": {
+          "general": 1,
+          "data-engineer": 2,
+          "ai-engineer": 1
+        }
+      },
+      {
+        "id": "intelligent-email-campaign-automation-openai",
+        "title": "Intelligent Email Campaign Automation with OpenAI",
+        "description": "Developed a Python-based automated email campaign tool integrating the OpenAI API for LLM-driven personalization at scale. Built a GUI dashboard for campaign scheduling, template management, and delivery analytics, utilizing Google Sheets API as a live backend.",
+        "technologies": [
+          "Python",
+          "OpenAI API",
+          "Google Sheets API",
+          "Matplotlib",
+          "Tkinter",
+          "SMTP"
+        ],
+        "metrics": [],
+        "githubUrl": "https://github.com/Adarsh-Singh07/email-campaign-automation",
+        "demoUrl": null,
+        "status": "Deployed",
+        "featured": false,
+        "priority": {
+          "general": 3,
+          "data-engineer": 3,
+          "ai-engineer": 2
+        }
+      },
+      {
+        "id": "indian-sign-language-ml-translation",
+        "title": "Indian Sign Language Real-Time ML Translation System",
+        "description": "Engineered a real-time ML inference pipeline for Indian Sign Language (ISL) to text and speech translation using TensorFlow and OpenCV. Optimized model inference for low-latency processing on resource-constrained devices, demonstrating practical application of machine learning for accessibility.",
+        "technologies": [
+          "Python",
+          "TensorFlow",
+          "OpenCV",
+          "NLP",
+          "Google TTS"
+        ],
+        "metrics": [],
+        "githubUrl": "https://github.com/Adarsh-Singh07/isl-translation-system",
+        "demoUrl": null,
+        "status": "Deployed",
+        "featured": false,
+        "priority": {
+          "general": 4,
+          "data-engineer": 99,
+          "ai-engineer": 3
+        }
+      }
+    ],
+    "skills": [
+      {
+        "title": "Programming Languages",
+        "skills": [
+          {
+            "name": "Python",
+            "level": "Expert"
+          },
+          {
+            "name": "C++",
+            "level": "Proficient"
+          },
+          {
+            "name": "SQL",
+            "level": "Advanced"
+          }
+        ],
+        "priority": {
+          "general": 1,
+          "data-engineer": 1,
+          "ai-engineer": 1,
+          "ml-engineer": 1
+        }
+      },
+      {
+        "title": "AI / ML & Generative AI",
+        "skills": [
+          {
+            "name": "Generative AI",
+            "level": "Expert"
+          },
+          {
+            "name": "Large Language Models (LLMs)",
+            "level": "Expert"
+          },
+          {
+            "name": "Transformers",
+            "level": "Advanced"
+          },
+          {
+            "name": "Agentic AI",
+            "level": "Expert"
+          },
+          {
+            "name": "RAG",
+            "level": "Expert"
+          },
+          {
+            "name": "PyTorch",
+            "level": "Advanced"
+          },
+          {
+            "name": "TensorFlow",
+            "level": "Advanced"
+          },
+          {
+            "name": "Sci-Kit Learn",
+            "level": "Proficient"
+          },
+          {
+            "name": "NLP",
+            "level": "Advanced"
+          },
+          {
+            "name": "OpenCV",
+            "level": "Proficient"
+          },
+          {
+            "name": "Machine Learning",
+            "level": "Advanced"
+          }
+        ],
+        "priority": {
+          "general": 1,
+          "data-engineer": 3,
+          "ai-engineer": 1,
+          "ml-engineer": 1
+        }
+      },
+      {
+        "title": "Cloud & MLOps Platforms",
+        "skills": [
+          {
+            "name": "Microsoft Azure (Databricks, Data Factory)",
+            "level": "Advanced"
+          },
+          {
+            "name": "GCP (BigQuery, Vertex AI)",
+            "level": "Advanced"
+          },
+          {
+            "name": "Docker",
+            "level": "Advanced"
+          },
+          {
+            "name": "REST APIs",
+            "level": "Advanced"
+          }
+        ],
+        "priority": {
+          "general": 2,
+          "data-engineer": 1,
+          "ai-engineer": 1,
+          "ml-engineer": 2
+        }
+      },
+      {
+        "title": "Development Practices",
+        "skills": [
+          {
+            "name": "Agile",
+            "level": "Advanced"
+          },
+          {
+            "name": "CI/CD",
+            "level": "Advanced"
+          },
+          {
+            "name": "Git",
+            "level": "Advanced"
+          },
+          {
+            "name": "Microservices",
+            "level": "Advanced"
+          },
+          {
+            "name": "Distributed Systems",
+            "level": "Advanced"
+          }
+        ],
+        "priority": {
+          "general": 2,
+          "data-engineer": 2,
+          "ai-engineer": 1,
+          "ml-engineer": 2
+        }
+      },
+      {
+        "title": "Data Visualization",
+        "skills": [
+          {
+            "name": "Power BI",
+            "level": "Proficient"
+          },
+          {
+            "name": "Matplotlib",
+            "level": "Proficient"
+          },
+          {
+            "name": "Seaborn",
+            "level": "Proficient"
+          },
+          {
+            "name": "Looker",
+            "level": "Basic"
+          },
+          {
+            "name": "Tableau",
+            "level": "Basic"
+          }
+        ],
+        "priority": {
+          "general": 4,
+          "data-engineer": 2,
+          "ai-engineer": 4,
+          "ml-engineer": 4
+        }
+      },
+      {
+        "title": "Soft Skills",
+        "skills": [
+          {
+            "name": "Problem-Solving",
+            "level": "Advanced"
+          },
+          {
+            "name": "Stakeholder Communication",
+            "level": "Advanced"
+          },
+          {
+            "name": "Team Collaboration",
+            "level": "Advanced"
+          },
+          {
+            "name": "Fast Learner",
+            "level": "Advanced"
+          },
+          {
+            "name": "Adaptability",
+            "level": "Advanced"
+          }
+        ],
+        "priority": {
+          "general": 1,
+          "data-engineer": 1,
+          "ai-engineer": 1,
+          "ml-engineer": 1
+        }
+      }
+    ],
+    "certifications": [
+      {
+        "id": "aws-certified-ai-practitioner",
+        "title": "AWS Certified AI Practitioner",
+        "issuer": "Amazon Web Services",
+        "code": null,
+        "date": "Mar 2026",
+        "credentialUrl": "https://www.credly.com/badges/c178772b-f8b4-4744-9f36-29e86e6fee3b",
+        "badgeUrl": null,
+        "featured": true,
+        "priority": {
+          "general": 2,
+          "data-engineer": 3,
+          "ai-engineer": 1,
+          "ml-engineer": 2
+        }
+      },
+      {
+        "id": "associate-data-practitioner-google-cloud",
+        "title": "Associate Data Practitioner Certification",
+        "issuer": "Google Cloud",
+        "code": "9a4b5db3b2ec4d17a5e2d6731098616d",
+        "date": "Mar 2026",
+        "credentialUrl": "https://www.credly.com/badges/3dfaa7cd-d9f7-492f-adfe-91907b346c8c",
+        "badgeUrl": null,
+        "featured": true,
+        "priority": {
+          "general": 1,
+          "data-engineer": 1,
+          "ai-engineer": 2,
+          "ml-engineer": 2
+        }
+      },
+      {
+        "id": "professional-cloud-developer-google-cloud",
+        "title": "Professional Cloud Developer Certification",
+        "issuer": "Google Cloud",
+        "code": "a1c842e7ec1744d6a809d8c042381948",
+        "date": "Jan 2026",
+        "credentialUrl": "https://www.credly.com/badges/552f04a0-a307-4dfb-ac23-af9301b280e4",
+        "badgeUrl": null,
+        "featured": true,
+        "priority": {
+          "general": 2,
+          "data-engineer": 1,
+          "ai-engineer": 2,
+          "ml-engineer": 2
+        }
+      },
+      {
+        "id": "generative-ai-leader-google-cloud",
+        "title": "Generative AI Leader Certification",
+        "issuer": "Google Cloud",
+        "code": "6767488012b148009660d4c6c3da0ffe",
+        "date": "Dec 2025",
+        "credentialUrl": "https://www.credly.com/badges/e2556efe-eb9c-492e-945c-393fefacae26",
+        "badgeUrl": null,
+        "featured": true,
+        "priority": {
+          "general": 1,
+          "data-engineer": 3,
+          "ai-engineer": 1,
+          "ml-engineer": 1
+        }
+      },
+      {
+        "id": "google-data-analytics-professional-certificate",
+        "title": "Google Data Analytics Professional Certificate",
+        "issuer": "Coursera",
+        "code": null,
+        "date": "Dec 2024",
+        "credentialUrl": "https://www.credly.com/badges/625312be-058a-4739-9c41-6db9551a1e63",
+        "badgeUrl": null,
+        "featured": true,
+        "priority": {
+          "general": 3,
+          "data-engineer": 2,
+          "ai-engineer": 4,
+          "ml-engineer": 4
+        }
+      },
+      {
+        "id": "python-for-data-science-and-ai",
+        "title": "Python for Data Science and AI",
+        "issuer": "Coursera",
+        "code": null,
+        "date": "Sep 2024",
+        "credentialUrl": "https://www.credly.com/badges/9c024776-05ed-42b3-922c-c3416a51a934",
+        "badgeUrl": null,
+        "featured": false,
+        "priority": {
+          "general": 4,
+          "data-engineer": 4,
+          "ai-engineer": 3,
+          "ml-engineer": 3
+        }
+      },
+      {
+        "id": "ai-102-azure-ai-solutions",
+        "title": "Microsoft Certified: Azure AI Engineer Associate (AI-102)",
+        "issuer": "Microsoft",
+        "code": null,
+        "date": "Mar 2026",
+        "credentialUrl": "https://learn.microsoft.com/api/credentials/share/en-us/AdarshSingh2049/79DE2DEF41234156?sharingId=8D4E75A61B7B7717",
+        "badgeUrl": null,
+        "featured": true,
+        "priority": {
+          "general": 1,
+          "data-engineer": 2,
+          "ai-engineer": 1,
+          "ml-engineer": 1
+        }
+      },
+      {
+        "id": "az-900-azure-fundamentals",
+        "title": "Microsoft Certified: Azure Fundamentals (AZ-900)",
+        "issuer": "Microsoft",
+        "code": null,
+        "date": "Feb 2026",
+        "credentialUrl": "https://learn.microsoft.com/api/credentials/share/en-us/AdarshSingh2049/CF6A9CFE5207BE7E?sharingId=8D4E75A61B7B7717",
+        "badgeUrl": null,
+        "featured": false,
+        "priority": {
+          "general": 4,
+          "data-engineer": 4,
+          "ai-engineer": 4,
+          "ml-engineer": 4
+        }
+      },
+      {
+        "id": "ai-900-azure-ai-fundamentals",
+        "title": "Microsoft Certified: Azure AI Fundamentals (AI-900)",
+        "issuer": "Microsoft",
+        "code": null,
+        "date": "Nov 2025",
+        "credentialUrl": "https://learn.microsoft.com/api/credentials/share/en-us/AdarshSingh2049/7DAAC3F8980CED77?sharingId=8D4E75A61B7B7717",
+        "badgeUrl": null,
+        "featured": false,
+        "priority": {
+          "general": 3,
+          "data-engineer": 4,
+          "ai-engineer": 3,
+          "ml-engineer": 3
+        }
+      }
+    ],
+    "journey": [
+      {
+        "id": "capgemini-analyst",
+        "era": "Professional Experience",
+        "title": "Analyst – AI & Data Engineering",
+        "subtitle": "Capgemini",
+        "description": "Building automated ETL pipelines and data transformation workflows using Python and Azure Databricks for an enterprise-scale Financial Data Lake (FDL) BI engagement. Integrating Retrieval-Augmented Generation (RAG) and Generative AI techniques to enhance data querying and insight generation on large structured datasets. Developing Power BI dashboards tracking key performance metrics, presenting data-driven insights to technical and non-technical stakeholders. Working with Azure cloud-native services (Databricks, ADF) for scalable distributed data processing and ML model deployment.",
+        "period": "Aug 2025 – Present",
+        "emphasis": {
+          "general": true,
+          "data-engineer": true,
+          "ai-engineer": true,
+          "ml-engineer": true
+        }
+      },
+      {
+        "id": "capgemini-intern",
+        "era": "Professional Experience",
+        "title": "Software Engineering Intern – Python & RAG",
+        "subtitle": "Capgemini",
+        "description": "Developed Python-based backend services and integrated RAG pipelines to power intelligent document retrieval and response generation. Built and tested REST API endpoints, contributing to end-to-end feature delivery in an Agile sprint-based environment. Collaborated with cross-functional teams on deploying AI-powered features, gaining exposure to CI/CD workflows and distributed service architecture.",
+        "period": "Apr 2025 – Jun 2025",
+        "emphasis": {
+          "general": true,
+          "data-engineer": false,
+          "ai-engineer": true,
+          "ml-engineer": true
+        }
+      },
+      {
+        "id": "lpu-mca",
+        "era": "Education",
+        "title": "Master of Computer Applications – Computer Science",
+        "subtitle": "Lovely Professional University (Jalandhar, India)",
+        "description": "Completed Master of Computer Applications with a CGPA of 8.35, focusing on advanced computer science concepts relevant to modern software and AI development.",
+        "period": "Aug 2023 – Jul 2025",
+        "emphasis": {
+          "general": true,
+          "data-engineer": true,
+          "ai-engineer": true,
+          "ml-engineer": true
+        }
+      },
+      {
+        "id": "ddu-bsc",
+        "era": "Education",
+        "title": "Bachelor of Science – Mathematics & Computer Science",
+        "subtitle": "Deen Dayal Upadhyay Gorakhpur University (Gorakhpur, UP, India)",
+        "description": "Earned a Bachelor of Science degree with a focus on Mathematics and Computer Science, providing a strong foundational understanding for a career in technology.",
+        "period": "Apr 2018 – Sep 2021",
+        "emphasis": {
+          "general": true,
+          "data-engineer": false,
+          "ai-engineer": false,
+          "ml-engineer": false
+        }
+      }
+    ],
+    "blogs": [
+      {
+        "id": "agentic-ai-rag-dynamic-pricing",
+        "title": "Leveraging Agentic AI and RAG for Dynamic Pricing in On-Demand Services",
+        "excerpt": "Dive into how Agentic AI and Retrieval-Augmented Generation (RAG) can be integrated into microservices architectures to enable real-time, data-driven dynamic pricing and enhance customer support through LLM-powered chatbots.",
+        "readTime": "9 min read",
+        "category": "Generative AI",
+        "date": "2024-06-20",
+        "url": "#",
+        "priority": {
+          "general": 1,
+          "data-engineer": 2,
+          "ai-engineer": 1
+        }
+      },
+      {
+        "id": "personalizing-email-openai-llm",
+        "title": "Personalizing Email Campaigns with OpenAI: A Practical Guide to LLM Integration",
+        "excerpt": "Learn how to build an automated email campaign tool using Python and the OpenAI API to generate personalized content at scale, improving engagement and campaign effectiveness.",
+        "readTime": "6 min read",
+        "category": "AI/ML",
+        "date": "2024-05-10",
+        "url": "#",
+        "priority": {
+          "general": 3,
+          "data-engineer": 3,
+          "ai-engineer": 2
+        }
+      },
+      {
+        "id": "real-time-isl-translation-ml",
+        "title": "Real-Time Indian Sign Language Translation: An ML Pipeline with TensorFlow & OpenCV",
+        "excerpt": "Discover the technical challenges and solutions in developing a low-latency, real-time machine learning system for Indian Sign Language translation, from model optimization to deployment.",
+        "readTime": "8 min read",
+        "category": "Machine Learning",
+        "date": "2024-04-01",
+        "url": "#",
+        "priority": {
+          "general": 4,
+          "data-engineer": 99,
+          "ai-engineer": 3
+        }
+      }
+    ],
+    "philosophy": "My philosophy as an AI Engineer is to build intelligent systems that are not only innovative but also robust, scalable, and ethically sound. I am driven by the potential of Generative AI, RAG, and Agentic AI to solve complex real-world problems, transforming data into actionable intelligence. My passion lies in architecting and deploying cutting-edge LLM applications, ensuring they deliver tangible value and push the boundaries of what's possible in artificial intelligence."
+  }
+}

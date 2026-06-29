@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+data/portfolio.db
+data/contact_messages.json
+data/files_hash.json
+.env
+.env*
+tests/
+test_*.py
