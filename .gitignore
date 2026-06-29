@@ -34,4 +34,6 @@ backend/data/files_hash.json
 Thumbs.db
 *.log
 .firebase/
+.antigravity/
+
 
