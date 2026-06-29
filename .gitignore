@@ -35,5 +35,7 @@ Thumbs.db
 *.log
 .firebase/
 .antigravity/
+PROGRESS_TRACKER.md
+
 
 
