@@ -77,7 +77,7 @@ jobs:
             --region us-central1 \
             --add-volume=name=db-volume,type=cloud-storage,bucket=${{ secrets.GCS_BUCKET_NAME }} \
             --add-volume-mount=volume=db-volume,mount-path=/app/data \
-            --update-env-vars ALLOWED_ORIGINS="https://portfolio2049.web.app,https://portfolio2049.firebaseapp.com" \
+            --update-env-vars "^#^ALLOWED_ORIGINS=https://${{ secrets.GCP_PROJECT_ID }}.web.app,https://${{ secrets.GCP_PROJECT_ID }}.firebaseapp.com" \
             --allow-unauthenticated
 
       # Deploy Frontend to Firebase Hosting (Production Channel)
