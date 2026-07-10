@@ -376,5 +376,69 @@ export class PortfolioService {
     }
     return await response.json();
   }
+
+  /**
+   * Logs in admin with username and password.
+   */
+  public static async adminLogin(username: string, password: string): Promise<{ success: boolean; token: string }> {
+    if (this.useMock) {
+      return { success: username === 'admin' && password === 'admin123', token: 'mock-admin-token-12345' };
+    }
+    const response = await fetch(`${this.apiBaseUrl}/admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+    if (!response.ok) {
+      throw new Error('Authentication failed.');
+    }
+    return await response.json();
+  }
+
+  /**
+   * Fetches full configuration (profile.json structure).
+   */
+  public static async getAdminConfig(token: string): Promise<Record<ProfileMode, ProfileData>> {
+    if (this.useMock) {
+      return {
+        general: generalProfile,
+        'data-engineer': dataEngineerProfile,
+        'ai-engineer': generalProfile, // fallback for mock
+      } as any;
+    }
+    const response = await fetch(`${this.apiBaseUrl}/admin/config`, {
+      method: 'GET',
+      headers: {
+        'X-Admin-Token': token,
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to retrieve configurations.');
+    }
+    return await response.json();
+  }
+
+  /**
+   * Saves/publishes updated configuration.
+   */
+  public static async saveAdminConfig(token: string, config: Record<string, ProfileData>): Promise<{ success: boolean; message: string }> {
+    if (this.useMock) {
+      return { success: true, message: 'Configuration saved mock-mode.' };
+    }
+    const response = await fetch(`${this.apiBaseUrl}/admin/config`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Token': token,
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(config),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to save configuration.');
+    }
+    return await response.json();
+  }
 }
 export default PortfolioService;

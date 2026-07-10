@@ -87,6 +87,100 @@ def on_startup():
     else:
         print("GEMINI_API_KEY is not defined in environment. RAG indexing skipped.")
 
+# Admin credentials resolving
+ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin_password_123")
+ADMIN_SECRET_KEY = os.environ.get("ADMIN_SECRET_KEY")
+if not ADMIN_SECRET_KEY:
+    ADMIN_SECRET_KEY = secrets.token_urlsafe(32)
+
+import hashlib
+def generate_session_token(username: str, expiry_seconds: int = 86400) -> str:
+    """Generates a secure, signed session token."""
+    expiry_time = int(time.time()) + expiry_seconds
+    payload_str = f"{username}:{expiry_time}"
+    sig = hmac.new(ADMIN_SECRET_KEY.encode("utf-8"), payload_str.encode("utf-8"), hashlib.sha256).hexdigest()
+    return f"{payload_str}:{sig}"
+
+def verify_session_token(token: str) -> bool:
+    """Verifies a signed session token against secret key and expiration."""
+    if not token:
+        return False
+    try:
+        parts = token.split(":")
+        if len(parts) != 3:
+            return False
+        username, expiry_str, sig = parts
+        expiry_time = int(expiry_str)
+        
+        if username != ADMIN_USERNAME:
+            return False
+            
+        if time.time() > expiry_time:
+            return False
+            
+        expected_payload = f"{username}:{expiry_str}"
+        expected_sig = hmac.new(ADMIN_SECRET_KEY.encode("utf-8"), expected_payload.encode("utf-8"), hashlib.sha256).hexdigest()
+        
+        return hmac.compare_digest(sig, expected_sig)
+    except Exception:
+        return False
+
+def get_token_from_request(request: Request) -> str:
+    """Extracts the session token from request headers."""
+    token = request.headers.get("X-Admin-Token")
+    if token:
+        return token
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        return auth_header[7:]
+    return ""
+
+class AdminLoginPayload(BaseModel):
+    username: str
+    password: str
+
+@app.post("/api/v1/portfolio/admin/login")
+async def admin_login(payload: AdminLoginPayload):
+    """Authenticates admin credentials and returns a session token."""
+    if payload.username == ADMIN_USERNAME and payload.password == ADMIN_PASSWORD:
+        token = generate_session_token(payload.username)
+        return {"success": True, "token": token}
+    raise HTTPException(status_code=401, detail="Invalid username or password")
+
+@app.get("/api/v1/portfolio/admin/config")
+async def get_admin_config(request: Request):
+    """Retrieves the complete profile.json config. Protected by admin session token."""
+    token = get_token_from_request(request)
+    if not verify_session_token(token):
+        raise HTTPException(status_code=401, detail="Unauthorized access. Invalid or expired token.")
+        
+    profiles = load_profiles()
+    if not profiles:
+        raise HTTPException(status_code=500, detail="Portfolio database is not initialized.")
+    return profiles
+
+@app.post("/api/v1/portfolio/admin/config")
+async def save_admin_config(payload: dict, request: Request, background_tasks: BackgroundTasks):
+    """Overwrites the complete profile.json config and triggers RAG re-indexing. Protected."""
+    token = get_token_from_request(request)
+    if not verify_session_token(token):
+        raise HTTPException(status_code=401, detail="Unauthorized access. Invalid or expired token.")
+        
+    os.makedirs(DATA_DIR, exist_ok=True)
+    try:
+        with open(PROFILE_JSON, "w", encoding="utf-8") as f:
+            json.dump(payload, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to write configuration: {str(e)}")
+        
+    # Trigger RAG re-indexing asynchronously
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if api_key:
+        background_tasks.add_task(rag.index_knowledge_base, api_key)
+        
+    return {"success": True, "message": "Configuration saved. RAG re-indexing triggered."}
+
 def load_profiles():
     """Loads consolidated profile roles from local JSON database."""
     if not os.path.exists(PROFILE_JSON):

@@ -16,15 +16,26 @@ import {
   Sparkles,
   Calendar,
   AlertCircle,
-  Loader2
+  Loader2,
+  Edit,
+  Trash2,
+  Plus,
+  Check,
+  LogOut,
+  FileText,
+  Award,
+  Eye,
+  EyeOff,
+  Save
 } from 'lucide-react';
 import PortfolioService from '../services/api';
+import { ProfileMode, ProfileData } from '../types';
 
 interface DashboardProps {
   isDark: boolean;
 }
 
-type TabType = 'analytics' | 'rag' | 'unanswered';
+type TabType = 'analytics' | 'rag' | 'unanswered' | 'config' | 'projects' | 'certifications' | 'blogs';
 
 export default function Dashboard({ isDark }: DashboardProps) {
   const [activeTab, setActiveTab] = useState<TabType>('analytics');
@@ -34,10 +45,12 @@ export default function Dashboard({ isDark }: DashboardProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Passcode State
-  const [passcode, setPasscode] = useState('');
+  // Auth State
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [token, setToken] = useState<string | null>(null);
   const [isUnlocked, setIsUnlocked] = useState(false);
-  const [passcodeError, setPasscodeError] = useState(false);
+  const [loginError, setLoginError] = useState(false);
   
   // RAG Search State
   const [ragQuery, setRagQuery] = useState('');
@@ -47,7 +60,70 @@ export default function Dashboard({ isDark }: DashboardProps) {
   // Selected Chat Session details
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
 
-  // Load stats, logs and unanswered questions
+  // Admin Config States
+  const [adminConfig, setAdminConfig] = useState<any>(null);
+  const [originalConfig, setOriginalConfig] = useState<any>(null);
+  const [selectedHeroMode, setSelectedHeroMode] = useState<ProfileMode>('general');
+
+  // Publishing Status
+  const [publishing, setPublishing] = useState(false);
+  const [publishSuccess, setPublishSuccess] = useState(false);
+
+  // Project Form States
+  const [showProjectForm, setShowProjectForm] = useState(false);
+  const [editingProject, setEditingProject] = useState<any | null>(null);
+  const [projTitle, setProjTitle] = useState('');
+  const [projId, setProjId] = useState('');
+  const [projDesc, setProjDesc] = useState('');
+  const [projStatus, setProjStatus] = useState<'Deployed' | 'Beta' | 'In Progress'>('In Progress');
+  const [projFeatured, setProjFeatured] = useState(false);
+  const [projGithubUrl, setProjGithubUrl] = useState('');
+  const [projDemoUrl, setProjDemoUrl] = useState('');
+  const [projTechs, setProjTechs] = useState('');
+  const [projMetrics, setProjMetrics] = useState<Array<{ label: string, value: string }>>([]);
+  const [projShowGeneral, setProjShowGeneral] = useState(false);
+  const [projShowData, setProjShowData] = useState(false);
+  const [projShowAi, setProjShowAi] = useState(false);
+  const [projPriorityGeneral, setProjPriorityGeneral] = useState(1);
+  const [projPriorityData, setProjPriorityData] = useState(1);
+  const [projPriorityAi, setProjPriorityAi] = useState(1);
+
+  // Certification Form States
+  const [showCertForm, setShowCertForm] = useState(false);
+  const [editingCert, setEditingCert] = useState<any | null>(null);
+  const [certTitle, setCertTitle] = useState('');
+  const [certId, setCertId] = useState('');
+  const [certIssuer, setCertIssuer] = useState('');
+  const [certCode, setCertCode] = useState('');
+  const [certDate, setCertDate] = useState('');
+  const [certCredUrl, setCertCredUrl] = useState('');
+  const [certBadgeUrl, setCertBadgeUrl] = useState('');
+  const [certFeatured, setCertFeatured] = useState(false);
+  const [certShowGeneral, setCertShowGeneral] = useState(false);
+  const [certShowData, setCertShowData] = useState(false);
+  const [certShowAi, setCertShowAi] = useState(false);
+  const [certPriorityGeneral, setCertPriorityGeneral] = useState(1);
+  const [certPriorityData, setCertPriorityData] = useState(1);
+  const [certPriorityAi, setCertPriorityAi] = useState(1);
+
+  // Blog Form States
+  const [showBlogForm, setShowBlogForm] = useState(false);
+  const [editingBlog, setEditingBlog] = useState<any | null>(null);
+  const [blogTitle, setBlogTitle] = useState('');
+  const [blogId, setBlogId] = useState('');
+  const [blogExcerpt, setBlogExcerpt] = useState('');
+  const [blogReadTime, setBlogReadTime] = useState('');
+  const [blogCategory, setBlogCategory] = useState('');
+  const [blogDate, setBlogDate] = useState('');
+  const [blogUrl, setBlogUrl] = useState('');
+  const [blogShowGeneral, setBlogShowGeneral] = useState(false);
+  const [blogShowData, setBlogShowData] = useState(false);
+  const [blogShowAi, setBlogShowAi] = useState(false);
+  const [blogPriorityGeneral, setBlogPriorityGeneral] = useState(1);
+  const [blogPriorityData, setBlogPriorityData] = useState(1);
+  const [blogPriorityAi, setBlogPriorityAi] = useState(1);
+
+  // Load telemetry stats and admin logs
   const fetchData = async (currentPasscode?: string) => {
     setLoading(true);
     try {
@@ -59,8 +135,12 @@ export default function Dashboard({ isDark }: DashboardProps) {
       setIsUnlocked(logsData.is_admin);
 
       if (logsData.is_admin || currentPasscode) {
-        const unansweredData = await PortfolioService.getUnansweredQuestions(currentPasscode || passcode);
+        const unansweredData = await PortfolioService.getUnansweredQuestions(currentPasscode || token || '');
         setUnanswered(unansweredData);
+        
+        const configData = await PortfolioService.getAdminConfig(currentPasscode || token || '');
+        setAdminConfig(configData);
+        setOriginalConfig(JSON.parse(JSON.stringify(configData))); // Deep clone
       }
       
       setError(null);
@@ -73,30 +153,78 @@ export default function Dashboard({ isDark }: DashboardProps) {
   };
 
   useEffect(() => {
-    fetchData();
+    const savedToken = sessionStorage.getItem('admin-token') || localStorage.getItem('admin-token');
+    if (savedToken) {
+      setToken(savedToken);
+      setIsUnlocked(true);
+      fetchData(savedToken);
+    } else {
+      setLoading(false);
+    }
   }, []);
 
-  const handleUnlock = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setPasscodeError(false);
+    setLoginError(false);
+    setLoading(true);
     try {
-      const res = await PortfolioService.verifyPasscode(passcode);
-      if (res.success) {
+      const res = await PortfolioService.adminLogin(username, password);
+      if (res.success && res.token) {
+        setToken(res.token);
         setIsUnlocked(true);
-        fetchData(passcode);
+        sessionStorage.setItem('admin-token', res.token);
+        await fetchData(res.token);
       } else {
-        setPasscodeError(true);
-        setTimeout(() => setPasscodeError(false), 2000);
+        setLoginError(true);
       }
     } catch (err) {
-      console.error("Verification failed:", err);
-      setPasscodeError(true);
+      console.error("Login failed:", err);
+      setLoginError(true);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('admin-token');
+    localStorage.removeItem('admin-token');
+    setToken(null);
+    setIsUnlocked(false);
+    setStats(null);
+    setLogs({ sessions: [], leads: [] });
+    setUnanswered([]);
+    setAdminConfig(null);
+    setOriginalConfig(null);
+    setActiveTab('analytics');
+  };
+
+  const handlePublish = async () => {
+    if (!token || !adminConfig) return;
+    setPublishing(true);
+    setPublishSuccess(false);
+    try {
+      const res = await PortfolioService.saveAdminConfig(token, adminConfig);
+      if (res.success) {
+        setOriginalConfig(JSON.parse(JSON.stringify(adminConfig)));
+        setPublishSuccess(true);
+        setTimeout(() => setPublishSuccess(false), 3000);
+      }
+    } catch (err) {
+      console.error("Failed to publish configuration:", err);
+      alert("Failed to publish configuration to the server.");
+    } finally {
+      setPublishing(false);
+    }
+  };
+
+  const hasUnsavedChanges = () => {
+    if (!adminConfig || !originalConfig) return false;
+    return JSON.stringify(adminConfig) !== JSON.stringify(originalConfig);
   };
 
   const handleResolveQuestion = async (q_id: number) => {
     try {
-      const res = await PortfolioService.resolveUnansweredQuestion(q_id, passcode);
+      const res = await PortfolioService.resolveUnansweredQuestion(q_id, token || '');
       if (res.success) {
         setUnanswered(prev => prev.filter(q => q.id !== q_id));
       }
@@ -132,54 +260,615 @@ export default function Dashboard({ isDark }: DashboardProps) {
     return logs.sessions.find((s: any) => s.id === selectedSessionId);
   };
 
+  // CRUD helpers to consolidate lists of items across profiles
+  const getUniqueProjects = () => {
+    if (!adminConfig) return [];
+    const projectMap: Record<string, any> = {};
+    (['general', 'data-engineer', 'ai-engineer'] as const).forEach(mode => {
+      if (adminConfig[mode]?.projects) {
+        adminConfig[mode].projects.forEach((proj: any) => {
+          projectMap[proj.id] = proj;
+        });
+      }
+    });
+    return Object.values(projectMap);
+  };
+
+  const getUniqueCertifications = () => {
+    if (!adminConfig) return [];
+    const certMap: Record<string, any> = {};
+    (['general', 'data-engineer', 'ai-engineer'] as const).forEach(mode => {
+      if (adminConfig[mode]?.certifications) {
+        adminConfig[mode].certifications.forEach((cert: any) => {
+          certMap[cert.id] = cert;
+        });
+      }
+    });
+    return Object.values(certMap);
+  };
+
+  const getUniqueBlogs = () => {
+    if (!adminConfig) return [];
+    const blogMap: Record<string, any> = {};
+    (['general', 'data-engineer', 'ai-engineer'] as const).forEach(mode => {
+      if (adminConfig[mode]?.blogs) {
+        adminConfig[mode].blogs.forEach((blog: any) => {
+          blogMap[blog.id] = blog;
+        });
+      }
+    });
+    return Object.values(blogMap);
+  };
+
+  // Project CRUD Actions
+  const handleAddProject = () => {
+    setEditingProject(null);
+    setProjTitle('');
+    setProjId('');
+    setProjDesc('');
+    setProjStatus('In Progress');
+    setProjFeatured(false);
+    setProjGithubUrl('');
+    setProjDemoUrl('');
+    setProjTechs('');
+    setProjMetrics([]);
+    setProjShowGeneral(true);
+    setProjShowData(false);
+    setProjShowAi(false);
+    setProjPriorityGeneral(1);
+    setProjPriorityData(1);
+    setProjPriorityAi(1);
+    setShowProjectForm(true);
+  };
+
+  const handleEditProject = (proj: any) => {
+    setEditingProject(proj);
+    setProjTitle(proj.title || '');
+    setProjId(proj.id || '');
+    setProjDesc(proj.description || '');
+    setProjStatus(proj.status || 'In Progress');
+    setProjFeatured(!!proj.featured);
+    setProjGithubUrl(proj.githubUrl || '');
+    setProjDemoUrl(proj.demoUrl || '');
+    setProjTechs(proj.technologies ? proj.technologies.join(', ') : '');
+    setProjMetrics(proj.metrics || []);
+
+    const showGeneral = !!adminConfig.general?.projects?.some((p: any) => p.id === proj.id);
+    const showData = !!adminConfig['data-engineer']?.projects?.some((p: any) => p.id === proj.id);
+    const showAi = !!adminConfig['ai-engineer']?.projects?.some((p: any) => p.id === proj.id);
+
+    setProjShowGeneral(showGeneral);
+    setProjShowData(showData);
+    setProjShowAi(showAi);
+
+    const priGeneral = adminConfig.general?.projects?.find((p: any) => p.id === proj.id)?.priority?.general ?? 1;
+    const priData = adminConfig['data-engineer']?.projects?.find((p: any) => p.id === proj.id)?.priority?.['data-engineer'] ?? 1;
+    const priAi = adminConfig['ai-engineer']?.projects?.find((p: any) => p.id === proj.id)?.priority?.['ai-engineer'] ?? 1;
+
+    setProjPriorityGeneral(priGeneral);
+    setProjPriorityData(priData);
+    setProjPriorityAi(priAi);
+
+    setShowProjectForm(true);
+  };
+
+  const handleSaveProject = () => {
+    if (!projTitle.trim()) return;
+    const cleanId = projId.trim() || projTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+    const updatedProj: any = {
+      id: cleanId,
+      title: projTitle.trim(),
+      description: projDesc.trim(),
+      status: projStatus,
+      featured: projFeatured,
+      githubUrl: projGithubUrl.trim(),
+      demoUrl: projDemoUrl.trim() || undefined,
+      technologies: projTechs.split(',').map(s => s.trim()).filter(Boolean),
+      metrics: projMetrics.filter(m => m.label.trim() && m.value.trim()),
+      priority: {
+        general: projShowGeneral ? Number(projPriorityGeneral) : 99,
+        'data-engineer': projShowData ? Number(projPriorityData) : 99,
+        'ai-engineer': projShowAi ? Number(projPriorityAi) : 99
+      }
+    };
+
+    setAdminConfig((prev: any) => {
+      const next = { ...prev };
+      const modes = ['general', 'data-engineer', 'ai-engineer'] as const;
+      const shows = [projShowGeneral, projShowData, projShowAi];
+      const priorities = [projPriorityGeneral, projPriorityData, projPriorityAi];
+
+      modes.forEach((mode, idx) => {
+        const isVisible = shows[idx];
+        let projectsList = next[mode]?.projects ? [...next[mode].projects] : [];
+        projectsList = projectsList.filter((p: any) => p.id !== cleanId);
+
+        if (isVisible) {
+          const modeSpecificProj = { 
+            ...updatedProj,
+            priority: {
+              ...updatedProj.priority,
+              [mode]: Number(priorities[idx])
+            }
+          };
+          projectsList.push(modeSpecificProj);
+          projectsList.sort((a: any, b: any) => (a.priority?.[mode] ?? 99) - (b.priority?.[mode] ?? 99));
+        }
+        
+        next[mode] = {
+          ...next[mode],
+          projects: projectsList
+        };
+      });
+
+      return next;
+    });
+
+    setShowProjectForm(false);
+    setEditingProject(null);
+  };
+
+  const handleDeleteProject = (projIdToDelete: string) => {
+    if (!window.confirm("Are you sure you want to delete this project from all profiles?")) return;
+    setAdminConfig((prev: any) => {
+      const next = { ...prev };
+      const modes = ['general', 'data-engineer', 'ai-engineer'] as const;
+      modes.forEach(mode => {
+        if (next[mode]?.projects) {
+          next[mode].projects = next[mode].projects.filter((p: any) => p.id !== projIdToDelete);
+        }
+      });
+      return next;
+    });
+  };
+
+  // Certification CRUD Actions
+  const handleAddCert = () => {
+    setEditingCert(null);
+    setCertTitle('');
+    setCertId('');
+    setCertIssuer('');
+    setCertCode('');
+    setCertDate('');
+    setCertCredUrl('');
+    setCertBadgeUrl('');
+    setCertFeatured(false);
+    setCertShowGeneral(true);
+    setCertShowData(false);
+    setCertShowAi(false);
+    setCertPriorityGeneral(1);
+    setCertPriorityData(1);
+    setCertPriorityAi(1);
+    setShowCertForm(true);
+  };
+
+  const handleEditCert = (cert: any) => {
+    setEditingCert(cert);
+    setCertTitle(cert.title || '');
+    setCertId(cert.id || '');
+    setCertIssuer(cert.issuer || '');
+    setCertCode(cert.code || '');
+    setCertDate(cert.date || '');
+    setCertCredUrl(cert.credentialUrl || '');
+    setCertBadgeUrl(cert.badgeUrl || '');
+    setCertFeatured(!!cert.featured);
+
+    const showGeneral = !!adminConfig.general?.certifications?.some((c: any) => c.id === cert.id);
+    const showData = !!adminConfig['data-engineer']?.certifications?.some((c: any) => c.id === cert.id);
+    const showAi = !!adminConfig['ai-engineer']?.certifications?.some((c: any) => c.id === cert.id);
+
+    setCertShowGeneral(showGeneral);
+    setCertShowData(showData);
+    setCertShowAi(showAi);
+
+    const priGeneral = adminConfig.general?.certifications?.find((c: any) => c.id === cert.id)?.priority?.general ?? 1;
+    const priData = adminConfig['data-engineer']?.certifications?.find((c: any) => c.id === cert.id)?.priority?.['data-engineer'] ?? 1;
+    const priAi = adminConfig['ai-engineer']?.certifications?.find((c: any) => c.id === cert.id)?.priority?.['ai-engineer'] ?? 1;
+
+    setCertPriorityGeneral(priGeneral);
+    setCertPriorityData(priData);
+    setCertPriorityAi(priAi);
+
+    setShowCertForm(true);
+  };
+
+  const handleSaveCert = () => {
+    if (!certTitle.trim()) return;
+    const cleanId = certId.trim() || certTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+    const updatedCert: any = {
+      id: cleanId,
+      title: certTitle.trim(),
+      issuer: certIssuer.trim(),
+      code: certCode.trim() || undefined,
+      date: certDate.trim(),
+      credentialUrl: certCredUrl.trim() || undefined,
+      badgeUrl: certBadgeUrl.trim() || undefined,
+      featured: certFeatured,
+      priority: {
+        general: certShowGeneral ? Number(certPriorityGeneral) : 99,
+        'data-engineer': certShowData ? Number(certPriorityData) : 99,
+        'ai-engineer': certShowAi ? Number(certPriorityAi) : 99
+      }
+    };
+
+    setAdminConfig((prev: any) => {
+      const next = { ...prev };
+      const modes = ['general', 'data-engineer', 'ai-engineer'] as const;
+      const shows = [certShowGeneral, certShowData, certShowAi];
+      const priorities = [certPriorityGeneral, certPriorityData, certPriorityAi];
+
+      modes.forEach((mode, idx) => {
+        const isVisible = shows[idx];
+        let certsList = next[mode]?.certifications ? [...next[mode].certifications] : [];
+        certsList = certsList.filter((c: any) => c.id !== cleanId);
+
+        if (isVisible) {
+          const modeSpecificCert = {
+            ...updatedCert,
+            priority: {
+              ...updatedCert.priority,
+              [mode]: Number(priorities[idx])
+            }
+          };
+          certsList.push(modeSpecificCert);
+          certsList.sort((a: any, b: any) => (a.priority?.[mode] ?? 99) - (b.priority?.[mode] ?? 99));
+        }
+
+        next[mode] = {
+          ...next[mode],
+          certifications: certsList
+        };
+      });
+      return next;
+    });
+
+    setShowCertForm(false);
+    setEditingCert(null);
+  };
+
+  const handleDeleteCert = (certIdToDelete: string) => {
+    if (!window.confirm("Are you sure you want to delete this certification from all profiles?")) return;
+    setAdminConfig((prev: any) => {
+      const next = { ...prev };
+      const modes = ['general', 'data-engineer', 'ai-engineer'] as const;
+      modes.forEach(mode => {
+        if (next[mode]?.certifications) {
+          next[mode].certifications = next[mode].certifications.filter((c: any) => c.id !== certIdToDelete);
+        }
+      });
+      return next;
+    });
+  };
+
+  // Blog CRUD Actions
+  const handleAddBlog = () => {
+    setEditingBlog(null);
+    setBlogTitle('');
+    setBlogId('');
+    setBlogExcerpt('');
+    setBlogReadTime('');
+    setBlogCategory('');
+    setBlogDate('');
+    setBlogUrl('');
+    setBlogShowGeneral(true);
+    setBlogShowData(false);
+    setBlogShowAi(false);
+    setBlogPriorityGeneral(1);
+    setBlogPriorityData(1);
+    setBlogPriorityAi(1);
+    setShowBlogForm(true);
+  };
+
+  const handleEditBlog = (blog: any) => {
+    setEditingBlog(blog);
+    setBlogTitle(blog.title || '');
+    setBlogId(blog.id || '');
+    setBlogExcerpt(blog.excerpt || '');
+    setBlogReadTime(blog.readTime || '');
+    setBlogCategory(blog.category || '');
+    setBlogDate(blog.date || '');
+    setBlogUrl(blog.url || '');
+
+    const showGeneral = !!adminConfig.general?.blogs?.some((b: any) => b.id === blog.id);
+    const showData = !!adminConfig['data-engineer']?.blogs?.some((b: any) => b.id === blog.id);
+    const showAi = !!adminConfig['ai-engineer']?.blogs?.some((b: any) => b.id === blog.id);
+
+    setBlogShowGeneral(showGeneral);
+    setBlogShowData(showData);
+    setBlogShowAi(showAi);
+
+    const priGeneral = adminConfig.general?.blogs?.find((b: any) => b.id === blog.id)?.priority?.general ?? 1;
+    const priData = adminConfig['data-engineer']?.blogs?.find((b: any) => b.id === blog.id)?.priority?.['data-engineer'] ?? 1;
+    const priAi = adminConfig['ai-engineer']?.blogs?.find((b: any) => b.id === blog.id)?.priority?.['ai-engineer'] ?? 1;
+
+    setBlogPriorityGeneral(priGeneral);
+    setBlogPriorityData(priData);
+    setBlogPriorityAi(priAi);
+
+    setShowBlogForm(true);
+  };
+
+  const handleSaveBlog = () => {
+    if (!blogTitle.trim()) return;
+    const cleanId = blogId.trim() || blogTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+    const updatedBlog: any = {
+      id: cleanId,
+      title: blogTitle.trim(),
+      excerpt: blogExcerpt.trim(),
+      readTime: blogReadTime.trim(),
+      category: blogCategory.trim(),
+      date: blogDate.trim(),
+      url: blogUrl.trim(),
+      priority: {
+        general: blogShowGeneral ? Number(blogPriorityGeneral) : 99,
+        'data-engineer': blogShowData ? Number(blogPriorityData) : 99,
+        'ai-engineer': blogShowAi ? Number(blogPriorityAi) : 99
+      }
+    };
+
+    setAdminConfig((prev: any) => {
+      const next = { ...prev };
+      const modes = ['general', 'data-engineer', 'ai-engineer'] as const;
+      const shows = [blogShowGeneral, blogShowData, blogShowAi];
+      const priorities = [blogPriorityGeneral, blogPriorityData, blogPriorityAi];
+
+      modes.forEach((mode, idx) => {
+        const isVisible = shows[idx];
+        let blogsList = next[mode]?.blogs ? [...next[mode].blogs] : [];
+        blogsList = blogsList.filter((b: any) => b.id !== cleanId);
+
+        if (isVisible) {
+          const modeSpecificBlog = {
+            ...updatedBlog,
+            priority: {
+              ...updatedBlog.priority,
+              [mode]: Number(priorities[idx])
+            }
+          };
+          blogsList.push(modeSpecificBlog);
+          blogsList.sort((a: any, b: any) => (a.priority?.[mode] ?? 99) - (b.priority?.[mode] ?? 99));
+        }
+
+        next[mode] = {
+          ...next[mode],
+          blogs: blogsList
+        };
+      });
+      return next;
+    });
+
+    setShowBlogForm(false);
+    setEditingBlog(null);
+  };
+
+  const handleDeleteBlog = (blogIdToDelete: string) => {
+    if (!window.confirm("Are you sure you want to delete this blog post from all profiles?")) return;
+    setAdminConfig((prev: any) => {
+      const next = { ...prev };
+      const modes = ['general', 'data-engineer', 'ai-engineer'] as const;
+      modes.forEach(mode => {
+        if (next[mode]?.blogs) {
+          next[mode].blogs = next[mode].blogs.filter((b: any) => b.id !== blogIdToDelete);
+        }
+      });
+      return next;
+    });
+  };
+
+  // Secure full screen login gate
+  if (!isUnlocked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center py-28 px-4 font-sans relative overflow-hidden">
+        {/* Soft Background Accents */}
+        <div className="absolute top-1/4 left-1/4 w-80 h-80 rounded-full bg-cyan-500/10 blur-3xl -z-10" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-indigo-500/10 blur-3xl -z-10" />
+        
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 15 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          className={`max-w-md w-full p-8 rounded-3xl border backdrop-blur-2xl ${
+            isDark ? 'bg-black/45 border-white/[0.08] text-white' : 'bg-white/80 border-slate-200 text-slate-900 shadow-xl'
+          }`}
+        >
+          <div className="text-center mb-8">
+            <div className={`mx-auto w-12 h-12 rounded-2xl flex items-center justify-center mb-4 ${
+              isDark ? 'bg-white/5 border border-white/10' : 'bg-slate-100 border border-slate-250'
+            }`}>
+              <Lock className="w-6 h-6 text-sky-400" />
+            </div>
+            <h2 className="text-2xl font-semibold tracking-tight">Admin Console Gate</h2>
+            <p className={`text-xs mt-2 font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              Verify credentials to unlock CRUD panel &amp; system telemetry.
+            </p>
+          </div>
+
+          {loginError && (
+            <div className="mb-6 p-3.5 rounded-xl border border-rose-500/25 bg-rose-500/10 text-rose-500 text-xs font-mono text-center flex items-center justify-center gap-2">
+              <AlertCircle className="w-4 h-4" />
+              <span>Authentication credentials invalid.</span>
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Username</label>
+              <input
+                type="text"
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter Username"
+                className={`w-full px-4 py-2.5 rounded-xl text-sm border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                  isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                }`}
+              />
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Password</label>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter Password"
+                className={`w-full px-4 py-2.5 rounded-xl text-sm border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                  isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                }`}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 mt-6 bg-gradient-to-tr from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-xs font-semibold uppercase tracking-wider rounded-xl cursor-pointer transition-all flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
+              ) : (
+                <>
+                  <Unlock className="w-3.5 h-3.5" />
+                  <span>Authenticate Session</span>
+                </>
+              )}
+            </button>
+          </form>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Once authenticated: Render Admin control console
   return (
-    <div className="min-h-screen py-28 px-4 md:px-12 max-w-7xl mx-auto w-full select-none font-sans">
+    <div className="min-h-screen py-28 px-4 md:px-12 max-w-7xl mx-auto w-full select-none font-sans relative">
       
+      {/* Dynamic Unsaved Changes Floating Bar */}
+      <AnimatePresence>
+        {hasUnsavedChanges() && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 max-w-lg w-[90%] z-50 p-4 rounded-2xl border border-amber-500/30 bg-amber-950/90 text-white flex items-center justify-between gap-4 shadow-2xl backdrop-blur-md"
+          >
+            <div className="flex items-center gap-3">
+              <Sparkles className="w-5 h-5 text-amber-400 shrink-0 animate-pulse" />
+              <div>
+                <p className="text-xs font-bold font-mono">Unpublished Draft Changes</p>
+                <p className="text-[10px] opacity-75 mt-0.5">Modifications exist in local cache. Save to publish and re-index RAG.</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => setAdminConfig(JSON.parse(JSON.stringify(originalConfig)))}
+                className="px-3 py-1.5 border border-white/20 hover:bg-white/10 rounded-lg text-[10px] font-semibold cursor-pointer"
+              >
+                Discard
+              </button>
+              <button
+                onClick={handlePublish}
+                disabled={publishing}
+                className="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-black text-[10px] font-bold rounded-lg cursor-pointer flex items-center gap-1"
+              >
+                {publishing ? (
+                  <Loader2 className="w-3 h-3 animate-spin text-black" />
+                ) : (
+                  <>
+                    <Save className="w-3 h-3" />
+                    <span>Publish</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Dynamic Publish Success Notification */}
+      <AnimatePresence>
+        {publishSuccess && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 max-w-md z-50 p-4 rounded-2xl border border-emerald-500/30 bg-emerald-950/95 text-white flex items-center gap-3 shadow-2xl backdrop-blur-md"
+          >
+            <Check className="w-5 h-5 text-emerald-400 shrink-0" />
+            <div>
+              <p className="text-xs font-bold font-mono">Configuration Published</p>
+              <p className="text-[10px] opacity-75 mt-0.5">Updates are live. RAG semantic re-indexing is running in the background.</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* 1. HERO HEADER */}
       <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="max-w-2xl">
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-bold tracking-[0.2em] uppercase w-fit mb-6 ${
-              isDark 
-                ? 'bg-[#007AFF15] border-[#007AFF30] text-[#007AFF]' 
-                : 'bg-[#007AFF10] border-[#007AFF20] text-[#007AFF]'
-            }`}
-          >
-            <BarChart3 className="w-3.5 h-3.5" />
-            <span>OPERATIONAL TELEMETRY</span>
-          </motion.div>
+          <div className="flex items-center gap-4">
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-bold tracking-[0.2em] uppercase w-fit ${
+                isDark 
+                  ? 'bg-[#007AFF15] border-[#007AFF30] text-[#007AFF]' 
+                  : 'bg-[#007AFF10] border-[#007AFF20] text-[#007AFF]'
+              }`}
+            >
+              <BarChart3 className="w-3.5 h-3.5" />
+              <span>CONTROL CONSOLE</span>
+            </motion.div>
+            
+            <button
+              onClick={handleLogout}
+              className="text-[10px] font-bold font-mono text-rose-500 hover:text-rose-400 flex items-center gap-1 cursor-pointer shrink-0 uppercase tracking-wider"
+            >
+              <LogOut className="w-3 h-3" />
+              <span>Logout</span>
+            </button>
+          </div>
 
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-5xl font-semibold tracking-tight leading-none mb-4"
+            className="text-4xl md:text-5xl font-semibold tracking-tight leading-none mb-4 mt-6"
           >
-            System &amp; RAG Insights<br />
+            System &amp; CRUD Dashboard<br />
             <span className={`text-transparent bg-clip-text bg-gradient-to-r ${
               isDark 
                 ? 'from-white via-white/80 to-white/40' 
                 : 'from-neutral-950 via-neutral-900 to-neutral-500'
-            } italic font-serif font-medium`}>Chatbot Analytics &amp; Context Retrieval</span>
+            } italic font-serif font-medium`}>Dynamic Portfolio Configuration Manager</span>
           </motion.h1>
         </div>
 
         {/* Tab Selection Glassmorphic Control */}
-        <div className={`p-1 rounded-2xl border flex items-center gap-1 backdrop-blur-xl ${
+        <div className={`p-1 rounded-2xl border flex items-center gap-1 backdrop-blur-xl overflow-x-auto max-w-full scrollbar-none shrink-0 ${
           isDark ? 'bg-white/5 border-white/[0.08]' : 'bg-slate-100 border-slate-200'
         }`}>
-          {(['analytics', 'rag', 'unanswered'] as const).map((tab) => {
-            const isActive = activeTab === tab;
-            const label = 
-              tab === 'analytics' ? 'Interaction Analytics' : 
-              tab === 'rag' ? 'RAG Semantic Explorer' : 
-              'Unresolved Queries';
+          {([
+            { id: 'analytics', label: 'Analytics' },
+            { id: 'rag', label: 'RAG Explorer' },
+            { id: 'unanswered', label: 'Queries' },
+            { id: 'config', label: 'Hero/Home' },
+            { id: 'projects', label: 'Projects' },
+            { id: 'certifications', label: 'Certs' },
+            { id: 'blogs', label: 'Blogs' }
+          ] as const).map((tab) => {
+            const isActive = activeTab === tab.id;
             return (
               <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`relative px-4 py-2 rounded-xl text-xs font-mono font-medium tracking-wide transition-all duration-300 cursor-pointer ${
+                key={tab.id}
+                onClick={() => {
+                  setShowProjectForm(false);
+                  setShowCertForm(false);
+                  setShowBlogForm(false);
+                  setActiveTab(tab.id);
+                }}
+                className={`relative px-3.5 py-2 rounded-xl text-[10px] md:text-xs font-mono font-medium tracking-wide transition-all duration-300 cursor-pointer shrink-0 ${
                   isActive 
                     ? isDark ? 'text-black' : 'text-white'
                     : isDark ? 'text-white/60 hover:text-white' : 'text-neutral-600 hover:text-neutral-950'
@@ -194,7 +883,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                     transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                   />
                 )}
-                <span>{label}</span>
+                <span>{tab.label}</span>
               </button>
             );
           })}
@@ -205,7 +894,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
         <div className="mb-8 p-4 rounded-xl border border-rose-500/25 bg-rose-500/10 text-rose-500 flex items-center gap-3 text-xs md:text-sm font-mono">
           <AlertCircle className="w-5 h-5 shrink-0" />
           <span>{error}</span>
-          <button onClick={() => fetchData(passcode)} className="underline ml-auto font-bold hover:text-rose-400">Retry Sync</button>
+          <button onClick={() => fetchData()} className="underline ml-auto font-bold hover:text-rose-400">Retry Sync</button>
         </div>
       )}
 
@@ -224,7 +913,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
               exit={{ opacity: 0, y: -15 }}
               className="space-y-10"
             >
-              {/* 2. STATS GRID BENTO LAYOUT */}
+              {/* STATS Bento GRID */}
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 {/* Session Card */}
                 <div className={`p-4 rounded-2xl border flex flex-col justify-between group transition-all duration-300 ${
@@ -254,7 +943,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                   </div>
                 </div>
 
-                {/* Helpful percentage */}
+                {/* Helpful ratio */}
                 <div className={`p-4 rounded-2xl border flex flex-col justify-between transition-all duration-300 ${
                   isDark ? 'bg-slate-950/45 border-slate-900 hover:border-slate-800' : 'bg-white border-slate-200 hover:shadow-md'
                 }`}>
@@ -272,7 +961,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                   </div>
                 </div>
 
-                {/* Average Latency */}
+                {/* Latency */}
                 <div className={`p-4 rounded-2xl border flex flex-col justify-between transition-all duration-300 ${
                   isDark ? 'bg-slate-950/45 border-slate-900 hover:border-slate-800' : 'bg-white border-slate-200 hover:shadow-md'
                 }`}>
@@ -286,9 +975,9 @@ export default function Dashboard({ isDark }: DashboardProps) {
                   </div>
                 </div>
 
-                {/* Tokens Used */}
+                {/* Telemetry Tokens */}
                 <div className={`p-4 rounded-2xl border flex flex-col justify-between transition-all duration-300 ${
-                  isDark ? 'bg-slate-950/45 border-slate-900 hover:border-slate-800' : 'bg-white border-slate-200 hover:shadow-md'
+                  isDark ? 'bg-slate-950/45 border-slate-900 hover:border-slate-850' : 'bg-white border-slate-200 hover:shadow-md'
                 }`}>
                   <div className="flex items-center justify-between text-slate-400 mb-4">
                     <Cpu className="w-5 h-5 text-purple-400" />
@@ -298,105 +987,45 @@ export default function Dashboard({ isDark }: DashboardProps) {
                     <h2 className="text-xl md:text-2xl font-semibold tracking-tight truncate">
                       {stats?.tokens_used?.total ? Math.round(stats.tokens_used.total / 1000) : 0}k
                     </h2>
-                    <p className="text-[10px] text-slate-400 mt-1.5 uppercase tracking-wider font-mono font-semibold">Total tokens processed</p>
+                    <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-mono font-semibold">
+                      Tokens ({stats?.tokens_used?.input ? Math.round(stats.tokens_used.input / 1000) : 0}k in / {stats?.tokens_used?.output ? Math.round(stats.tokens_used.output / 1000) : 0}k out)
+                    </p>
                   </div>
                 </div>
 
-                {/* Cost Card */}
+                {/* Estimated Cost */}
                 <div className={`p-4 rounded-2xl border flex flex-col justify-between transition-all duration-300 ${
                   isDark ? 'bg-slate-950/45 border-slate-900 hover:border-slate-800' : 'bg-white border-slate-200 hover:shadow-md'
                 }`}>
                   <div className="flex items-center justify-between text-slate-400 mb-4">
                     <DollarSign className="w-5 h-5 text-pink-500" />
-                    <span className="text-[10px] font-mono opacity-50">API BILLING</span>
+                    <span className="text-[10px] font-mono opacity-50">COST</span>
                   </div>
                   <div>
-                    <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-emerald-500">
-                      ${stats?.estimated_cost_usd ? stats.estimated_cost_usd.toFixed(4) : "0.0000"}
+                    <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-400">
+                      ${stats?.estimated_cost_usd ? stats.estimated_cost_usd.toFixed(4) : "0.00"}
                     </h2>
-                    <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-mono font-semibold">Estimated cost</p>
+                    <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-mono font-semibold">Gemini API spends</p>
                   </div>
                 </div>
               </div>
 
-              {/* 3. CHARTS BREAKDOWN */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Chatbot Mode Distribution */}
-                <div className={`p-6 rounded-2xl border ${
-                  isDark ? 'bg-slate-950/40 border-slate-900' : 'bg-white border-slate-200'
+              {/* Chat conversations and outreach gateway */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                {/* Conversations list (Left - 5 cols) */}
+                <div className={`lg:col-span-5 p-6 rounded-2xl border flex flex-col h-[550px] overflow-hidden ${
+                  isDark ? 'bg-slate-950/40 border-slate-900' : 'bg-white border-slate-200 shadow-sm'
                 }`}>
-                  <h3 className="text-sm font-semibold uppercase tracking-wider font-mono opacity-60 mb-6">Chat Session Toggle Distribution</h3>
-                  <div className="space-y-4">
-                    {['general', 'data-engineer', 'ai-engineer'].map((mode) => {
-                      const count = stats?.mode_distribution?.[mode] || 0;
-                      const total = stats?.total_sessions || 1;
-                      const pct = Math.round((count / total) * 100);
-                      const labels: any = {
-                        general: { label: "General AI/Data Portfolio", color: "bg-cyan-400" },
-                        "data-engineer": { label: "Data Engineer Resume Mode", color: "bg-indigo-500" },
-                        "ai-engineer": { label: "Gen AI Engineer Resume Mode", color: "bg-purple-500" }
-                      };
-                      return (
-                        <div key={mode} className="space-y-1.5">
-                          <div className="flex justify-between text-xs font-mono">
-                            <span className="text-slate-300 font-semibold">{labels[mode].label}</span>
-                            <span>{count} chats ({pct}%)</span>
-                          </div>
-                          <div className={`h-2 w-full rounded-full overflow-hidden ${isDark ? 'bg-slate-900' : 'bg-slate-100'}`}>
-                            <div className={`h-full rounded-full ${labels[mode].color}`} style={{ width: `${pct}%` }} />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Recruiter Outreach Intent Distribution */}
-                <div className={`p-6 rounded-2xl border ${
-                  isDark ? 'bg-slate-950/40 border-slate-900' : 'bg-white border-slate-200'
-                }`}>
-                  <h3 className="text-sm font-semibold uppercase tracking-wider font-mono opacity-60 mb-6">AI-Categorized Outreach Intent</h3>
-                  <div className="space-y-4">
-                    {['Hiring Inquiry', 'Collaboration', 'General Question', 'Other'].map((intent) => {
-                      const count = stats?.intent_distribution?.[intent] || 0;
-                      const total = stats?.total_leads || 1;
-                      const pct = Math.round((count / total) * 100);
-                      const colors: any = {
-                        "Hiring Inquiry": "bg-emerald-500",
-                        "Collaboration": "bg-amber-500",
-                        "General Question": "bg-blue-500",
-                        "Other": "bg-slate-500"
-                      };
-                      return (
-                        <div key={intent} className="space-y-1.5">
-                          <div className="flex justify-between text-xs font-mono">
-                            <span className="text-slate-300 font-semibold">{intent}</span>
-                            <span>{count} leads ({pct}%)</span>
-                          </div>
-                          <div className={`h-2 w-full rounded-full overflow-hidden ${isDark ? 'bg-slate-900' : 'bg-slate-100'}`}>
-                            <div className={`h-full rounded-full ${colors[intent]}`} style={{ width: `${total > 0 ? pct : 0}%` }} />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-
-              {/* 4. CONVERSATION LOGS & OUTBOX LEADS PANEL */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                
-                {/* 4.1 Chat Sessions Column (Left - 5 cols) */}
-                <div className={`lg:col-span-5 p-6 rounded-2xl border flex flex-col h-[550px] ${
-                  isDark ? 'bg-slate-950/40 border-slate-900' : 'bg-white border-slate-200'
-                }`}>
-                  <h3 className="text-sm font-semibold uppercase tracking-wider font-mono opacity-60 mb-4">Live Conversation Log Streams</h3>
-                  <div className="flex-grow overflow-y-auto space-y-2 custom-scrollbar pr-1">
-                    {logs.sessions && logs.sessions.length > 0 ? (
+                  <h3 className="text-sm font-semibold uppercase tracking-wider font-mono opacity-60 mb-4 flex items-center gap-2">
+                    <Users className="w-4 h-4 text-cyan-400" />
+                    <span>Chat Streams</span>
+                  </h3>
+                  
+                  <div className="flex-grow overflow-y-auto space-y-3.5 custom-scrollbar pr-1">
+                    {logs.sessions.length > 0 ? (
                       logs.sessions.map((session: any) => {
-                        const isSelected = selectedSessionId === session.id;
-                        const assistantMsgs = session.messages.filter((m: any) => m.role === 'model');
-                        const ratingAvg = assistantMsgs.filter((m: any) => m.rating === 1).length;
+                        const isSelected = session.id === selectedSessionId;
+                        const ratingAvg = session.messages.filter((m: any) => m.rating === 1).length;
                         return (
                           <div
                             key={session.id}
@@ -442,7 +1071,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                   </div>
                 </div>
 
-                {/* 4.2 Chat Conversation Details (Right - 7 cols) */}
+                {/* Chat transcript details (Right - 7 cols) */}
                 <div className={`lg:col-span-7 p-6 rounded-2xl border flex flex-col h-[550px] relative ${
                   isDark ? 'bg-slate-950/40 border-slate-900' : 'bg-white border-slate-200'
                 }`}>
@@ -464,7 +1093,6 @@ export default function Dashboard({ isDark }: DashboardProps) {
                             </div>
                           </div>
                           
-                          {/* Display RAG metadata for Assistant responses */}
                           {m.role === 'model' && (
                             <div className="pl-2 flex flex-col gap-1 text-[9px] font-mono opacity-60">
                               <div className="flex flex-wrap gap-2 text-[9px]">
@@ -502,103 +1130,55 @@ export default function Dashboard({ isDark }: DashboardProps) {
                 </div>
               </div>
 
-              {/* 5. OUTBOX LEADS PANEL (PASSCODE MASKED) */}
+              {/* Outreach submissions logs */}
               <div className={`p-6 rounded-2xl border space-y-6 ${
                 isDark ? 'bg-slate-950/40 border-slate-900' : 'bg-white border-slate-200'
               }`}>
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800/40 pb-4">
-                  <div>
-                    <h3 className="text-sm font-semibold uppercase tracking-wider font-mono opacity-60">Outbox Recruiter Outreach Gateway</h3>
-                    <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Contact form submissions catalogued by intent category.</p>
-                  </div>
-                  
-                  {/* Password entry widget */}
-                  <form onSubmit={handleUnlock} className="flex items-center gap-2">
-                    <div className="relative">
-                      <input
-                        type="password"
-                        value={passcode}
-                        onChange={(e) => setPasscode(e.target.value)}
-                        placeholder="Enter Developer Code"
-                        disabled={isUnlocked}
-                        className={`pl-8 pr-3 py-1.5 text-xs font-mono rounded-lg border focus:outline-none focus:ring-1 focus:ring-sky-500 ${
-                          isUnlocked 
-                            ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-                            : passcodeError 
-                              ? 'bg-rose-500/10 border-rose-500/30 text-rose-500 animate-shake'
-                              : isDark 
-                                ? 'bg-slate-900 border-slate-800 text-white' 
-                                : 'bg-white border-slate-250 text-slate-900'
-                        }`}
-                      />
-                      {isUnlocked ? (
-                        <Unlock className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-emerald-400" />
-                      ) : (
-                        <Lock className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-500" />
-                      )}
-                    </div>
-                    {!isUnlocked && (
-                      <button
-                        type="submit"
-                        className="px-3 py-1.5 bg-gradient-to-tr from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-xs font-medium rounded-lg cursor-pointer transition-all"
-                      >
-                        Decrypt Leads
-                      </button>
-                    )}
-                  </form>
+                <div className="border-b border-slate-850 pb-4">
+                  <h3 className="text-sm font-semibold uppercase tracking-wider font-mono opacity-60">Outbox Recruiter Outreach Gateway</h3>
+                  <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Contact form submissions catalogued by intent category.</p>
                 </div>
 
-                {/* Leads lists */}
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs font-mono border-collapse">
-                    <thead>
-                      <tr className={`border-b border-slate-800/40 text-[10px] uppercase tracking-wider opacity-60 ${
-                        isDark ? 'text-slate-300' : 'text-slate-700'
-                      }`}>
-                        <th className="py-3 px-2">Timestamp</th>
-                        <th className="py-3 px-2">Sender Name</th>
-                        <th className="py-3 px-2">Email Address</th>
-                        <th className="py-3 px-2">AI Intent Routing</th>
-                        <th className="py-3 px-2">Subject / Message</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-800/20">
-                      {logs.leads && logs.leads.length > 0 ? (
-                        logs.leads.map((lead: any) => {
-                          const intentColors: any = {
-                            "Hiring Inquiry": "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-                            "Collaboration": "bg-amber-500/10 text-amber-400 border border-amber-500/20",
-                            "General Question": "bg-blue-500/10 text-blue-400 border border-blue-500/20",
-                            "Other": "bg-slate-500/10 text-slate-400 border border-slate-500/20"
-                          };
-                          return (
-                            <tr key={lead.id} className="hover:bg-slate-900/10 transition-colors">
-                              <td className="py-3 px-2 opacity-60 whitespace-nowrap">{formatTime(lead.created_at)}</td>
-                              <td className="py-3 px-2 font-semibold text-slate-200">{lead.name}</td>
-                              <td className="py-3 px-2 text-slate-350">{lead.email}</td>
-                              <td className="py-3 px-2 whitespace-nowrap">
-                                <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${intentColors[lead.intent_category] || intentColors["Other"]}`}>
-                                  {lead.intent_category}
-                                </span>
-                              </td>
-                              <td className="py-3 px-2 max-w-xs md:max-w-md">
-                                <div className="font-semibold text-slate-250 truncate mb-0.5">{lead.subject}</div>
-                                <div className={`text-[10px] whitespace-pre-wrap leading-relaxed ${isDark ? 'text-slate-450' : 'text-slate-550'}`}>
-                                  {lead.message}
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      ) : (
-                        <tr>
-                          <td colSpan={5} className="py-8 text-center opacity-50">
-                            No outreach submissions received yet.
-                          </td>
+                  {logs.leads.length > 0 ? (
+                    <table className="w-full text-left border-collapse text-xs">
+                      <thead>
+                        <tr className="opacity-50 border-b border-slate-900/40 font-mono">
+                          <th className="pb-3 pr-4 font-normal">SENDER</th>
+                          <th className="pb-3 pr-4 font-normal">EMAIL</th>
+                          <th className="pb-3 pr-4 font-normal">INTENT</th>
+                          <th className="pb-3 pr-4 font-normal">SUBJECT &amp; MESSAGE</th>
+                          <th className="pb-3 font-normal">TIMESTAMP</th>
                         </tr>
-                      )}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {logs.leads.map((l: any) => (
+                          <tr key={l.id} className="border-b border-slate-900/30 hover:bg-white/5 transition-colors">
+                            <td className="py-4 pr-4 font-semibold">{l.name}</td>
+                            <td className="py-4 pr-4 font-mono">{l.email}</td>
+                            <td className="py-4 pr-4">
+                              <span className={`px-2 py-0.5 rounded text-[9px] font-mono font-bold tracking-wider ${
+                                l.intent_category === 'Hiring Inquiry' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                                l.intent_category === 'Collaboration' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' :
+                                'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                              }`}>
+                                {l.intent_category}
+                              </span>
+                            </td>
+                            <td className="py-4 pr-4 max-w-sm">
+                              <p className="font-semibold text-slate-200">{l.subject}</p>
+                              <p className="opacity-60 mt-1 whitespace-pre-wrap">{l.message}</p>
+                            </td>
+                            <td className="py-4 font-mono opacity-50">{formatTime(l.created_at)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <div className="py-8 text-center text-xs opacity-50 font-mono">
+                      No outreach inquiries received yet.
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -610,107 +1190,84 @@ export default function Dashboard({ isDark }: DashboardProps) {
               exit={{ opacity: 0, y: -15 }}
               className="space-y-8"
             >
-              {/* RAG PLAYGROUND SEARCH BAR */}
-              <div className={`p-6 rounded-2xl border text-center space-y-6 ${
-                isDark ? 'bg-slate-950/40 border-slate-900 shadow-xl shadow-cyan-950/5' : 'bg-white border-slate-200 shadow-md'
+              {/* RAG playground */}
+              <div className={`p-6 rounded-2xl border space-y-6 ${
+                isDark ? 'bg-slate-950/45 border-slate-900' : 'bg-white border-slate-200'
               }`}>
-                <div className="max-w-2xl mx-auto space-y-3">
-                  <h3 className="text-lg font-semibold tracking-tight">Dynamic RAG Retrieval Sandbox</h3>
-                  <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                    Test how the AI vector indexing engine works. Type any query (e.g. "what is his experience with PySpark?") 
-                    to compute live cosine similarity embeddings and retrieve matching database context chunks.
-                  </p>
+                <div>
+                  <h3 className="text-sm font-semibold uppercase tracking-wider font-mono opacity-60">RAG Semantic Search Playground</h3>
+                  <p className="text-xs opacity-60 mt-1">Queries the cached vector chunks directly to inspect matching coefficients.</p>
                 </div>
 
-                <form onSubmit={handleRagSearch} className="max-w-2xl mx-auto flex gap-2">
+                <form onSubmit={handleRagSearch} className="flex gap-3">
                   <div className="relative flex-grow">
+                    <Search className="w-4 h-4 absolute left-3 top-3.5 text-slate-500" />
                     <input
                       type="text"
                       value={ragQuery}
                       onChange={(e) => setRagQuery(e.target.value)}
-                      placeholder="Type a test query (e.g. Kubernetes projects, Education, Python experience...)"
-                      className={`w-full pl-10 pr-4 py-2.5 text-xs md:text-sm rounded-xl border focus:outline-none focus:ring-1 focus:ring-sky-500 ${
-                        isDark 
-                          ? 'bg-slate-900 border-slate-800 text-white placeholder-slate-500' 
-                          : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400'
+                      placeholder="Query vector index (e.g. 'Do you know Python?')"
+                      className={`w-full pl-9 pr-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 ${
+                        isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-slate-50 border-slate-250 text-slate-900'
                       }`}
                     />
-                    <Search className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-500" />
                   </div>
                   <button
                     type="submit"
-                    disabled={!ragQuery.trim() || ragSearching}
-                    className="px-5 py-2.5 bg-gradient-to-tr from-[#00E5FF] to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white text-xs md:text-sm font-semibold rounded-xl cursor-pointer transition-all shadow-md shadow-cyan-500/10 flex items-center gap-1.5"
+                    disabled={ragSearching}
+                    className="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-sky-600 hover:from-cyan-400 hover:to-sky-500 text-white text-xs font-semibold rounded-xl cursor-pointer transition-all flex items-center gap-1.5 shrink-0"
                   >
                     {ragSearching ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Searching...</span>
-                      </>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
                     ) : (
                       <>
-                        <Sparkles className="w-4 h-4" />
-                        <span>Query Embeddings</span>
+                        <Cpu className="w-3.5 h-3.5" />
+                        <span>Search Chunks</span>
                       </>
                     )}
                   </button>
                 </form>
-              </div>
 
-              {/* RAG SEARCH RESULTS GRID */}
-              <div className="space-y-4">
-                <h4 className="text-xs uppercase tracking-wider font-semibold opacity-60 flex items-center gap-1.5 font-mono px-1">
-                  <Database className="w-4 h-4 text-cyan-400" />
-                  <span>Semantic Database Matches</span>
-                </h4>
-                
                 {ragResults.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {ragResults.map((result: any, idx: number) => {
+                    {ragResults.map((result: any, index: number) => {
                       const scorePct = Math.round(result.similarity * 100);
                       return (
                         <motion.div
-                          key={idx}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: idx * 0.05 }}
-                          className={`p-5 rounded-2xl border flex flex-col justify-between space-y-4 hover:border-slate-700/80 transition-all ${
-                            isDark ? 'bg-slate-950/40 border-slate-900 shadow-md shadow-cyan-950/5' : 'bg-white border-slate-200 shadow-sm'
+                          key={index}
+                          initial={{ opacity: 0, scale: 0.98 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: index * 0.04 }}
+                          className={`p-4 rounded-xl border flex flex-col gap-3 transition-colors ${
+                            isDark ? 'bg-slate-950/70 border-slate-900/60 hover:border-slate-850' : 'bg-white border-slate-200'
                           }`}
                         >
-                          <div className="space-y-3">
-                            <div className="flex justify-between items-center gap-2">
-                              <div className="flex items-center gap-2 truncate">
-                                <span className={`px-2 py-0.5 rounded font-mono text-[9px] font-bold shrink-0 ${
-                                  result.source_file.endsWith('.json') 
-                                    ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' 
-                                    : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
-                                }`}>
-                                  {result.source_file}
-                                </span>
-                                <span className="font-semibold text-xs md:text-sm text-slate-200 truncate">{result.chunk_title}</span>
-                              </div>
-                              <span className={`text-xs font-bold font-mono shrink-0 ${
-                                scorePct >= 80 ? 'text-emerald-400' : scorePct >= 65 ? 'text-amber-400' : 'text-slate-450'
-                              }`}>
-                                {scorePct}% Cosine Match
+                          <div className="flex justify-between items-start gap-2">
+                            <div>
+                              <span className="text-[10px] font-mono opacity-50 px-2 py-0.5 rounded bg-slate-900/40 border border-slate-800 uppercase font-bold tracking-wider">
+                                {result.source_file}
                               </span>
+                              <h4 className="text-xs font-bold mt-2 truncate max-w-[250px]">{result.chunk_title}</h4>
                             </div>
-                            
-                            <div className={`relative h-1 w-full rounded-full overflow-hidden ${
-                              isDark ? 'bg-slate-900' : 'bg-slate-100'
-                            }`}>
-                              <div
-                                className={`absolute left-0 top-0 h-full rounded-full ${
-                                  scorePct >= 80 ? 'bg-emerald-400' : scorePct >= 65 ? 'bg-amber-400' : 'bg-slate-400'
-                                }`}
-                                style={{ width: `${scorePct}%` }}
-                              />
+                            <div className="text-right shrink-0">
+                              <span className={`text-xs font-bold ${
+                                scorePct >= 80 ? 'text-emerald-400' : scorePct >= 65 ? 'text-amber-400' : 'text-slate-400'
+                              }`}>{scorePct}% Match</span>
+                              <div className={`relative h-1 w-full rounded-full overflow-hidden mt-1 ${
+                                isDark ? 'bg-slate-900' : 'bg-slate-100'
+                              }`}>
+                                <div
+                                  className={`absolute left-0 top-0 h-full rounded-full ${
+                                    scorePct >= 80 ? 'bg-emerald-400' : scorePct >= 65 ? 'bg-amber-400' : 'bg-slate-400'
+                                  }`}
+                                  style={{ width: `${scorePct}%` }}
+                                />
+                              </div>
                             </div>
                           </div>
 
                           <div className={`p-4 rounded-xl font-mono text-[10px] md:text-xs border whitespace-pre-wrap overflow-x-auto leading-relaxed max-h-48 custom-scrollbar ${
-                            isDark ? 'bg-[#060608]/80 border-slate-900/60 text-slate-350' : 'bg-slate-50 border-slate-150 text-slate-650'
+                            isDark ? 'bg-[#060608]/80 border-slate-900/60 text-slate-305' : 'bg-slate-50 border-slate-150 text-slate-650'
                           }`}>
                             {result.content}
                           </div>
@@ -730,7 +1287,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                 )}
               </div>
             </motion.div>
-          ) : (
+          ) : activeTab === 'unanswered' ? (
             <motion.div
               key="unanswered-tab"
               initial={{ opacity: 0, y: 15 }}
@@ -738,7 +1295,6 @@ export default function Dashboard({ isDark }: DashboardProps) {
               exit={{ opacity: 0, y: -15 }}
               className="space-y-6"
             >
-              {/* Unanswered Queries Telemetry Panel */}
               <div className="space-y-4">
                 <div className="mb-6 px-1">
                   <h3 className="text-lg font-semibold tracking-tight">Unresolved Recruiter &amp; Visitor Queries</h3>
@@ -747,14 +1303,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                   </p>
                 </div>
 
-                {!isUnlocked ? (
-                  <div className={`p-8 rounded-2xl border text-center font-mono text-xs ${
-                    isDark ? 'bg-slate-950/45 border-slate-900 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'
-                  }`}>
-                    <Lock className="w-5 h-5 mx-auto mb-2 text-rose-450" />
-                    <p>Enter your developer passcode at the top to decrypt unresolved queries.</p>
-                  </div>
-                ) : unanswered.length > 0 ? (
+                {unanswered.length > 0 ? (
                   <div className="grid grid-cols-1 gap-4">
                     {unanswered.map((q: any, idx: number) => (
                       <motion.div
@@ -776,7 +1325,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                             "{q.question}"
                           </h4>
                           <div className="flex items-center gap-3 text-[10px] opacity-50 font-mono mt-1">
-                            <span>Session ID: {q.session_id.substring(0, 8)}...</span>
+                            <span>Session ID: {q.session_id ? q.session_id.substring(0, 8) : "none"}...</span>
                             <span>&bull;</span>
                             <span>{formatTime(q.created_at)}</span>
                           </div>
@@ -806,6 +1355,1186 @@ export default function Dashboard({ isDark }: DashboardProps) {
                   </div>
                 )}
               </div>
+            </motion.div>
+          ) : activeTab === 'config' ? (
+            <motion.div
+              key="config-tab"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              className="space-y-6"
+            >
+              <div className={`p-6 rounded-2xl border space-y-6 ${
+                isDark ? 'bg-slate-950/45 border-slate-900' : 'bg-white border-slate-200'
+              }`}>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-900/30">
+                  <div>
+                    <h3 className="text-sm font-semibold uppercase tracking-wider font-mono opacity-60">Hero Configuration &amp; Home Page Editor</h3>
+                    <p className="text-xs opacity-60 mt-1">Configure profile-specific branding headlines and overall philosophy statement.</p>
+                  </div>
+
+                  {/* Profile Mode Selector */}
+                  <select
+                    value={selectedHeroMode}
+                    onChange={(e) => setSelectedHeroMode(e.target.value as ProfileMode)}
+                    className={`px-3 py-1.5 text-xs rounded-xl border font-mono font-bold focus:outline-none ${
+                      isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
+                    }`}
+                  >
+                    <option value="general">GENERAL PROFILE</option>
+                    <option value="data-engineer">DATA ENGINEER PROFILE</option>
+                    <option value="ai-engineer">AI ENGINEER PROFILE</option>
+                  </select>
+                </div>
+
+                {adminConfig && adminConfig[selectedHeroMode] ? (
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Badge Text</label>
+                        <input
+                          type="text"
+                          value={adminConfig[selectedHeroMode].hero?.badge || ''}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setAdminConfig((prev: any) => {
+                              const next = { ...prev };
+                              next[selectedHeroMode].hero.badge = val;
+                              return next;
+                            });
+                          }}
+                          className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                            isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          }`}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Full Title Name</label>
+                        <input
+                          type="text"
+                          value={adminConfig[selectedHeroMode].hero?.titleName || ''}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setAdminConfig((prev: any) => {
+                              const next = { ...prev };
+                              next[selectedHeroMode].hero.titleName = val;
+                              return next;
+                            });
+                          }}
+                          className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                            isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          }`}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Main Title Headline</label>
+                      <input
+                        type="text"
+                        value={adminConfig[selectedHeroMode].hero?.headline || ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setAdminConfig((prev: any) => {
+                            const next = { ...prev };
+                            next[selectedHeroMode].hero.headline = val;
+                            return next;
+                          });
+                        }}
+                        className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                          isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Hero Subtext Description</label>
+                      <textarea
+                        rows={3}
+                        value={adminConfig[selectedHeroMode].hero?.subtext || ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setAdminConfig((prev: any) => {
+                            const next = { ...prev };
+                            next[selectedHeroMode].hero.subtext = val;
+                            return next;
+                            });
+                        }}
+                        className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                          isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Trust Row Tags (Comma-separated)</label>
+                      <input
+                        type="text"
+                        value={adminConfig[selectedHeroMode].hero?.trustRow ? adminConfig[selectedHeroMode].hero.trustRow.join(', ') : ''}
+                        onChange={(e) => {
+                          const val = e.target.value.split(',').map(s => s.trim());
+                          setAdminConfig((prev: any) => {
+                            const next = { ...prev };
+                            next[selectedHeroMode].hero.trustRow = val;
+                            return next;
+                          });
+                        }}
+                        className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                          isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                        }`}
+                      />
+                      {/* Tags Preview */}
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {adminConfig[selectedHeroMode].hero?.trustRow?.map((tag: string, i: number) => tag && (
+                          <span key={i} className="text-[9px] font-mono px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">{tag}</span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Philosophy Statement</label>
+                      <textarea
+                        rows={4}
+                        value={adminConfig[selectedHeroMode].philosophy || ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setAdminConfig((prev: any) => {
+                            const next = { ...prev };
+                            next[selectedHeroMode].philosophy = val;
+                            return next;
+                          });
+                        }}
+                        className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                          isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                        }`}
+                      />
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </motion.div>
+          ) : activeTab === 'projects' ? (
+            <motion.div
+              key="projects-tab"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              className="space-y-6"
+            >
+              {showProjectForm ? (
+                <div className={`p-6 rounded-2xl border space-y-6 ${
+                  isDark ? 'bg-slate-950/45 border-slate-900' : 'bg-white border-slate-200'
+                }`}>
+                  <div className="flex items-center justify-between pb-4 border-b border-slate-900/30">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider font-mono opacity-60">
+                      {editingProject ? `Edit Project: ${projTitle}` : 'Create New Project'}
+                    </h3>
+                    <button
+                      onClick={() => setShowProjectForm(false)}
+                      className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[10px] font-mono hover:bg-white/10 cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Project Title</label>
+                        <input
+                          type="text"
+                          required
+                          value={projTitle}
+                          onChange={(e) => setProjTitle(e.target.value)}
+                          placeholder="e.g. My Delta ETL Pipeline"
+                          className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                            isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          }`}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Project ID / Slug (Read-only after creation)</label>
+                        <input
+                          type="text"
+                          disabled={!!editingProject}
+                          value={projId || projTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}
+                          onChange={(e) => setProjId(e.target.value)}
+                          placeholder="Auto-generated from title"
+                          className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none transition-all ${
+                            isDark ? 'bg-white/5 border-white/10 text-white opacity-60' : 'bg-slate-50 border-slate-200 text-slate-900 opacity-60'
+                          }`}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Project Description</label>
+                      <textarea
+                        rows={3}
+                        required
+                        value={projDesc}
+                        onChange={(e) => setProjDesc(e.target.value)}
+                        placeholder="Describe the architecture, metrics, and business value of the project..."
+                        className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                          isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                        }`}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Project Status</label>
+                        <select
+                          value={projStatus}
+                          onChange={(e) => setProjStatus(e.target.value as any)}
+                          className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none transition-all ${
+                            isDark ? 'bg-slate-900 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+                          }`}
+                        >
+                          <option value="Deployed">Deployed</option>
+                          <option value="Beta">Beta</option>
+                          <option value="In Progress">In Progress</option>
+                        </select>
+                      </div>
+
+                      <div className="flex items-center pt-5">
+                        <label className="flex items-center gap-2 cursor-pointer text-xs font-mono font-semibold">
+                          <input
+                            type="checkbox"
+                            checked={projFeatured}
+                            onChange={(e) => setProjFeatured(e.target.checked)}
+                            className="rounded border-slate-800 text-sky-500 w-4 h-4 bg-transparent"
+                          />
+                          <span>Featured Project</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">GitHub URL</label>
+                        <input
+                          type="url"
+                          value={projGithubUrl}
+                          onChange={(e) => setProjGithubUrl(e.target.value)}
+                          placeholder="https://github.com/..."
+                          className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                            isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          }`}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Demo URL (Optional)</label>
+                        <input
+                          type="url"
+                          value={projDemoUrl}
+                          onChange={(e) => setProjDemoUrl(e.target.value)}
+                          placeholder="https://..."
+                          className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                            isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          }`}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Technologies (Comma-separated)</label>
+                      <input
+                        type="text"
+                        value={projTechs}
+                        onChange={(e) => setProjTechs(e.target.value)}
+                        placeholder="Python, Spark, Databricks, Delta Lake"
+                        className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                          isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                        }`}
+                      />
+                      {/* Tech Preview */}
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {projTechs.split(',').map((tag, i) => tag.trim() && (
+                          <span key={i} className="text-[9px] font-mono px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">{tag.trim()}</span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Metrics list */}
+                    <div className="border border-white/5 p-4 rounded-xl space-y-3 bg-white/[0.01]">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase opacity-60">Project Success Metrics</label>
+                        <button
+                          type="button"
+                          onClick={() => setProjMetrics(prev => [...prev, { label: '', value: '' }])}
+                          className="text-[9px] font-mono px-2 py-1 rounded bg-white/5 hover:bg-white/10 flex items-center gap-1 cursor-pointer border border-white/10 text-sky-400 font-bold"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Add Metric</span>
+                        </button>
+                      </div>
+
+                      {projMetrics.length > 0 ? (
+                        <div className="space-y-2">
+                          {projMetrics.map((metric, idx) => (
+                            <div key={idx} className="flex gap-2 items-center">
+                              <input
+                                type="text"
+                                value={metric.label}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setProjMetrics(prev => prev.map((m, i) => i === idx ? { ...m, label: val } : m));
+                                }}
+                                placeholder="Metric Label (e.g. Query speed uplift)"
+                                className={`flex-grow px-3 py-2 rounded-xl text-xs border focus:outline-none ${
+                                  isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                                }`}
+                              />
+                              <input
+                                type="text"
+                                value={metric.value}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setProjMetrics(prev => prev.map((m, i) => i === idx ? { ...m, value: val } : m));
+                                }}
+                                placeholder="Value (e.g. 40%)"
+                                className={`w-32 px-3 py-2 rounded-xl text-xs border focus:outline-none ${
+                                  isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                                }`}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setProjMetrics(prev => prev.filter((_, i) => i !== idx))}
+                                className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-lg cursor-pointer border border-rose-500/20"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-[10px] opacity-40 font-mono text-center">No metrics defined for this project.</p>
+                      )}
+                    </div>
+
+                    {/* Visibility & Priorities grid */}
+                    <div className="border border-white/5 p-4 rounded-xl bg-white/[0.01]">
+                      <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-3 opacity-60">Profile Visibility &amp; Ordering Priority</label>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        
+                        {/* General checkbox/priority */}
+                        <div className={`p-4 rounded-xl border ${
+                          isDark ? 'bg-[#060608]/40 border-white/[0.04]' : 'bg-slate-50 border-slate-150'
+                        }`}>
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-mono font-bold">
+                            <input
+                              type="checkbox"
+                              checked={projShowGeneral}
+                              onChange={(e) => setProjShowGeneral(e.target.checked)}
+                              className="rounded border-slate-805 text-sky-500 w-4 h-4"
+                            />
+                            <span>General View</span>
+                          </label>
+                          {projShowGeneral && (
+                            <div className="mt-3">
+                              <label className="block text-[8px] font-mono opacity-50 mb-1">General Priority Order</label>
+                              <input
+                                type="number"
+                                min={1}
+                                max={99}
+                                value={projPriorityGeneral}
+                                onChange={(e) => setProjPriorityGeneral(Number(e.target.value))}
+                                className={`w-full px-2.5 py-1.5 text-xs rounded-lg border focus:outline-none ${
+                                  isDark ? 'bg-slate-900 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+                                }`}
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Data Engineer checkbox/priority */}
+                        <div className={`p-4 rounded-xl border ${
+                          isDark ? 'bg-[#060608]/40 border-white/[0.04]' : 'bg-slate-50 border-slate-150'
+                        }`}>
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-mono font-bold">
+                            <input
+                              type="checkbox"
+                              checked={projShowData}
+                              onChange={(e) => setProjShowData(e.target.checked)}
+                              className="rounded border-slate-805 text-sky-500 w-4 h-4"
+                            />
+                            <span>Data Eng View</span>
+                          </label>
+                          {projShowData && (
+                            <div className="mt-3">
+                              <label className="block text-[8px] font-mono opacity-50 mb-1">Data Eng Priority Order</label>
+                              <input
+                                type="number"
+                                min={1}
+                                max={99}
+                                value={projPriorityData}
+                                onChange={(e) => setProjPriorityData(Number(e.target.value))}
+                                className={`w-full px-2.5 py-1.5 text-xs rounded-lg border focus:outline-none ${
+                                  isDark ? 'bg-slate-900 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+                                }`}
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* AI Engineer checkbox/priority */}
+                        <div className={`p-4 rounded-xl border ${
+                          isDark ? 'bg-[#060608]/40 border-white/[0.04]' : 'bg-slate-50 border-slate-150'
+                        }`}>
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-mono font-bold">
+                            <input
+                              type="checkbox"
+                              checked={projShowAi}
+                              onChange={(e) => setProjShowAi(e.target.checked)}
+                              className="rounded border-slate-805 text-sky-500 w-4 h-4"
+                            />
+                            <span>AI Eng View</span>
+                          </label>
+                          {projShowAi && (
+                            <div className="mt-3">
+                              <label className="block text-[8px] font-mono opacity-50 mb-1">AI Eng Priority Order</label>
+                              <input
+                                type="number"
+                                min={1}
+                                max={99}
+                                value={projPriorityAi}
+                                onChange={(e) => setProjPriorityAi(Number(e.target.value))}
+                                className={`w-full px-2.5 py-1.5 text-xs rounded-lg border focus:outline-none ${
+                                  isDark ? 'bg-slate-900 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+                                }`}
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleSaveProject}
+                    className="w-full py-3 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-xs font-semibold uppercase tracking-wider rounded-xl cursor-pointer transition-all"
+                  >
+                    Save Project Draft
+                  </button>
+                </div>
+              ) : (
+                <div className={`p-6 rounded-2xl border space-y-6 ${
+                  isDark ? 'bg-slate-950/45 border-slate-900' : 'bg-white border-slate-200'
+                }`}>
+                  <div className="flex items-center justify-between pb-4 border-b border-slate-900/30">
+                    <div>
+                      <h3 className="text-sm font-semibold uppercase tracking-wider font-mono opacity-60">Dynamic Projects List</h3>
+                      <p className="text-xs opacity-60 mt-1">Manage project descriptions, links, and priorities globally across views.</p>
+                    </div>
+
+                    <button
+                      onClick={handleAddProject}
+                      className="px-4 py-2 bg-gradient-to-tr from-cyan-500 to-sky-600 hover:from-cyan-400 hover:to-sky-500 text-white text-xs font-semibold rounded-xl cursor-pointer flex items-center gap-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add Project</span>
+                    </button>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    {getUniqueProjects().length > 0 ? (
+                      <table className="w-full text-left border-collapse text-xs">
+                        <thead>
+                          <tr className="opacity-50 border-b border-slate-900/40 font-mono">
+                            <th className="pb-3 pr-4 font-normal">PROJECT NAME</th>
+                            <th className="pb-3 pr-4 font-normal">STATUS</th>
+                            <th className="pb-3 pr-4 font-normal">PROFILES VISIBLE</th>
+                            <th className="pb-3 pr-4 font-normal">TECHNOLOGIES</th>
+                            <th className="pb-3 font-normal text-right">ACTIONS</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {getUniqueProjects().map((proj: any) => {
+                            const showG = adminConfig.general?.projects?.some((p: any) => p.id === proj.id);
+                            const showD = adminConfig['data-engineer']?.projects?.some((p: any) => p.id === proj.id);
+                            const showA = adminConfig['ai-engineer']?.projects?.some((p: any) => p.id === proj.id);
+                            return (
+                              <tr key={proj.id} className="border-b border-slate-900/30 hover:bg-white/5 transition-colors">
+                                <td className="py-4 pr-4 font-semibold text-slate-200">
+                                  <span>{proj.title}</span>
+                                  {proj.featured && <span className="ml-2 text-[8px] font-mono bg-amber-500/10 border border-amber-500/20 text-amber-400 px-1 py-0.5 rounded">FEATURED</span>}
+                                </td>
+                                <td className="py-4 pr-4">
+                                  <span className={`px-2 py-0.5 rounded text-[8px] font-mono font-bold ${
+                                    proj.status === 'Deployed' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                                    proj.status === 'Beta' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' :
+                                    'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                                  }`}>
+                                    {proj.status}
+                                  </span>
+                                </td>
+                                <td className="py-4 pr-4 flex flex-wrap gap-1 pt-4">
+                                  {showG && <span className="text-[8px] font-mono bg-sky-500/10 border border-sky-500/20 text-sky-400 px-1.5 py-0.5 rounded">General</span>}
+                                  {showD && <span className="text-[8px] font-mono bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded">DataEng</span>}
+                                  {showA && <span className="text-[8px] font-mono bg-purple-500/10 border border-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded">AIEng</span>}
+                                </td>
+                                <td className="py-4 pr-4 max-w-xs truncate font-mono opacity-70">
+                                  {proj.technologies ? proj.technologies.join(', ') : 'None'}
+                                </td>
+                                <td className="py-4 text-right">
+                                  <div className="flex justify-end gap-1.5">
+                                    <button
+                                      onClick={() => handleEditProject(proj)}
+                                      className="p-1.5 text-sky-400 hover:bg-sky-500/10 rounded-lg cursor-pointer border border-sky-500/20"
+                                    >
+                                      <Edit className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteProject(proj.id)}
+                                      className="p-1.5 text-rose-500 hover:bg-rose-500/10 rounded-lg cursor-pointer border border-rose-500/20"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    ) : (
+                      <div className="py-8 text-center text-xs opacity-50 font-mono">
+                        No projects mapped in the database.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          ) : activeTab === 'certifications' ? (
+            <motion.div
+              key="certs-tab"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              className="space-y-6"
+            >
+              {showCertForm ? (
+                <div className={`p-6 rounded-2xl border space-y-6 ${
+                  isDark ? 'bg-slate-950/45 border-slate-900' : 'bg-white border-slate-200'
+                }`}>
+                  <div className="flex items-center justify-between pb-4 border-b border-slate-900/30">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider font-mono opacity-60">
+                      {editingCert ? `Edit Certification: ${certTitle}` : 'Create New Certification'}
+                    </h3>
+                    <button
+                      onClick={() => setShowCertForm(false)}
+                      className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[10px] font-mono hover:bg-white/10 cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Certification Title</label>
+                        <input
+                          type="text"
+                          required
+                          value={certTitle}
+                          onChange={(e) => setCertTitle(e.target.value)}
+                          placeholder="e.g. Azure Solutions Architect"
+                          className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                            isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          }`}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Certification ID / Slug (Read-only)</label>
+                        <input
+                          type="text"
+                          disabled={!!editingCert}
+                          value={certId || certTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}
+                          onChange={(e) => setCertId(e.target.value)}
+                          placeholder="Auto-generated ID"
+                          className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none transition-all ${
+                            isDark ? 'bg-white/5 border-white/10 text-white opacity-60' : 'bg-slate-50 border-slate-200 text-slate-900 opacity-60'
+                          }`}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Issuer</label>
+                        <input
+                          type="text"
+                          required
+                          value={certIssuer}
+                          onChange={(e) => setCertIssuer(e.target.value)}
+                          placeholder="e.g. Microsoft, Databricks"
+                          className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                            isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          }`}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Credential Code / Verification ID (Optional)</label>
+                        <input
+                          type="text"
+                          value={certCode}
+                          onChange={(e) => setCertCode(e.target.value)}
+                          placeholder="e.g. E123-4567"
+                          className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                            isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          }`}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Issue Date (e.g. Jan 2026)</label>
+                        <input
+                          type="text"
+                          required
+                          value={certDate}
+                          onChange={(e) => setCertDate(e.target.value)}
+                          placeholder="Jan 2026"
+                          className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                            isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          }`}
+                        />
+                      </div>
+                      <div className="flex items-center pt-5">
+                        <label className="flex items-center gap-2 cursor-pointer text-xs font-mono font-semibold">
+                          <input
+                            type="checkbox"
+                            checked={certFeatured}
+                            onChange={(e) => setCertFeatured(e.target.checked)}
+                            className="rounded border-slate-805 text-sky-500 w-4 h-4"
+                          />
+                          <span>Featured Credential</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Verification Link URL</label>
+                        <input
+                          type="url"
+                          value={certCredUrl}
+                          onChange={(e) => setCertCredUrl(e.target.value)}
+                          placeholder="https://..."
+                          className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                            isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          }`}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Badge Image URL</label>
+                        <input
+                          type="url"
+                          value={certBadgeUrl}
+                          onChange={(e) => setCertBadgeUrl(e.target.value)}
+                          placeholder="https://..."
+                          className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                            isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          }`}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Visibility & Priorities grid */}
+                    <div className="border border-white/5 p-4 rounded-xl bg-white/[0.01]">
+                      <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-3 opacity-60">Profile Visibility &amp; Ordering Priority</label>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        
+                        <div className={`p-4 rounded-xl border ${
+                          isDark ? 'bg-[#060608]/40 border-white/[0.04]' : 'bg-slate-50 border-slate-150'
+                        }`}>
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-mono font-bold">
+                            <input
+                              type="checkbox"
+                              checked={certShowGeneral}
+                              onChange={(e) => setCertShowGeneral(e.target.checked)}
+                              className="rounded border-slate-805 text-sky-500 w-4 h-4"
+                            />
+                            <span>General View</span>
+                          </label>
+                          {certShowGeneral && (
+                            <div className="mt-3">
+                              <label className="block text-[8px] font-mono opacity-50 mb-1">General Priority Order</label>
+                              <input
+                                type="number"
+                                min={1}
+                                max={99}
+                                value={certPriorityGeneral}
+                                onChange={(e) => setCertPriorityGeneral(Number(e.target.value))}
+                                className={`w-full px-2.5 py-1.5 text-xs rounded-lg border focus:outline-none ${
+                                  isDark ? 'bg-slate-900 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+                                }`}
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className={`p-4 rounded-xl border ${
+                          isDark ? 'bg-[#060608]/40 border-white/[0.04]' : 'bg-slate-50 border-slate-150'
+                        }`}>
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-mono font-bold">
+                            <input
+                              type="checkbox"
+                              checked={certShowData}
+                              onChange={(e) => setCertShowData(e.target.checked)}
+                              className="rounded border-slate-805 text-sky-500 w-4 h-4"
+                            />
+                            <span>Data Eng View</span>
+                          </label>
+                          {certShowData && (
+                            <div className="mt-3">
+                              <label className="block text-[8px] font-mono opacity-50 mb-1">Data Eng Priority Order</label>
+                              <input
+                                type="number"
+                                min={1}
+                                max={99}
+                                value={certPriorityData}
+                                onChange={(e) => setCertPriorityData(Number(e.target.value))}
+                                className={`w-full px-2.5 py-1.5 text-xs rounded-lg border focus:outline-none ${
+                                  isDark ? 'bg-slate-900 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+                                }`}
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className={`p-4 rounded-xl border ${
+                          isDark ? 'bg-[#060608]/40 border-white/[0.04]' : 'bg-slate-50 border-slate-150'
+                        }`}>
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-mono font-bold">
+                            <input
+                              type="checkbox"
+                              checked={certShowAi}
+                              onChange={(e) => setCertShowAi(e.target.checked)}
+                              className="rounded border-slate-805 text-sky-500 w-4 h-4"
+                            />
+                            <span>AI Eng View</span>
+                          </label>
+                          {certShowAi && (
+                            <div className="mt-3">
+                              <label className="block text-[8px] font-mono opacity-50 mb-1">AI Eng Priority Order</label>
+                              <input
+                                type="number"
+                                min={1}
+                                max={99}
+                                value={certPriorityAi}
+                                onChange={(e) => setCertPriorityAi(Number(e.target.value))}
+                                className={`w-full px-2.5 py-1.5 text-xs rounded-lg border focus:outline-none ${
+                                  isDark ? 'bg-slate-900 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+                                }`}
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleSaveCert}
+                    className="w-full py-3 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-xs font-semibold uppercase tracking-wider rounded-xl cursor-pointer transition-all"
+                  >
+                    Save Certification Draft
+                  </button>
+                </div>
+              ) : (
+                <div className={`p-6 rounded-2xl border space-y-6 ${
+                  isDark ? 'bg-slate-950/45 border-slate-900' : 'bg-white border-slate-200'
+                }`}>
+                  <div className="flex items-center justify-between pb-4 border-b border-slate-900/30">
+                    <div>
+                      <h3 className="text-sm font-semibold uppercase tracking-wider font-mono opacity-60">Dynamic Certifications List</h3>
+                      <p className="text-xs opacity-60 mt-1">Manage certification details, links, and visibility priorities.</p>
+                    </div>
+
+                    <button
+                      onClick={handleAddCert}
+                      className="px-4 py-2 bg-gradient-to-tr from-cyan-500 to-sky-600 hover:from-cyan-400 hover:to-sky-500 text-white text-xs font-semibold rounded-xl cursor-pointer flex items-center gap-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add Cert</span>
+                    </button>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    {getUniqueCertifications().length > 0 ? (
+                      <table className="w-full text-left border-collapse text-xs">
+                        <thead>
+                          <tr className="opacity-50 border-b border-slate-900/40 font-mono">
+                            <th className="pb-3 pr-4 font-normal">CERTIFICATION NAME</th>
+                            <th className="pb-3 pr-4 font-normal">ISSUER</th>
+                            <th className="pb-3 pr-4 font-normal">PROFILES VISIBLE</th>
+                            <th className="pb-3 pr-4 font-normal">DATE</th>
+                            <th className="pb-3 font-normal text-right">ACTIONS</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {getUniqueCertifications().map((cert: any) => {
+                            const showG = adminConfig.general?.certifications?.some((c: any) => c.id === cert.id);
+                            const showD = adminConfig['data-engineer']?.certifications?.some((c: any) => c.id === cert.id);
+                            const showA = adminConfig['ai-engineer']?.certifications?.some((c: any) => c.id === cert.id);
+                            return (
+                              <tr key={cert.id} className="border-b border-slate-900/30 hover:bg-white/5 transition-colors">
+                                <td className="py-4 pr-4 font-semibold text-slate-200">
+                                  <span>{cert.title}</span>
+                                  {cert.featured && <span className="ml-2 text-[8px] font-mono bg-amber-500/10 border border-amber-500/20 text-amber-400 px-1 py-0.5 rounded">FEATURED</span>}
+                                </td>
+                                <td className="py-4 pr-4">{cert.issuer}</td>
+                                <td className="py-4 pr-4 flex flex-wrap gap-1 pt-4">
+                                  {showG && <span className="text-[8px] font-mono bg-sky-500/10 border border-sky-500/20 text-sky-400 px-1.5 py-0.5 rounded">General</span>}
+                                  {showD && <span className="text-[8px] font-mono bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded">DataEng</span>}
+                                  {showA && <span className="text-[8px] font-mono bg-purple-500/10 border border-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded">AIEng</span>}
+                                </td>
+                                <td className="py-4 pr-4 font-mono opacity-70">{cert.date}</td>
+                                <td className="py-4 text-right">
+                                  <div className="flex justify-end gap-1.5">
+                                    <button
+                                      onClick={() => handleEditCert(cert)}
+                                      className="p-1.5 text-sky-400 hover:bg-sky-500/10 rounded-lg cursor-pointer border border-sky-500/20"
+                                    >
+                                      <Edit className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteCert(cert.id)}
+                                      className="p-1.5 text-rose-500 hover:bg-rose-500/10 rounded-lg cursor-pointer border border-rose-500/20"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    ) : (
+                      <div className="py-8 text-center text-xs opacity-50 font-mono">
+                        No certifications mapped in the database.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="blogs-tab"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              className="space-y-6"
+            >
+              {showBlogForm ? (
+                <div className={`p-6 rounded-2xl border space-y-6 ${
+                  isDark ? 'bg-slate-950/45 border-slate-900' : 'bg-white border-slate-200'
+                }`}>
+                  <div className="flex items-center justify-between pb-4 border-b border-slate-900/30">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider font-mono opacity-60">
+                      {editingBlog ? `Edit Blog: ${blogTitle}` : 'Write New Blog Post'}
+                    </h3>
+                    <button
+                      onClick={() => setShowBlogForm(false)}
+                      className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[10px] font-mono hover:bg-white/10 cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Blog Title</label>
+                        <input
+                          type="text"
+                          required
+                          value={blogTitle}
+                          onChange={(e) => setBlogTitle(e.target.value)}
+                          placeholder="e.g. Building Agents with Gemini"
+                          className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                            isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          }`}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Blog ID / Slug (Read-only)</label>
+                        <input
+                          type="text"
+                          disabled={!!editingBlog}
+                          value={blogId || blogTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}
+                          onChange={(e) => setBlogId(e.target.value)}
+                          placeholder="Auto-generated ID"
+                          className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none transition-all ${
+                            isDark ? 'bg-white/5 border-white/10 text-white opacity-60' : 'bg-slate-50 border-slate-200 text-slate-900 opacity-60'
+                          }`}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Excerpt / Summary Card text</label>
+                      <textarea
+                        rows={2}
+                        required
+                        value={blogExcerpt}
+                        onChange={(e) => setBlogExcerpt(e.target.value)}
+                        placeholder="Brief summary sentence that shows up on the card bento..."
+                        className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                          isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                        }`}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Read Time (e.g. 5 min read)</label>
+                        <input
+                          type="text"
+                          required
+                          value={blogReadTime}
+                          onChange={(e) => setBlogReadTime(e.target.value)}
+                          placeholder="5 min read"
+                          className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                            isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          }`}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Category / Tag</label>
+                        <input
+                          type="text"
+                          required
+                          value={blogCategory}
+                          onChange={(e) => setBlogCategory(e.target.value)}
+                          placeholder="e.g. GenAI, Spark"
+                          className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                            isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          }`}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Date (e.g. July 2026)</label>
+                        <input
+                          type="text"
+                          required
+                          value={blogDate}
+                          onChange={(e) => setBlogDate(e.target.value)}
+                          placeholder="July 2026"
+                          className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                            isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          }`}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">External URL / Internal Content Slug</label>
+                      <input
+                        type="text"
+                        required
+                        value={blogUrl}
+                        onChange={(e) => setBlogUrl(e.target.value)}
+                        placeholder="https://medium.com/... or /blog/my-post"
+                        className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                          isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                        }`}
+                      />
+                    </div>
+
+                    {/* Visibility & Priorities grid */}
+                    <div className="border border-white/5 p-4 rounded-xl bg-white/[0.01]">
+                      <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-3 opacity-60">Profile Visibility &amp; Ordering Priority</label>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        
+                        <div className={`p-4 rounded-xl border ${
+                          isDark ? 'bg-[#060608]/40 border-white/[0.04]' : 'bg-slate-50 border-slate-150'
+                        }`}>
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-mono font-bold">
+                            <input
+                              type="checkbox"
+                              checked={blogShowGeneral}
+                              onChange={(e) => setBlogShowGeneral(e.target.checked)}
+                              className="rounded border-slate-805 text-sky-500 w-4 h-4"
+                            />
+                            <span>General View</span>
+                          </label>
+                          {blogShowGeneral && (
+                            <div className="mt-3">
+                              <label className="block text-[8px] font-mono opacity-50 mb-1">General Priority Order</label>
+                              <input
+                                type="number"
+                                min={1}
+                                max={99}
+                                value={blogPriorityGeneral}
+                                onChange={(e) => setBlogPriorityGeneral(Number(e.target.value))}
+                                className={`w-full px-2.5 py-1.5 text-xs rounded-lg border focus:outline-none ${
+                                  isDark ? 'bg-slate-950 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+                                }`}
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className={`p-4 rounded-xl border ${
+                          isDark ? 'bg-[#060608]/40 border-white/[0.04]' : 'bg-slate-50 border-slate-150'
+                        }`}>
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-mono font-bold">
+                            <input
+                              type="checkbox"
+                              checked={blogShowData}
+                              onChange={(e) => setBlogShowData(e.target.checked)}
+                              className="rounded border-slate-805 text-sky-500 w-4 h-4"
+                            />
+                            <span>Data Eng View</span>
+                          </label>
+                          {blogShowData && (
+                            <div className="mt-3">
+                              <label className="block text-[8px] font-mono opacity-50 mb-1">Data Eng Priority Order</label>
+                              <input
+                                type="number"
+                                min={1}
+                                max={99}
+                                value={blogPriorityData}
+                                onChange={(e) => setBlogPriorityData(Number(e.target.value))}
+                                className={`w-full px-2.5 py-1.5 text-xs rounded-lg border focus:outline-none ${
+                                  isDark ? 'bg-slate-950 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+                                }`}
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className={`p-4 rounded-xl border ${
+                          isDark ? 'bg-[#060608]/40 border-white/[0.04]' : 'bg-slate-50 border-slate-150'
+                        }`}>
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-mono font-bold">
+                            <input
+                              type="checkbox"
+                              checked={blogShowAi}
+                              onChange={(e) => setBlogShowAi(e.target.checked)}
+                              className="rounded border-slate-805 text-sky-500 w-4 h-4"
+                            />
+                            <span>AI Eng View</span>
+                          </label>
+                          {blogShowAi && (
+                            <div className="mt-3">
+                              <label className="block text-[8px] font-mono opacity-50 mb-1">AI Eng Priority Order</label>
+                              <input
+                                type="number"
+                                min={1}
+                                max={99}
+                                value={blogPriorityAi}
+                                onChange={(e) => setBlogPriorityAi(Number(e.target.value))}
+                                className={`w-full px-2.5 py-1.5 text-xs rounded-lg border focus:outline-none ${
+                                  isDark ? 'bg-slate-950 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+                                }`}
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleSaveBlog}
+                    className="w-full py-3 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-xs font-semibold uppercase tracking-wider rounded-xl cursor-pointer transition-all"
+                  >
+                    Save Blog Post Draft
+                  </button>
+                </div>
+              ) : (
+                <div className={`p-6 rounded-2xl border space-y-6 ${
+                  isDark ? 'bg-slate-950/45 border-slate-900' : 'bg-white border-slate-200'
+                }`}>
+                  <div className="flex items-center justify-between pb-4 border-b border-slate-900/30">
+                    <div>
+                      <h3 className="text-sm font-semibold uppercase tracking-wider font-mono opacity-60">Dynamic Blog Posts List</h3>
+                      <p className="text-xs opacity-60 mt-1">Manage technical writings, excerpt summary cards, and visibility priorities.</p>
+                    </div>
+
+                    <button
+                      onClick={handleAddBlog}
+                      className="px-4 py-2 bg-gradient-to-tr from-cyan-500 to-sky-600 hover:from-cyan-400 hover:to-sky-500 text-white text-xs font-semibold rounded-xl cursor-pointer flex items-center gap-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Write Post</span>
+                    </button>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    {getUniqueBlogs().length > 0 ? (
+                      <table className="w-full text-left border-collapse text-xs">
+                        <thead>
+                          <tr className="opacity-50 border-b border-slate-900/40 font-mono">
+                            <th className="pb-3 pr-4 font-normal">BLOG TITLE</th>
+                            <th className="pb-3 pr-4 font-normal">CATEGORY</th>
+                            <th className="pb-3 pr-4 font-normal">PROFILES VISIBLE</th>
+                            <th className="pb-3 pr-4 font-normal">READ TIME</th>
+                            <th className="pb-3 font-normal text-right">ACTIONS</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {getUniqueBlogs().map((blog: any) => {
+                            const showG = adminConfig.general?.blogs?.some((b: any) => b.id === blog.id);
+                            const showD = adminConfig['data-engineer']?.blogs?.some((b: any) => b.id === blog.id);
+                            const showA = adminConfig['ai-engineer']?.blogs?.some((b: any) => b.id === blog.id);
+                            return (
+                              <tr key={blog.id} className="border-b border-slate-900/30 hover:bg-white/5 transition-colors">
+                                <td className="py-4 pr-4 font-semibold text-slate-200">{blog.title}</td>
+                                <td className="py-4 pr-4">
+                                  <span className="px-2 py-0.5 rounded text-[8px] font-mono font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20 uppercase">
+                                    {blog.category || 'Writing'}
+                                  </span>
+                                </td>
+                                <td className="py-4 pr-4 flex flex-wrap gap-1 pt-4">
+                                  {showG && <span className="text-[8px] font-mono bg-sky-500/10 border border-sky-500/20 text-sky-400 px-1.5 py-0.5 rounded">General</span>}
+                                  {showD && <span className="text-[8px] font-mono bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded">DataEng</span>}
+                                  {showA && <span className="text-[8px] font-mono bg-purple-500/10 border border-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded">AIEng</span>}
+                                </td>
+                                <td className="py-4 pr-4 font-mono opacity-70">{blog.readTime || '5 min read'}</td>
+                                <td className="py-4 text-right">
+                                  <div className="flex justify-end gap-1.5">
+                                    <button
+                                      onClick={() => handleEditBlog(blog)}
+                                      className="p-1.5 text-sky-400 hover:bg-sky-500/10 rounded-lg cursor-pointer border border-sky-500/20"
+                                    >
+                                      <Edit className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteBlog(blog.id)}
+                                      className="p-1.5 text-rose-500 hover:bg-rose-500/10 rounded-lg cursor-pointer border border-rose-500/20"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    ) : (
+                      <div className="py-8 text-center text-xs opacity-50 font-mono">
+                        No blog posts mapped in the database.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

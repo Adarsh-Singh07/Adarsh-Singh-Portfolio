@@ -32,6 +32,7 @@ export interface Project {
   priority: {
     general: number;
     'data-engineer': number;
+    'ai-engineer'?: number;
   };
 }
 
@@ -46,6 +47,7 @@ export interface SkillCategory {
   priority: {
     general: number;
     'data-engineer': number;
+    'ai-engineer'?: number;
   };
 }
 
@@ -61,6 +63,7 @@ export interface Certification {
   priority: {
     general: number;
     'data-engineer': number;
+    'ai-engineer'?: number;
   };
 }
 
@@ -85,6 +88,7 @@ export interface BlogNote {
   priority: {
     general: number;
     'data-engineer': number;
+    'ai-engineer'?: number;
   };
 }
 
