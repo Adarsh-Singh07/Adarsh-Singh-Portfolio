@@ -488,7 +488,8 @@ async def verify_passcode(payload: PasscodePayload, request: Request):
     """Validates developer access passcode to view raw recruiter messages."""
     header_pass = request.headers.get("X-Admin-Passcode")
     check_code = header_pass or payload.passcode
-    if check_code and hmac.compare_digest(check_code, admin_pass):
+    token = get_token_from_request(request)
+    if (check_code and hmac.compare_digest(check_code, admin_pass)) or verify_session_token(token):
         return {"success": True}
     return {"success": False}
 
@@ -584,11 +585,12 @@ def mask_name(name: str) -> str:
 
 @app.get("/api/v1/portfolio/analytics/logs")
 async def get_analytics_logs(request: Request, passcode: str = Query(default=None)):
-    """Retrieves session conversations and leads. Masks recruiter personal details unless passcode is valid."""
+    """Retrieves session conversations and leads. Masks recruiter personal details unless passcode or session token is valid."""
     header_pass = request.headers.get("X-Admin-Passcode")
     check_code = header_pass or passcode
+    token = get_token_from_request(request)
     is_admin = False
-    if check_code and hmac.compare_digest(check_code, admin_pass):
+    if (check_code and hmac.compare_digest(check_code, admin_pass)) or verify_session_token(token):
         is_admin = True
     
     conn = db.get_db_connection()
@@ -692,11 +694,16 @@ async def rag_playground(query: str = Query(...)):
 
 @app.get("/api/v1/portfolio/analytics/unanswered")
 async def get_unanswered_questions(request: Request, passcode: str = Query(default=None)):
-    """Retrieves list of unanswered questions. Protected by admin passcode."""
+    """Retrieves list of unanswered questions. Protected by admin passcode or session token."""
     header_pass = request.headers.get("X-Admin-Passcode")
     check_code = header_pass or passcode
-    if not (check_code and hmac.compare_digest(check_code, admin_pass)):
-        raise HTTPException(status_code=401, detail="Unauthorized access. Invalid passcode.")
+    token = get_token_from_request(request)
+    is_authorized = False
+    if (check_code and hmac.compare_digest(check_code, admin_pass)) or verify_session_token(token):
+        is_authorized = True
+        
+    if not is_authorized:
+        raise HTTPException(status_code=401, detail="Unauthorized access. Invalid passcode or token.")
         
     conn = db.get_db_connection()
     try:
@@ -718,14 +725,19 @@ async def get_unanswered_questions(request: Request, passcode: str = Query(defau
         raise HTTPException(status_code=500, detail="Failed to fetch unresolved queries.")
     finally:
         conn.close()
-
+ 
 @app.post("/api/v1/portfolio/analytics/unanswered/resolve/{q_id}")
 async def resolve_unanswered_question_endpoint(q_id: int, payload: PasscodePayload, request: Request):
-    """Marks an unanswered question as resolved. Protected by admin passcode."""
+    """Marks an unanswered question as resolved. Protected by admin passcode or session token."""
     header_pass = request.headers.get("X-Admin-Passcode")
     check_code = header_pass or payload.passcode
-    if not (check_code and hmac.compare_digest(check_code, admin_pass)):
-        raise HTTPException(status_code=401, detail="Unauthorized access. Invalid passcode.")
+    token = get_token_from_request(request)
+    is_authorized = False
+    if (check_code and hmac.compare_digest(check_code, admin_pass)) or verify_session_token(token):
+        is_authorized = True
+        
+    if not is_authorized:
+        raise HTTPException(status_code=401, detail="Unauthorized access. Invalid passcode or token.")
         
     try:
         db.resolve_unanswered_question(q_id)
