@@ -44,7 +44,7 @@ if (Test-Path ".env") {
         if ($line -and -not $line.StartsWith("#") -and $line.Contains("=")) {
             $parts = $line.Split("=", 2)
             $key = $parts[0].Trim()
-            $value = $parts[1].Trim().Trim('"').Trim("'").Replace(",", "\,")
+            $value = $parts[1].Trim().Trim('"').Trim("'")
             $envList += "$key=$value"
         }
     }
@@ -55,14 +55,15 @@ $hasOrigins = $false
 for ($i = 0; $i -lt $envList.Length; $i++) {
     if ($envList[$i].StartsWith("ALLOWED_ORIGINS=")) {
         $hasOrigins = $true
-        $envList[$i] = $envList[$i] + "\,https://adarshsingh-portfolio--admin-crud-test-ud4lt1en.web.app"
+        $envList[$i] = $envList[$i] + ",https://adarshsingh-portfolio--admin-crud-test-ud4lt1en.web.app"
     }
 }
 if (-not $hasOrigins) {
     $envList += "ALLOWED_ORIGINS=*"
 }
 
-$envVarsString = [string]::Join(",", $envList)
+# Join variables using a pipe character (|) and prefix with ^|^ to tell gcloud to use pipe as separator
+$envVarsString = "^|^" + [string]::Join("|", $envList)
 
 gcloud run deploy $STAGING_SERVICE `
     --source ./backend `
@@ -70,7 +71,7 @@ gcloud run deploy $STAGING_SERVICE `
     --project $PROJECT_ID `
     "--add-volume=name=db-volume,type=cloud-storage,bucket=$STAGING_BUCKET" `
     "--add-volume-mount=volume=db-volume,mount-path=/app/data" `
-    --set-env-vars $envVarsString `
+    "--set-env-vars=$envVarsString" `
     --allow-unauthenticated
 
 if ($LASTEXITCODE -ne 0) {
