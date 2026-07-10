@@ -165,6 +165,9 @@ def get_token_from_request(request: Request) -> str:
     token = request.headers.get("X-Admin-Token")
     if token:
         return token
+    passcode_header = request.headers.get("X-Admin-Passcode")
+    if passcode_header and ":" in passcode_header:
+        return passcode_header
     auth_header = request.headers.get("Authorization")
     if auth_header and auth_header.startswith("Bearer "):
         return auth_header[7:]
