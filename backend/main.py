@@ -87,14 +87,47 @@ def on_startup():
     else:
         print("GEMINI_API_KEY is not defined in environment. RAG indexing skipped.")
 
-# Admin credentials resolving
+# Admin credentials resolving & hashing
 ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin_password_123")
 ADMIN_SECRET_KEY = os.environ.get("ADMIN_SECRET_KEY")
 if not ADMIN_SECRET_KEY:
     ADMIN_SECRET_KEY = secrets.token_urlsafe(32)
 
+CREDENTIALS_JSON = os.path.join(DATA_DIR, "admin_credentials.json")
+
 import hashlib
+import base64
+from fastapi.responses import FileResponse, RedirectResponse
+
+def hash_password(password: str, salt: str = None) -> tuple[str, str]:
+    """Hashes a password using PBKDF2 with SHA256 and a random salt."""
+    if not salt:
+        salt = secrets.token_hex(16)
+    key = hashlib.pbkdf2_hmac(
+        'sha256',
+        password.encode('utf-8'),
+        salt.encode('utf-8'),
+        100000  # number of iterations
+    )
+    return key.hex(), salt
+
+def verify_password(stored_hash: str, salt: str, password_to_check: str) -> bool:
+    """Verifies a password against a stored hash and salt."""
+    hash_to_check, _ = hash_password(password_to_check, salt)
+    return hmac.compare_digest(stored_hash, hash_to_check)
+
+def load_admin_credentials() -> tuple[str, str, str]:
+    """Loads admin credentials. Returns (username, password_hash_or_plain, salt)."""
+    if os.path.exists(CREDENTIALS_JSON):
+        try:
+            with open(CREDENTIALS_JSON, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return data["username"], data["password_hash"], data["salt"]
+        except Exception as e:
+            print(f"Error reading admin_credentials.json: {e}")
+    return ADMIN_USERNAME, ADMIN_PASSWORD, ""
+
 def generate_session_token(username: str, expiry_seconds: int = 86400) -> str:
     """Generates a secure, signed session token."""
     expiry_time = int(time.time()) + expiry_seconds
@@ -113,7 +146,8 @@ def verify_session_token(token: str) -> bool:
         username, expiry_str, sig = parts
         expiry_time = int(expiry_str)
         
-        if username != ADMIN_USERNAME:
+        stored_username, _, _ = load_admin_credentials()
+        if username != stored_username:
             return False
             
         if time.time() > expiry_time:
@@ -140,10 +174,28 @@ class AdminLoginPayload(BaseModel):
     username: str
     password: str
 
+class ChangeCredentialsPayload(BaseModel):
+    current_password: str
+    new_username: str
+    new_password: str
+
+class UploadPayload(BaseModel):
+    file_data: str # Base64 data URI
+
 @app.post("/api/v1/portfolio/admin/login")
 async def admin_login(payload: AdminLoginPayload):
     """Authenticates admin credentials and returns a session token."""
-    if payload.username == ADMIN_USERNAME and payload.password == ADMIN_PASSWORD:
+    stored_username, stored_pass_or_hash, salt = load_admin_credentials()
+    
+    is_valid = False
+    if salt:
+        is_valid = (payload.username == stored_username and 
+                    verify_password(stored_pass_or_hash, salt, payload.password))
+    else:
+        is_valid = (payload.username == stored_username and 
+                    payload.password == stored_pass_or_hash)
+                    
+    if is_valid:
         token = generate_session_token(payload.username)
         return {"success": True, "token": token}
     raise HTTPException(status_code=401, detail="Invalid username or password")
@@ -180,6 +232,95 @@ async def save_admin_config(payload: dict, request: Request, background_tasks: B
         background_tasks.add_task(rag.index_knowledge_base, api_key)
         
     return {"success": True, "message": "Configuration saved. RAG re-indexing triggered."}
+
+@app.post("/api/v1/portfolio/admin/change-credentials")
+async def change_credentials(payload: ChangeCredentialsPayload, request: Request):
+    """Securely updates the admin credentials. Protected by admin session token."""
+    token = get_token_from_request(request)
+    if not verify_session_token(token):
+        raise HTTPException(status_code=401, detail="Unauthorized access. Invalid or expired token.")
+        
+    stored_username, stored_pass_or_hash, salt = load_admin_credentials()
+    
+    is_valid = False
+    if salt:
+        is_valid = verify_password(stored_pass_or_hash, salt, payload.current_password)
+    else:
+        is_valid = (payload.current_password == stored_pass_or_hash)
+        
+    if not is_valid:
+        raise HTTPException(status_code=400, detail="Current password verification failed.")
+        
+    new_hash, new_salt = hash_password(payload.new_password)
+    
+    os.makedirs(DATA_DIR, exist_ok=True)
+    try:
+        with open(CREDENTIALS_JSON, "w", encoding="utf-8") as f:
+            json.dump({
+                "username": payload.new_username,
+                "password_hash": new_hash,
+                "salt": new_salt
+            }, f, indent=2)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save credentials: {str(e)}")
+        
+    return {"success": True, "message": "Credentials updated successfully."}
+
+@app.post("/api/v1/portfolio/admin/upload/avatar")
+async def upload_avatar(payload: UploadPayload, request: Request):
+    """Uploads a new profile image. Protected by admin session token."""
+    token = get_token_from_request(request)
+    if not verify_session_token(token):
+        raise HTTPException(status_code=401, detail="Unauthorized access. Invalid or expired token.")
+        
+    try:
+        base64_str = payload.file_data
+        if "," in base64_str:
+            base64_str = base64_str.split(",")[1]
+        binary_data = base64.b64decode(base64_str)
+        
+        avatar_path = os.path.join(DATA_DIR, "avatar.jpg")
+        with open(avatar_path, "wb") as f:
+            f.write(binary_data)
+        return {"success": True, "message": "Avatar image uploaded successfully."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to process image: {str(e)}")
+
+@app.post("/api/v1/portfolio/admin/upload/cv")
+async def upload_cv(payload: UploadPayload, request: Request):
+    """Uploads a new CV PDF. Protected by admin session token."""
+    token = get_token_from_request(request)
+    if not verify_session_token(token):
+        raise HTTPException(status_code=401, detail="Unauthorized access. Invalid or expired token.")
+        
+    try:
+        base64_str = payload.file_data
+        if "," in base64_str:
+            base64_str = base64_str.split(",")[1]
+        binary_data = base64.b64decode(base64_str)
+        
+        cv_path = os.path.join(DATA_DIR, "cv.pdf")
+        with open(cv_path, "wb") as f:
+            f.write(binary_data)
+        return {"success": True, "message": "CV PDF uploaded successfully."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to process CV: {str(e)}")
+
+@app.get("/api/v1/portfolio/assets/avatar.jpg")
+async def get_avatar():
+    """Serves the custom avatar.jpg from GCS mount, falls back to default avatar.jpg."""
+    avatar_path = os.path.join(DATA_DIR, "avatar.jpg")
+    if os.path.exists(avatar_path):
+        return FileResponse(avatar_path)
+    return RedirectResponse(url="/avatar.jpg")
+
+@app.get("/api/v1/portfolio/assets/cv.pdf")
+async def get_cv():
+    """Serves the custom cv.pdf from GCS mount, falls back to default Adarsh_Singh_CV.pdf."""
+    cv_path = os.path.join(DATA_DIR, "cv.pdf")
+    if os.path.exists(cv_path):
+        return FileResponse(cv_path)
+    return RedirectResponse(url="/Adarsh_Singh_CV.pdf")
 
 def load_profiles():
     """Loads consolidated profile roles from local JSON database."""

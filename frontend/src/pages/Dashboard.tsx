@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   BarChart3, 
@@ -26,7 +26,11 @@ import {
   Award,
   Eye,
   EyeOff,
-  Save
+  Save,
+  Upload,
+  User,
+  Settings,
+  Layers
 } from 'lucide-react';
 import PortfolioService from '../services/api';
 import { ProfileMode, ProfileData } from '../types';
@@ -35,7 +39,7 @@ interface DashboardProps {
   isDark: boolean;
 }
 
-type TabType = 'analytics' | 'rag' | 'unanswered' | 'config' | 'projects' | 'certifications' | 'blogs';
+type TabType = 'analytics' | 'rag' | 'unanswered' | 'config' | 'projects' | 'certifications' | 'blogs' | 'skills' | 'uploads' | 'settings';
 
 export default function Dashboard({ isDark }: DashboardProps) {
   const [activeTab, setActiveTab] = useState<TabType>('analytics');
@@ -68,6 +72,25 @@ export default function Dashboard({ isDark }: DashboardProps) {
   // Publishing Status
   const [publishing, setPublishing] = useState(false);
   const [publishSuccess, setPublishSuccess] = useState(false);
+
+  // File Upload State
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploadAvatarSuccess, setUploadAvatarSuccess] = useState(false);
+
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [uploadingCv, setUploadingCv] = useState(false);
+  const [uploadCvSuccess, setUploadCvSuccess] = useState(false);
+
+  // Account settings state
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newUsername, setNewUsername] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [changingCredentials, setChangingCredentials] = useState(false);
+  const [changeCredSuccess, setChangeCredSuccess] = useState(false);
+  const [changeCredError, setChangeCredError] = useState<string | null>(null);
 
   // Project Form States
   const [showProjectForm, setShowProjectForm] = useState(false);
@@ -123,7 +146,19 @@ export default function Dashboard({ isDark }: DashboardProps) {
   const [blogPriorityData, setBlogPriorityData] = useState(1);
   const [blogPriorityAi, setBlogPriorityAi] = useState(1);
 
-  // Load telemetry stats and admin logs
+  // Skills Form States
+  const [showSkillForm, setShowSkillForm] = useState(false);
+  const [editingSkillCat, setEditingSkillCat] = useState<any | null>(null);
+  const [skillCatTitle, setSkillCatTitle] = useState('');
+  const [skillList, setSkillList] = useState<Array<{ name: string, level: string }>>([]);
+  const [skillShowGeneral, setSkillShowGeneral] = useState(false);
+  const [skillShowData, setSkillShowData] = useState(false);
+  const [skillShowAi, setSkillShowAi] = useState(false);
+  const [skillPriorityGeneral, setSkillPriorityGeneral] = useState(1);
+  const [skillPriorityData, setSkillPriorityData] = useState(1);
+  const [skillPriorityAi, setSkillPriorityAi] = useState(1);
+
+  // Load telemetry stats and admin configs
   const fetchData = async (currentPasscode?: string) => {
     setLoading(true);
     try {
@@ -298,6 +333,120 @@ export default function Dashboard({ isDark }: DashboardProps) {
       }
     });
     return Object.values(blogMap);
+  };
+
+  const getUniqueSkills = () => {
+    if (!adminConfig) return [];
+    const skillMap: Record<string, any> = {};
+    (['general', 'data-engineer', 'ai-engineer'] as const).forEach(mode => {
+      if (adminConfig[mode]?.skills) {
+        adminConfig[mode].skills.forEach((skillCat: any) => {
+          skillMap[skillCat.title] = skillCat;
+        });
+      }
+    });
+    return Object.values(skillMap);
+  };
+
+  // Avatar Photo & CV Uploader Handlers
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setAvatarFile(file);
+      setAvatarPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleUploadAvatar = async () => {
+    if (!avatarFile || !token) return;
+    setUploadingAvatar(true);
+    setUploadAvatarSuccess(false);
+    try {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64Data = reader.result as string;
+        try {
+          const res = await PortfolioService.uploadAvatar(token, base64Data);
+          if (res.success) {
+            setUploadAvatarSuccess(true);
+            setTimeout(() => setUploadAvatarSuccess(false), 3000);
+          }
+        } catch (err) {
+          alert("Failed to upload avatar image.");
+        } finally {
+          setUploadingAvatar(false);
+        }
+      };
+      reader.readAsDataURL(avatarFile);
+    } catch (err) {
+      console.error(err);
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleCvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setCvFile(e.target.files[0]);
+    }
+  };
+
+  const handleUploadCv = async () => {
+    if (!cvFile || !token) return;
+    setUploadingCv(true);
+    setUploadCvSuccess(false);
+    try {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64Data = reader.result as string;
+        try {
+          const res = await PortfolioService.uploadCv(token, base64Data);
+          if (res.success) {
+            setUploadCvSuccess(true);
+            setTimeout(() => setUploadCvSuccess(false), 3000);
+          }
+        } catch (err) {
+          alert("Failed to upload CV PDF.");
+        } finally {
+          setUploadingCv(false);
+        }
+      };
+      reader.readAsDataURL(cvFile);
+    } catch (err) {
+      console.error(err);
+      setUploadingCv(false);
+    }
+  };
+
+  // Change Credentials Handler
+  const handleChangeCredentials = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setChangeCredError(null);
+    setChangeCredSuccess(false);
+
+    if (newPassword !== confirmPassword) {
+      setChangeCredError("New passwords do not match.");
+      return;
+    }
+
+    setChangingCredentials(true);
+    try {
+      const res = await PortfolioService.changeCredentials(token || '', currentPassword, newUsername, newPassword);
+      if (res.success) {
+        setChangeCredSuccess(true);
+        setCurrentPassword('');
+        setNewUsername('');
+        setNewPassword('');
+        setConfirmPassword('');
+        // Log out user so they can login again
+        setTimeout(() => {
+          handleLogout();
+        }, 2000);
+      }
+    } catch (err: any) {
+      setChangeCredError(err.message || "Failed to update admin credentials.");
+    } finally {
+      setChangingCredentials(false);
+    }
   };
 
   // Project CRUD Actions
@@ -658,6 +807,111 @@ export default function Dashboard({ isDark }: DashboardProps) {
     });
   };
 
+  // Skills CRUD Actions
+  const handleAddSkillCat = () => {
+    setEditingSkillCat(null);
+    setSkillCatTitle('');
+    setSkillList([]);
+    setSkillShowGeneral(true);
+    setSkillShowData(false);
+    setSkillShowAi(false);
+    setSkillPriorityGeneral(1);
+    setSkillPriorityData(1);
+    setSkillPriorityAi(1);
+    setShowSkillForm(true);
+  };
+
+  const handleEditSkillCat = (cat: any) => {
+    setEditingSkillCat(cat);
+    setSkillCatTitle(cat.title || '');
+    setSkillList(cat.skills || []);
+
+    const showGeneral = !!adminConfig.general?.skills?.some((s: any) => s.title === cat.title);
+    const showData = !!adminConfig['data-engineer']?.skills?.some((s: any) => s.title === cat.title);
+    const showAi = !!adminConfig['ai-engineer']?.skills?.some((s: any) => s.title === cat.title);
+
+    setSkillShowGeneral(showGeneral);
+    setSkillShowData(showData);
+    setSkillShowAi(showAi);
+
+    const priGeneral = adminConfig.general?.skills?.find((s: any) => s.title === cat.title)?.priority?.general ?? 1;
+    const priData = adminConfig['data-engineer']?.skills?.find((s: any) => s.title === cat.title)?.priority?.['data-engineer'] ?? 1;
+    const priAi = adminConfig['ai-engineer']?.skills?.find((s: any) => s.title === cat.title)?.priority?.['ai-engineer'] ?? 1;
+
+    setSkillPriorityGeneral(priGeneral);
+    setSkillPriorityData(priData);
+    setSkillPriorityAi(priAi);
+
+    setShowSkillForm(true);
+  };
+
+  const handleSaveSkillCat = () => {
+    if (!skillCatTitle.trim()) return;
+
+    const updatedCat: any = {
+      title: skillCatTitle.trim(),
+      skills: skillList.filter(s => s.name.trim()),
+      priority: {
+        general: skillShowGeneral ? Number(skillPriorityGeneral) : 99,
+        'data-engineer': skillShowData ? Number(skillPriorityData) : 99,
+        'ai-engineer': skillShowAi ? Number(skillPriorityAi) : 99
+      }
+    };
+
+    setAdminConfig((prev: any) => {
+      const next = { ...prev };
+      const modes = ['general', 'data-engineer', 'ai-engineer'] as const;
+      const shows = [skillShowGeneral, skillShowData, skillShowAi];
+      const priorities = [skillPriorityGeneral, skillPriorityData, skillPriorityAi];
+
+      modes.forEach((mode, idx) => {
+        const isVisible = shows[idx];
+        let skillsList = next[mode]?.skills ? [...next[mode].skills] : [];
+        
+        // Remove existing category with this title
+        skillsList = skillsList.filter((s: any) => s.title !== skillCatTitle.trim());
+        if (editingSkillCat && editingSkillCat.title !== skillCatTitle.trim()) {
+          skillsList = skillsList.filter((s: any) => s.title !== editingSkillCat.title);
+        }
+
+        if (isVisible) {
+          const modeSpecificCat = {
+            ...updatedCat,
+            priority: {
+              ...updatedCat.priority,
+              [mode]: Number(priorities[idx])
+            }
+          };
+          skillsList.push(modeSpecificCat);
+          skillsList.sort((a: any, b: any) => (a.priority?.[mode] ?? 99) - (b.priority?.[mode] ?? 99));
+        }
+
+        next[mode] = {
+          ...next[mode],
+          skills: skillsList
+        };
+      });
+      return next;
+    });
+
+    setShowSkillForm(false);
+    setEditingSkillCat(null);
+  };
+
+  const handleDeleteSkillCat = (titleToDelete: string) => {
+    if (!window.confirm("Are you sure you want to delete this skills category from all profiles?")) return;
+    setAdminConfig((prev: any) => {
+      const next = { ...prev };
+      const modes = ['general', 'data-engineer', 'ai-engineer'] as const;
+      modes.forEach(mode => {
+        if (next[mode]?.skills) {
+          next[mode].skills = next[mode].skills.filter((s: any) => s.title !== titleToDelete);
+        }
+      });
+      return next;
+    });
+  };
+
   // Secure full screen login gate
   if (!isUnlocked) {
     return (
@@ -824,7 +1078,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
             
             <button
               onClick={handleLogout}
-              className="text-[10px] font-bold font-mono text-rose-500 hover:text-rose-400 flex items-center gap-1 cursor-pointer shrink-0 uppercase tracking-wider"
+              className="text-[10px] font-bold font-mono text-rose-500 hover:text-rose-400 flex items-center gap-1 cursor-pointer shrink-0 uppercase tracking-wider animate-pulse"
             >
               <LogOut className="w-3 h-3" />
               <span>Logout</span>
@@ -849,15 +1103,18 @@ export default function Dashboard({ isDark }: DashboardProps) {
         <div className={`p-1 rounded-2xl border flex items-center gap-1 backdrop-blur-xl overflow-x-auto max-w-full scrollbar-none shrink-0 ${
           isDark ? 'bg-white/5 border-white/[0.08]' : 'bg-slate-100 border-slate-200'
         }`}>
-          {([
+          {[
             { id: 'analytics', label: 'Analytics' },
             { id: 'rag', label: 'RAG Explorer' },
             { id: 'unanswered', label: 'Queries' },
             { id: 'config', label: 'Hero/Home' },
             { id: 'projects', label: 'Projects' },
+            { id: 'skills', label: 'Skills' },
             { id: 'certifications', label: 'Certs' },
-            { id: 'blogs', label: 'Blogs' }
-          ] as const).map((tab) => {
+            { id: 'blogs', label: 'Blogs' },
+            { id: 'uploads', label: 'Assets' },
+            { id: 'settings', label: 'Settings' }
+          ].map((tab) => {
             const isActive = activeTab === tab.id;
             return (
               <button
@@ -866,7 +1123,8 @@ export default function Dashboard({ isDark }: DashboardProps) {
                   setShowProjectForm(false);
                   setShowCertForm(false);
                   setShowBlogForm(false);
-                  setActiveTab(tab.id);
+                  setShowSkillForm(false);
+                  setActiveTab(tab.id as any);
                 }}
                 className={`relative px-3.5 py-2 rounded-xl text-[10px] md:text-xs font-mono font-medium tracking-wide transition-all duration-300 cursor-pointer shrink-0 ${
                   isActive 
@@ -977,7 +1235,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
 
                 {/* Telemetry Tokens */}
                 <div className={`p-4 rounded-2xl border flex flex-col justify-between transition-all duration-300 ${
-                  isDark ? 'bg-slate-950/45 border-slate-900 hover:border-slate-850' : 'bg-white border-slate-200 hover:shadow-md'
+                  isDark ? 'bg-slate-950/45 border-slate-900 hover:border-slate-800' : 'bg-white border-slate-200 hover:shadow-md'
                 }`}>
                   <div className="flex items-center justify-between text-slate-400 mb-4">
                     <Cpu className="w-5 h-5 text-purple-400" />
@@ -1048,7 +1306,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                                 {session.role_mode}
                               </span>
                             </div>
-                            <div className="text-xs truncate font-medium text-slate-350">
+                            <div className="text-xs truncate font-medium text-slate-355">
                               {session.messages[0]?.content || "Empty chat session"}
                             </div>
                             <div className="flex justify-between items-center text-[9px] font-mono opacity-40 mt-3.5">
@@ -1267,7 +1525,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                           </div>
 
                           <div className={`p-4 rounded-xl font-mono text-[10px] md:text-xs border whitespace-pre-wrap overflow-x-auto leading-relaxed max-h-48 custom-scrollbar ${
-                            isDark ? 'bg-[#060608]/80 border-slate-900/60 text-slate-305' : 'bg-slate-50 border-slate-150 text-slate-650'
+                            isDark ? 'bg-[#060608]/80 border-slate-900/60 text-slate-300' : 'bg-slate-50 border-slate-150 text-slate-700'
                           }`}>
                             {result.content}
                           </div>
@@ -1459,7 +1717,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                             const next = { ...prev };
                             next[selectedHeroMode].hero.subtext = val;
                             return next;
-                            });
+                          });
                         }}
                         className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
                           isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
@@ -1604,7 +1862,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                             type="checkbox"
                             checked={projFeatured}
                             onChange={(e) => setProjFeatured(e.target.checked)}
-                            className="rounded border-slate-800 text-sky-500 w-4 h-4 bg-transparent"
+                            className="rounded border-slate-805 text-sky-505 w-4 h-4 bg-transparent"
                           />
                           <span>Featured Project</span>
                         </label>
@@ -1728,7 +1986,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                               type="checkbox"
                               checked={projShowGeneral}
                               onChange={(e) => setProjShowGeneral(e.target.checked)}
-                              className="rounded border-slate-805 text-sky-500 w-4 h-4"
+                              className="rounded border-slate-805 text-sky-505 w-4 h-4"
                             />
                             <span>General View</span>
                           </label>
@@ -1758,7 +2016,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                               type="checkbox"
                               checked={projShowData}
                               onChange={(e) => setProjShowData(e.target.checked)}
-                              className="rounded border-slate-805 text-sky-500 w-4 h-4"
+                              className="rounded border-slate-805 text-sky-505 w-4 h-4"
                             />
                             <span>Data Eng View</span>
                           </label>
@@ -1788,7 +2046,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                               type="checkbox"
                               checked={projShowAi}
                               onChange={(e) => setProjShowAi(e.target.checked)}
-                              className="rounded border-slate-805 text-sky-500 w-4 h-4"
+                              className="rounded border-slate-805 text-sky-505 w-4 h-4"
                             />
                             <span>AI Eng View</span>
                           </label>
@@ -1909,6 +2167,284 @@ export default function Dashboard({ isDark }: DashboardProps) {
                 </div>
               )}
             </motion.div>
+          ) : activeTab === 'skills' ? (
+            <motion.div
+              key="skills-tab"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              className="space-y-6"
+            >
+              {showSkillForm ? (
+                <div className={`p-6 rounded-2xl border space-y-6 ${
+                  isDark ? 'bg-slate-950/45 border-slate-900' : 'bg-white border-slate-200'
+                }`}>
+                  <div className="flex items-center justify-between pb-4 border-b border-slate-900/30">
+                    <h3 className="text-sm font-semibold uppercase tracking-wider font-mono opacity-60">
+                      {editingSkillCat ? `Edit Category: ${skillCatTitle}` : 'Create Skill Category'}
+                    </h3>
+                    <button
+                      onClick={() => setShowSkillForm(false)}
+                      className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[10px] font-mono hover:bg-white/10 cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Category Name</label>
+                      <input
+                        type="text"
+                        required
+                        value={skillCatTitle}
+                        onChange={(e) => setSkillCatTitle(e.target.value)}
+                        placeholder="e.g. Languages, Databases, Cloud &amp; Architectures"
+                        className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                          isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                        }`}
+                      />
+                    </div>
+
+                    {/* Skill tags builder */}
+                    <div className="border border-white/5 p-4 rounded-xl space-y-3 bg-white/[0.01]">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-[10px] font-mono font-bold tracking-wider uppercase opacity-60">Associated Skill Tags</label>
+                        <button
+                          type="button"
+                          onClick={() => setSkillList(prev => [...prev, { name: '', level: 'Expert' }])}
+                          className="text-[9px] font-mono px-2 py-1 rounded bg-white/5 hover:bg-white/10 flex items-center gap-1 cursor-pointer border border-white/10 text-sky-400 font-bold"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Add Skill</span>
+                        </button>
+                      </div>
+
+                      {skillList.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {skillList.map((skill, idx) => (
+                            <div key={idx} className="flex gap-2 items-center">
+                              <input
+                                type="text"
+                                value={skill.name}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setSkillList(prev => prev.map((s, i) => i === idx ? { ...s, name: val } : s));
+                                }}
+                                placeholder="Skill keyword (e.g. Python)"
+                                className={`flex-grow px-3 py-2 rounded-xl text-xs border focus:outline-none ${
+                                  isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                                }`}
+                              />
+                              <select
+                                value={skill.level}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setSkillList(prev => prev.map((s, i) => i === idx ? { ...s, level: val } : s));
+                                }}
+                                className={`w-32 px-3 py-2 rounded-xl text-xs border focus:outline-none ${
+                                  isDark ? 'bg-slate-900 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+                                }`}
+                              >
+                                <option value="Expert">Expert</option>
+                                <option value="Advanced">Advanced</option>
+                                <option value="Intermediate">Intermediate</option>
+                              </select>
+                              <button
+                                type="button"
+                                onClick={() => setSkillList(prev => prev.filter((_, i) => i !== idx))}
+                                className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-lg cursor-pointer border border-rose-500/20"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-[10px] opacity-40 font-mono text-center">No individual skill keywords added yet.</p>
+                      )}
+                    </div>
+
+                    {/* Visibility & Priorities grid */}
+                    <div className="border border-white/5 p-4 rounded-xl bg-white/[0.01]">
+                      <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-3 opacity-60">Profile Visibility &amp; Ordering Priority</label>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        
+                        <div className={`p-4 rounded-xl border ${
+                          isDark ? 'bg-[#060608]/40 border-white/[0.04]' : 'bg-slate-50 border-slate-150'
+                        }`}>
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-mono font-bold">
+                            <input
+                              type="checkbox"
+                              checked={skillShowGeneral}
+                              onChange={(e) => setSkillShowGeneral(e.target.checked)}
+                              className="rounded border-slate-805 text-sky-505 w-4 h-4"
+                            />
+                            <span>General View</span>
+                          </label>
+                          {skillShowGeneral && (
+                            <div className="mt-3">
+                              <label className="block text-[8px] font-mono opacity-50 mb-1">General Priority Order</label>
+                              <input
+                                type="number"
+                                min={1}
+                                max={99}
+                                value={skillPriorityGeneral}
+                                onChange={(e) => setSkillPriorityGeneral(Number(e.target.value))}
+                                className={`w-full px-2.5 py-1.5 text-xs rounded-lg border focus:outline-none ${
+                                  isDark ? 'bg-slate-900 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+                                }`}
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className={`p-4 rounded-xl border ${
+                          isDark ? 'bg-[#060608]/40 border-white/[0.04]' : 'bg-slate-50 border-slate-150'
+                        }`}>
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-mono font-bold">
+                            <input
+                              type="checkbox"
+                              checked={skillShowData}
+                              onChange={(e) => setSkillShowData(e.target.checked)}
+                              className="rounded border-slate-805 text-sky-505 w-4 h-4"
+                            />
+                            <span>Data Eng View</span>
+                          </label>
+                          {skillShowData && (
+                            <div className="mt-3">
+                              <label className="block text-[8px] font-mono opacity-50 mb-1">Data Eng Priority Order</label>
+                              <input
+                                type="number"
+                                min={1}
+                                max={99}
+                                value={skillPriorityData}
+                                onChange={(e) => setSkillPriorityData(Number(e.target.value))}
+                                className={`w-full px-2.5 py-1.5 text-xs rounded-lg border focus:outline-none ${
+                                  isDark ? 'bg-slate-900 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+                                }`}
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className={`p-4 rounded-xl border ${
+                          isDark ? 'bg-[#060608]/40 border-white/[0.04]' : 'bg-slate-50 border-slate-150'
+                        }`}>
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-mono font-bold">
+                            <input
+                              type="checkbox"
+                              checked={skillShowAi}
+                              onChange={(e) => setSkillShowAi(e.target.checked)}
+                              className="rounded border-slate-805 text-sky-505 w-4 h-4"
+                            />
+                            <span>AI Eng View</span>
+                          </label>
+                          {skillShowAi && (
+                            <div className="mt-3">
+                              <label className="block text-[8px] font-mono opacity-50 mb-1">AI Eng Priority Order</label>
+                              <input
+                                type="number"
+                                min={1}
+                                max={99}
+                                value={skillPriorityAi}
+                                onChange={(e) => setSkillPriorityAi(Number(e.target.value))}
+                                className={`w-full px-2.5 py-1.5 text-xs rounded-lg border focus:outline-none ${
+                                  isDark ? 'bg-slate-900 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+                                }`}
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleSaveSkillCat}
+                    className="w-full py-3 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-xs font-semibold uppercase tracking-wider rounded-xl cursor-pointer transition-all"
+                  >
+                    Save Category Draft
+                  </button>
+                </div>
+              ) : (
+                <div className={`p-6 rounded-2xl border space-y-6 ${
+                  isDark ? 'bg-slate-950/45 border-slate-900' : 'bg-white border-slate-200'
+                }`}>
+                  <div className="flex items-center justify-between pb-4 border-b border-slate-900/30">
+                    <div>
+                      <h3 className="text-sm font-semibold uppercase tracking-wider font-mono opacity-60">Dynamic Skills Category Grid</h3>
+                      <p className="text-xs opacity-60 mt-1">Manage skill subsets, levels (Expert/Advanced), and visibility priorities.</p>
+                    </div>
+
+                    <button
+                      onClick={handleAddSkillCat}
+                      className="px-4 py-2 bg-gradient-to-tr from-cyan-500 to-sky-600 hover:from-cyan-400 hover:to-sky-500 text-white text-xs font-semibold rounded-xl cursor-pointer flex items-center gap-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add Category</span>
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {getUniqueSkills().map((cat: any) => {
+                      const showG = adminConfig.general?.skills?.some((s: any) => s.title === cat.title);
+                      const showD = adminConfig['data-engineer']?.skills?.some((s: any) => s.title === cat.title);
+                      const showA = adminConfig['ai-engineer']?.skills?.some((s: any) => s.title === cat.title);
+                      return (
+                        <div
+                          key={cat.title}
+                          className={`p-5 rounded-2xl border flex flex-col justify-between gap-4 transition-all hover:shadow-md ${
+                            isDark ? 'bg-[#060608]/40 border-slate-900 hover:border-slate-800' : 'bg-white border-slate-200'
+                          }`}
+                        >
+                          <div>
+                            <div className="flex justify-between items-start gap-2">
+                              <h4 className="text-sm font-bold text-slate-200">{cat.title}</h4>
+                              <div className="flex justify-end gap-1.5 shrink-0">
+                                <button
+                                  onClick={() => handleEditSkillCat(cat)}
+                                  className="p-1.5 text-sky-400 hover:bg-sky-500/10 rounded-lg cursor-pointer border border-sky-500/20"
+                                >
+                                  <Edit className="w-3 h-3" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteSkillCat(cat.title)}
+                                  className="p-1.5 text-rose-500 hover:bg-rose-500/10 rounded-lg cursor-pointer border border-rose-500/20"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </button>
+                              </div>
+                            </div>
+                            
+                            {/* Skills details preview */}
+                            <div className="flex flex-wrap gap-1 mt-3">
+                              {cat.skills?.map((s: any, idx: number) => (
+                                <span key={idx} className={`text-[8px] font-mono px-2 py-0.5 rounded border ${
+                                  s.level === 'Expert' ? 'bg-cyan-500/5 border-cyan-500/15 text-cyan-400' :
+                                  s.level === 'Advanced' ? 'bg-indigo-500/5 border-indigo-500/15 text-indigo-400' :
+                                  'bg-slate-500/5 border-slate-500/15 text-slate-400'
+                                }`}>
+                                  {s.name} ({s.level[0]})
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="flex gap-2 pt-2 border-t border-white/[0.03] text-[9px] font-mono opacity-65">
+                            <span>VISIBLE IN:</span>
+                            {showG && <span className="text-sky-400">General</span>}
+                            {showD && <span className="text-indigo-400">DataEng</span>}
+                            {showA && <span className="text-purple-400">AIEng</span>}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </motion.div>
           ) : activeTab === 'certifications' ? (
             <motion.div
               key="certs-tab"
@@ -2011,7 +2547,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                             type="checkbox"
                             checked={certFeatured}
                             onChange={(e) => setCertFeatured(e.target.checked)}
-                            className="rounded border-slate-805 text-sky-500 w-4 h-4"
+                            className="rounded border-slate-805 text-sky-505 w-4 h-4"
                           />
                           <span>Featured Credential</span>
                         </label>
@@ -2058,7 +2594,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                               type="checkbox"
                               checked={certShowGeneral}
                               onChange={(e) => setCertShowGeneral(e.target.checked)}
-                              className="rounded border-slate-805 text-sky-500 w-4 h-4"
+                              className="rounded border-slate-805 text-sky-505 w-4 h-4"
                             />
                             <span>General View</span>
                           </label>
@@ -2087,7 +2623,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                               type="checkbox"
                               checked={certShowData}
                               onChange={(e) => setCertShowData(e.target.checked)}
-                              className="rounded border-slate-805 text-sky-500 w-4 h-4"
+                              className="rounded border-slate-805 text-sky-505 w-4 h-4"
                             />
                             <span>Data Eng View</span>
                           </label>
@@ -2116,7 +2652,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                               type="checkbox"
                               checked={certShowAi}
                               onChange={(e) => setCertShowAi(e.target.checked)}
-                              className="rounded border-slate-805 text-sky-500 w-4 h-4"
+                              className="rounded border-slate-805 text-sky-505 w-4 h-4"
                             />
                             <span>AI Eng View</span>
                           </label>
@@ -2186,7 +2722,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                             const showA = adminConfig['ai-engineer']?.certifications?.some((c: any) => c.id === cert.id);
                             return (
                               <tr key={cert.id} className="border-b border-slate-900/30 hover:bg-white/5 transition-colors">
-                                <td className="py-4 pr-4 font-semibold text-slate-200">
+                                <td className="py-4 pr-4 font-semibold text-slate-205 font-sans">
                                   <span>{cert.title}</span>
                                   {cert.featured && <span className="ml-2 text-[8px] font-mono bg-amber-500/10 border border-amber-500/20 text-amber-400 px-1 py-0.5 rounded">FEATURED</span>}
                                 </td>
@@ -2227,7 +2763,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                 </div>
               )}
             </motion.div>
-          ) : (
+          ) : activeTab === 'blogs' ? (
             <motion.div
               key="blogs-tab"
               initial={{ opacity: 0, y: 15 }}
@@ -2366,7 +2902,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                               type="checkbox"
                               checked={blogShowGeneral}
                               onChange={(e) => setBlogShowGeneral(e.target.checked)}
-                              className="rounded border-slate-805 text-sky-500 w-4 h-4"
+                              className="rounded border-slate-805 text-sky-505 w-4 h-4"
                             />
                             <span>General View</span>
                           </label>
@@ -2395,7 +2931,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                               type="checkbox"
                               checked={blogShowData}
                               onChange={(e) => setBlogShowData(e.target.checked)}
-                              className="rounded border-slate-805 text-sky-500 w-4 h-4"
+                              className="rounded border-slate-805 text-sky-505 w-4 h-4"
                             />
                             <span>Data Eng View</span>
                           </label>
@@ -2424,7 +2960,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                               type="checkbox"
                               checked={blogShowAi}
                               onChange={(e) => setBlogShowAi(e.target.checked)}
-                              className="rounded border-slate-805 text-sky-500 w-4 h-4"
+                              className="rounded border-slate-805 text-sky-505 w-4 h-4"
                             />
                             <span>AI Eng View</span>
                           </label>
@@ -2494,7 +3030,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                             const showA = adminConfig['ai-engineer']?.blogs?.some((b: any) => b.id === blog.id);
                             return (
                               <tr key={blog.id} className="border-b border-slate-900/30 hover:bg-white/5 transition-colors">
-                                <td className="py-4 pr-4 font-semibold text-slate-200">{blog.title}</td>
+                                <td className="py-4 pr-4 font-semibold text-slate-205">{blog.title}</td>
                                 <td className="py-4 pr-4">
                                   <span className="px-2 py-0.5 rounded text-[8px] font-mono font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20 uppercase">
                                     {blog.category || 'Writing'}
@@ -2535,6 +3071,259 @@ export default function Dashboard({ isDark }: DashboardProps) {
                   </div>
                 </div>
               )}
+            </motion.div>
+          ) : activeTab === 'uploads' ? (
+            <motion.div
+              key="uploads-tab"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              className="space-y-6"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                {/* 1. Upload Profile Photo */}
+                <div className={`p-6 rounded-2xl border space-y-6 ${
+                  isDark ? 'bg-slate-950/45 border-slate-900' : 'bg-white border-slate-200'
+                }`}>
+                  <div>
+                    <h3 className="text-sm font-semibold uppercase tracking-wider font-mono opacity-60 flex items-center gap-2">
+                      <User className="w-4 h-4 text-sky-400" />
+                      <span>Upload Profile Picture</span>
+                    </h3>
+                    <p className="text-xs opacity-60 mt-1">Upload a JPG or PNG photo. Replaces the default /avatar.jpg image on GCS FUSE.</p>
+                  </div>
+
+                  <div className="flex flex-col items-center gap-4 border border-dashed border-white/10 p-6 rounded-xl bg-white/[0.01]">
+                    <div className={`w-28 h-28 rounded-full overflow-hidden border flex items-center justify-center bg-white/5 ${
+                      isDark ? 'border-white/10' : 'border-slate-200'
+                    }`}>
+                      {avatarPreview ? (
+                        <img src={avatarPreview} alt="Preview" className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-xs opacity-40 font-mono">No Image</span>
+                      )}
+                    </div>
+
+                    <input
+                      type="file"
+                      accept="image/png, image/jpeg, image/jpg"
+                      onChange={handleAvatarChange}
+                      className="hidden"
+                      id="avatar-file-input"
+                    />
+                    
+                    <div className="flex gap-2">
+                      <label
+                        htmlFor="avatar-file-input"
+                        className="px-4 py-2 border border-white/10 bg-white/5 hover:bg-white/10 rounded-xl text-xs font-semibold cursor-pointer flex items-center gap-1.5"
+                      >
+                        <Search className="w-3.5 h-3.5" />
+                        <span>Select Photo</span>
+                      </label>
+                      
+                      {avatarFile && (
+                        <button
+                          onClick={handleUploadAvatar}
+                          disabled={uploadingAvatar}
+                          className="px-4 py-2 bg-gradient-to-tr from-cyan-500 to-sky-600 hover:from-cyan-400 hover:to-sky-500 text-white text-xs font-semibold rounded-xl cursor-pointer flex items-center gap-1.5"
+                        >
+                          {uploadingAvatar ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <>
+                              <Upload className="w-3.5 h-3.5" />
+                              <span>Upload photo</span>
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {uploadAvatarSuccess && (
+                    <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono rounded-xl text-center">
+                      ✓ Profile photo uploaded and updated successfully!
+                    </div>
+                  )}
+                </div>
+
+                {/* 2. Upload CV PDF */}
+                <div className={`p-6 rounded-2xl border space-y-6 ${
+                  isDark ? 'bg-slate-950/45 border-slate-900' : 'bg-white border-slate-200'
+                }`}>
+                  <div>
+                    <h3 className="text-sm font-semibold uppercase tracking-wider font-mono opacity-60 flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-cyan-400" />
+                      <span>Upload CV Resume PDF</span>
+                    </h3>
+                    <p className="text-xs opacity-60 mt-1">Upload an updated PDF resume. Replaces the default Adarsh_Singh_CV.pdf.</p>
+                  </div>
+
+                  <div className="flex flex-col items-center gap-4 border border-dashed border-white/10 p-6 rounded-xl bg-white/[0.01] h-[166px] justify-center">
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      onChange={handleCvChange}
+                      className="hidden"
+                      id="cv-file-input"
+                    />
+
+                    {cvFile ? (
+                      <div className="text-center space-y-1">
+                        <FileText className="w-8 h-8 text-cyan-400 mx-auto" />
+                        <p className="text-xs font-mono font-bold max-w-[200px] truncate">{cvFile.name}</p>
+                        <p className="text-[10px] opacity-50 font-mono">{(cvFile.size / (1024 * 1024)).toFixed(2)} MB</p>
+                      </div>
+                    ) : (
+                      <div className="text-center opacity-40 space-y-1">
+                        <FileText className="w-8 h-8 mx-auto" />
+                        <p className="text-xs font-mono">No PDF selected</p>
+                      </div>
+                    )}
+
+                    <div className="flex gap-2">
+                      <label
+                        htmlFor="cv-file-input"
+                        className="px-4 py-2 border border-white/10 bg-white/5 hover:bg-white/10 rounded-xl text-xs font-semibold cursor-pointer flex items-center gap-1.5"
+                      >
+                        <Search className="w-3.5 h-3.5" />
+                        <span>Select PDF</span>
+                      </label>
+                      
+                      {cvFile && (
+                        <button
+                          onClick={handleUploadCv}
+                          disabled={uploadingCv}
+                          className="px-4 py-2 bg-gradient-to-tr from-cyan-500 to-sky-600 hover:from-cyan-400 hover:to-sky-500 text-white text-xs font-semibold rounded-xl cursor-pointer flex items-center gap-1.5"
+                        >
+                          {uploadingCv ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <>
+                              <Upload className="w-3.5 h-3.5" />
+                              <span>Upload PDF</span>
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {uploadCvSuccess && (
+                    <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono rounded-xl text-center">
+                      ✓ CV PDF uploaded and updated successfully!
+                    </div>
+                  )}
+                </div>
+
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="settings-tab"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              className="space-y-6"
+            >
+              <div className={`p-6 rounded-2xl border space-y-6 max-w-xl mx-auto ${
+                isDark ? 'bg-slate-950/45 border-slate-900' : 'bg-white border-slate-200'
+              }`}>
+                <div>
+                  <h3 className="text-sm font-semibold uppercase tracking-wider font-mono opacity-60 flex items-center gap-2">
+                    <Settings className="w-4 h-4 text-sky-450" />
+                    <span>Change Admin Credentials</span>
+                  </h3>
+                  <p className="text-xs opacity-60 mt-1">Modify your secure admin username and password. After saving, you will be logged out.</p>
+                </div>
+
+                {changeCredError && (
+                  <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs font-mono rounded-xl text-center flex items-center justify-center gap-1.5">
+                    <AlertCircle className="w-4 h-4" />
+                    <span>{changeCredError}</span>
+                  </div>
+                )}
+
+                {changeCredSuccess && (
+                  <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono rounded-xl text-center">
+                    ✓ Credentials updated! Redirecting to login...
+                  </div>
+                )}
+
+                <form onSubmit={handleChangeCredentials} className="space-y-4">
+                  <div>
+                    <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Current Password</label>
+                    <input
+                      type="password"
+                      required
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="Verify current password"
+                      className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                        isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                      }`}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">New Username</label>
+                    <input
+                      type="text"
+                      required
+                      value={newUsername}
+                      onChange={(e) => setNewUsername(e.target.value)}
+                      placeholder="Enter new username"
+                      className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                        isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                      }`}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">New Password</label>
+                    <input
+                      type="password"
+                      required
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Enter new password"
+                      className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                        isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                      }`}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-mono font-bold tracking-wider uppercase mb-1.5 opacity-60">Confirm New Password</label>
+                    <input
+                      type="password"
+                      required
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Re-type new password"
+                      className={`w-full px-4 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all ${
+                        isDark ? 'bg-white/5 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                      }`}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={changingCredentials}
+                    className="w-full py-3 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-xs font-semibold uppercase tracking-wider rounded-xl cursor-pointer transition-all flex items-center justify-center gap-2"
+                  >
+                    {changingCredentials ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <>
+                        <Save className="w-3.5 h-3.5" />
+                        <span>Update Credentials</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

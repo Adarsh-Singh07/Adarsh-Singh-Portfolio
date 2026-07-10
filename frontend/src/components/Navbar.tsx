@@ -75,7 +75,7 @@ export default function Navbar({ isDark, toggleTheme, currentMode, onModeChange,
             >
               {!imgError ? (
                 <img 
-                  src="/avatar.jpg" 
+                  src="/api/v1/portfolio/assets/avatar.jpg" 
                   alt="AS" 
                   onError={() => setImgError(true)} 
                   className="w-full h-full object-cover"
@@ -102,7 +102,7 @@ export default function Navbar({ isDark, toggleTheme, currentMode, onModeChange,
 
             {/* view resume dynamic link */}
             <a
-              href="/Adarsh_Singh_CV.pdf"
+              href="/api/v1/portfolio/assets/cv.pdf"
               target="_blank"
               rel="noopener noreferrer"
               className={`px-4 py-2 rounded-full text-xs font-medium tracking-wide flex items-center gap-1.5 focus:outline-none transition-all duration-300 cursor-pointer ${
@@ -306,7 +306,7 @@ export default function Navbar({ isDark, toggleTheme, currentMode, onModeChange,
 
             {/* Mobile Call-To-Action Link */}
             <a
-              href="/Adarsh_Singh_CV.pdf"
+              href="/api/v1/portfolio/assets/cv.pdf"
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setMobileMenuOpen(false)}

@@ -440,5 +440,77 @@ export class PortfolioService {
     }
     return await response.json();
   }
+
+  /**
+   * Changes admin credentials (username and password).
+   */
+  public static async changeCredentials(
+    token: string,
+    currentPassword: string,
+    newUsername: string,
+    newPassword: string
+  ): Promise<{ success: boolean; message: string }> {
+    if (this.useMock) {
+      return { success: true, message: 'Credentials updated in mock mode.' };
+    }
+    const response = await fetch(`${this.apiBaseUrl}/admin/change-credentials`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Token': token,
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ current_password: currentPassword, new_username: newUsername, new_password: newPassword }),
+    });
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.detail || 'Failed to update credentials.');
+    }
+    return await response.json();
+  }
+
+  /**
+   * Uploads profile photo.
+   */
+  public static async uploadAvatar(token: string, fileData: string): Promise<{ success: boolean; message: string }> {
+    if (this.useMock) {
+      return { success: true, message: 'Avatar image uploaded mock mode.' };
+    }
+    const response = await fetch(`${this.apiBaseUrl}/admin/upload/avatar`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Token': token,
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ file_data: fileData }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to upload avatar image.');
+    }
+    return await response.json();
+  }
+
+  /**
+   * Uploads CV PDF.
+   */
+  public static async uploadCv(token: string, fileData: string): Promise<{ success: boolean; message: string }> {
+    if (this.useMock) {
+      return { success: true, message: 'CV PDF uploaded mock mode.' };
+    }
+    const response = await fetch(`${this.apiBaseUrl}/admin/upload/cv`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Token': token,
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ file_data: fileData }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to upload CV PDF.');
+    }
+    return await response.json();
+  }
 }
 export default PortfolioService;
