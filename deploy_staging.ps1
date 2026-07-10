@@ -34,14 +34,43 @@ if ($null -eq $stagingFiles -or $stagingFiles.Length -eq 0) {
     Write-Host "Staging bucket already has files. Skipping production sync to preserve staging test data." -ForegroundColor Green
 }
 
-# 3. Deploy Staging Backend to Google Cloud Run (mounted to staging bucket)
-Write-Host "`n[3/5] Deploying backend to Cloud Run staging service..." -ForegroundColor Yellow
+# 3. Load environment variables from local .env and Deploy Staging Backend to Google Cloud Run
+Write-Host "`n[3/5] Loading environment variables from .env and deploying backend..." -ForegroundColor Yellow
+
+$envList = @()
+if (Test-Path ".env") {
+    Get-Content ".env" | ForEach-Object {
+        $line = $_.Trim()
+        if ($line -and -not $line.StartsWith("#") -and $line.Contains("=")) {
+            $parts = $line.Split("=", 2)
+            $key = $parts[0].Trim()
+            $value = $parts[1].Trim().Trim('"').Trim("'").Replace(",", "\,")
+            $envList += "$key=$value"
+        }
+    }
+}
+
+# Ensure staging preview url is added to ALLOWED_ORIGINS for CORS
+$hasOrigins = $false
+for ($i = 0; $i -lt $envList.Length; $i++) {
+    if ($envList[$i].StartsWith("ALLOWED_ORIGINS=")) {
+        $hasOrigins = $true
+        $envList[$i] = $envList[$i] + "\,https://adarshsingh-portfolio--admin-crud-test-ud4lt1en.web.app"
+    }
+}
+if (-not $hasOrigins) {
+    $envList += "ALLOWED_ORIGINS=*"
+}
+
+$envVarsString = [string]::Join(",", $envList)
+
 gcloud run deploy $STAGING_SERVICE `
     --source ./backend `
     --region $REGION `
     --project $PROJECT_ID `
     "--add-volume=name=db-volume,type=cloud-storage,bucket=$STAGING_BUCKET" `
     "--add-volume-mount=volume=db-volume,mount-path=/app/data" `
+    --set-env-vars $envVarsString `
     --allow-unauthenticated
 
 if ($LASTEXITCODE -ne 0) {
