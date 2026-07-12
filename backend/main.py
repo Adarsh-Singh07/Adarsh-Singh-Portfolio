@@ -337,6 +337,12 @@ def load_profiles():
         print(f"Error loading profiles database: {e}")
         return {}
 
+def save_profiles(profiles):
+    """Saves consolidated profile roles to local JSON database."""
+    os.makedirs(DATA_DIR, exist_ok=True)
+    with open(PROFILE_JSON, "w", encoding="utf-8") as f:
+        json.dump(profiles, f, indent=2, ensure_ascii=False)
+
 class ContactPayload(BaseModel):
     name: str
     email: EmailStr

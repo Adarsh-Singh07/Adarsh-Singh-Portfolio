@@ -973,7 +973,7 @@ export default function DetailEditModal({
                   </div>
                 </div>
               </div>
-            ) : (
+            ) : item ? (
               // READ ONLY DETAILS VIEW
               <div className="flex flex-col gap-6">
                 
@@ -1341,7 +1341,7 @@ export default function DetailEditModal({
                 )}
 
               </div>
-            )}
+            ) : null}
           </form>
         </motion.div>
       </div>
