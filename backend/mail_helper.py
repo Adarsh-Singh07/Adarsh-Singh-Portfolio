@@ -7,14 +7,36 @@ from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+SMTP_CONFIG_JSON = "/app/data/smtp_config.json"
+if not os.path.exists("/app/data"):
+    SMTP_CONFIG_JSON = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "smtp_config.json")
+
 def get_smtp_config():
-    """Helper to retrieve SMTP configuration from environment variables."""
+    """Helper to retrieve SMTP configuration from JSON database or environment variables."""
+    # 1. Load from environment variables first (fallbacks)
     smtp_host = os.getenv("SMTP_HOST")
     smtp_port_str = os.getenv("SMTP_PORT")
     smtp_user = os.getenv("SMTP_USER")
     smtp_password = os.getenv("SMTP_PASSWORD")
     smtp_to = os.getenv("SMTP_TO") or os.getenv("SMTP_USER") or "adarsh2001gop@gmail.com"
+    resend_api_key = os.getenv("RESEND_API_KEY")
+    resend_from = os.getenv("RESEND_FROM") or "onboarding@resend.dev"
     
+    # 2. Override with JSON if it exists
+    if os.path.exists(SMTP_CONFIG_JSON):
+        try:
+            with open(SMTP_CONFIG_JSON, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                smtp_host = data.get("SMTP_HOST", smtp_host)
+                smtp_port_str = str(data.get("SMTP_PORT", smtp_port_str))
+                smtp_user = data.get("SMTP_USER", smtp_user)
+                smtp_password = data.get("SMTP_PASSWORD", smtp_password)
+                smtp_to = data.get("SMTP_TO", smtp_to)
+                resend_api_key = data.get("RESEND_API_KEY", resend_api_key)
+                resend_from = data.get("RESEND_FROM", resend_from)
+        except Exception as e:
+            print(f"Error loading smtp_config.json: {e}")
+
     smtp_port = 587
     if smtp_port_str:
         try:
@@ -27,12 +49,15 @@ def get_smtp_config():
         "port": smtp_port,
         "user": smtp_user,
         "password": smtp_password,
-        "to": smtp_to
+        "to": smtp_to,
+        "resend_api_key": resend_api_key,
+        "resend_from": resend_from
     }
 
 def send_email_via_resend(to_email: str, subject: str, html_content: str, reply_to: str = None) -> bool:
     """Dispatches email using Resend API (HTTP client). Returns True if successful."""
-    api_key = os.getenv("RESEND_API_KEY")
+    config = get_smtp_config()
+    api_key = config["resend_api_key"]
     if not api_key:
         return False
         
@@ -43,7 +68,7 @@ def send_email_via_resend(to_email: str, subject: str, html_content: str, reply_
     }
     
     # Resend free tier sends from onboarding@resend.dev by default unless a domain is verified
-    from_email = os.getenv("RESEND_FROM") or "onboarding@resend.dev"
+    from_email = config["resend_from"]
     
     payload = {
         "from": from_email,

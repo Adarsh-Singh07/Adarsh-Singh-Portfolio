@@ -3,21 +3,30 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Project, ProfileMode } from '../types';
-import { ArrowUpRight, Github, ExternalLink, Cpu, Database, Cloud, Layers, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Github, ExternalLink, Plus, Layers, Cpu, Database } from 'lucide-react';
+import DetailEditModal from '../components/DetailEditModal';
+import PortfolioService from '../services/api';
 
 interface ProjectsPageProps {
   projects: Project[];
   currentMode: ProfileMode;
   isDark: boolean;
+  onRefreshData?: () => void;
 }
 
 type ProjectCategory = 'All' | 'AI' | 'Data Engineering' | 'GenAI' | 'ETL' | 'Cloud';
 
-export default function Projects({ projects, currentMode, isDark }: ProjectsPageProps) {
+export default function Projects({ projects, currentMode, isDark, onRefreshData }: ProjectsPageProps) {
   const [activeCategory, setActiveCategory] = useState<ProjectCategory>('All');
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'view' | 'create'>('view');
+
+  const token = sessionStorage.getItem('admin-token') || localStorage.getItem('admin-token');
+  const isAdmin = !!token;
 
   // Categories list
   const categories: ProjectCategory[] = ['All', 'AI', 'Data Engineering', 'GenAI', 'ETL', 'Cloud'];
@@ -25,7 +34,6 @@ export default function Projects({ projects, currentMode, isDark }: ProjectsPage
   // Helper to check if a project belongs to a category
   const projectBelongsToCategory = (project: Project, category: ProjectCategory): boolean => {
     if (category === 'All') return true;
-    
     const techs = project.technologies.map(t => t.toLowerCase());
     const title = project.title.toLowerCase();
     const desc = project.description.toLowerCase();
@@ -48,14 +56,84 @@ export default function Projects({ projects, currentMode, isDark }: ProjectsPage
     return false;
   };
 
-  // Sort projects by priority for the active profile mode
-  const sortedProjects = [...projects].sort((a, b) => a.priority[currentMode] - b.priority[currentMode]);
+  // Sort projects by priority for the active profile mode, filtering out hidden items
+  const sortedProjects = [...projects]
+    .filter(p => {
+      const prio = p.priority?.[currentMode];
+      return prio !== 99 && prio !== undefined;
+    })
+    .sort((a, b) => {
+      const prioA = a.priority?.[currentMode] ?? 99;
+      const prioB = b.priority?.[currentMode] ?? 99;
+      return prioA - prioB;
+    });
 
   // Filter projects based on active category
   const filteredProjects = sortedProjects.filter(p => projectBelongsToCategory(p, activeCategory));
 
   // Identify featured project (Spotlight card)
   const featuredProject = sortedProjects.find(p => p.id === 'agentic-rag-platform') || sortedProjects[0];
+
+  const handleCardClick = (project: Project, e: React.MouseEvent) => {
+    // Prevent opening modal if user clicks directly on GitHub/Demo link tags
+    const target = e.target as HTMLElement;
+    if (target.closest('a')) return;
+    
+    setSelectedProject(project);
+    setModalMode('view');
+    setIsModalOpen(true);
+  };
+
+  const handleAddNew = () => {
+    setSelectedProject(null);
+    setModalMode('create');
+    setIsModalOpen(true);
+  };
+
+  const handleSave = async (updatedProject: Project) => {
+    if (!token) return;
+    try {
+      const fullConfig = await PortfolioService.getAdminConfig(token);
+      const activeProfile = fullConfig[currentMode];
+      if (!activeProfile) return;
+
+      if (!activeProfile.projects) {
+        activeProfile.projects = [];
+      }
+
+      const existingIndex = activeProfile.projects.findIndex(p => p.id === updatedProject.id);
+      if (existingIndex >= 0) {
+        activeProfile.projects[existingIndex] = updatedProject;
+      } else {
+        activeProfile.projects.push(updatedProject);
+      }
+
+      await PortfolioService.saveAdminConfig(token, fullConfig);
+      if (onRefreshData) onRefreshData();
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error('Failed to save project:', err);
+      alert('Failed to save project data.');
+    }
+  };
+
+  const handleDelete = async (projectId: string) => {
+    if (!token) return;
+    try {
+      const fullConfig = await PortfolioService.getAdminConfig(token);
+      const activeProfile = fullConfig[currentMode];
+      if (!activeProfile || !activeProfile.projects) return;
+
+      activeProfile.projects = activeProfile.projects.filter(p => p.id !== projectId);
+      await PortfolioService.saveAdminConfig(token, fullConfig);
+      
+      if (onRefreshData) onRefreshData();
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error('Failed to delete project:', err);
+      alert('Failed to delete project.');
+    }
+  };
 
   // Container variants
   const containerVariants = {
@@ -85,28 +163,41 @@ export default function Projects({ projects, currentMode, isDark }: ProjectsPage
   };
 
   return (
-    <div className="min-h-screen py-28 px-6 md:px-12 max-w-7xl mx-auto w-full select-none">
+    <div className="min-h-screen py-28 px-6 md:px-12 max-w-7xl mx-auto w-full">
+      
       {/* Editorial Page Header */}
-      <div className="mb-16 text-left max-w-4xl">
-        <div className="flex items-center gap-2 mb-4">
-          <span className="w-8 h-[1px] bg-[#007AFF]" />
-          <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#007AFF]">
-            Bento Catalog v2.0
-          </span>
+      <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="text-left max-w-2xl">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="w-8 h-[1px] bg-[#007AFF]" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#007AFF]">
+              Bento Catalog v2.0
+            </span>
+          </div>
+          <h1 className="text-4xl md:text-6xl font-sans font-semibold tracking-tight leading-none mb-6">
+            Architectural Works &amp;<br />
+            <span className={`text-transparent bg-clip-text bg-gradient-to-r ${
+              isDark 
+                ? 'from-white via-white/80 to-white/40' 
+                : 'from-neutral-950 via-neutral-900 to-neutral-500'
+            } italic font-serif font-medium`}>Intelligent Systems</span>
+          </h1>
+          <p className={`text-base md:text-lg font-light leading-relaxed ${
+            isDark ? 'text-slate-300' : 'text-slate-600'
+          }`}>
+            An asymmetrical curation of generative ecosystems, low-latency streaming lakes, and deep machine translation endpoints.
+          </p>
         </div>
-        <h1 className="text-4xl md:text-6xl font-sans font-semibold tracking-tight leading-none mb-6">
-          Architectural Works &amp;<br />
-          <span className={`text-transparent bg-clip-text bg-gradient-to-r ${
-            isDark 
-              ? 'from-white via-white/80 to-white/40' 
-              : 'from-neutral-950 via-neutral-900 to-neutral-500'
-          } italic font-serif font-medium`}>Intelligent Systems</span>
-        </h1>
-        <p className={`text-base md:text-lg font-light max-w-2xl leading-relaxed ${
-          isDark ? 'text-slate-300' : 'text-slate-600'
-        }`}>
-          An asymmetrical curation of generative ecosystems, low-latency streaming lakes, and deep machine translation endpoints. Click below to filter by stack focus.
-        </p>
+
+        {isAdmin && (
+          <button
+            onClick={handleAddNew}
+            className="px-5 py-2.5 bg-[#007AFF] hover:bg-[#007AFF]/90 text-white rounded-full flex items-center gap-2 text-xs font-semibold shadow-glow cursor-pointer transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Project</span>
+          </button>
+        )}
       </div>
 
       {/* Luxury Filter Bar */}
@@ -147,22 +238,21 @@ export default function Projects({ projects, currentMode, isDark }: ProjectsPage
         animate="show"
         className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch"
       >
-        {/* Render SPOTLIGHT Featured Project if category is 'All' or matches featured project category */}
-        {projectBelongsToCategory(featuredProject, activeCategory) && (
+        {/* Spotlight Featured Project */}
+        {featuredProject && projectBelongsToCategory(featuredProject, activeCategory) && (
           <motion.div
             layout
             variants={itemVariants}
-            className={`col-span-1 lg:col-span-12 p-8 md:p-10 rounded-[40px] relative overflow-hidden transition-all duration-500 hover:shadow-2xl border ${
+            onClick={(e) => handleCardClick(featuredProject, e)}
+            className={`col-span-1 lg:col-span-12 p-8 md:p-10 rounded-[40px] relative overflow-hidden transition-all duration-500 hover:shadow-2xl border cursor-pointer ${
               isDark 
                 ? 'bg-[#151515]/60 hover:bg-[#151515] border-white/5 hover:border-[#007AFF]/20' 
                 : 'bg-white hover:bg-slate-50/80 border-neutral-200/60 hover:border-[#007AFF]/15'
             } flex flex-col justify-between group`}
           >
-            {/* Ambient Background Glow Layer */}
             <div className="absolute -right-32 -bottom-32 w-96 h-96 rounded-full filter blur-[120px] opacity-15 pointer-events-none bg-[#007AFF]/30 transition-opacity group-hover:opacity-25" />
             
             <div className="relative z-10 w-full">
-              {/* Card Badge */}
               <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                 <span className={`px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase ${
                   isDark ? 'bg-[#007AFF]/10 text-[#007AFF] border border-[#007AFF]/20' : 'bg-[#007AFF]/5 text-[#007AFF] border border-[#007AFF]/10'
@@ -170,14 +260,13 @@ export default function Projects({ projects, currentMode, isDark }: ProjectsPage
                   Spotlight System Spec
                 </span>
                 <div className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span className={`text-[10px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                     Active Status: <span className="text-emerald-500 font-semibold">{featuredProject.status}</span>
                   </span>
                 </div>
               </div>
 
-              {/* Title & Description */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
                 <div className="lg:col-span-6">
                   <h2 className="text-3xl md:text-4xl font-sans font-semibold tracking-tight mb-4 group-hover:text-[#007AFF] transition-colors duration-300">
@@ -190,7 +279,6 @@ export default function Projects({ projects, currentMode, isDark }: ProjectsPage
                   </p>
                 </div>
 
-                {/* Tech Badges Column */}
                 <div className="lg:col-span-6 flex flex-col justify-end lg:items-end">
                   <span className={`text-[9px] uppercase font-mono tracking-widest mb-3 block ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                     System Stack Configuration
@@ -213,12 +301,11 @@ export default function Projects({ projects, currentMode, isDark }: ProjectsPage
               </div>
             </div>
 
-            {/* Metrics & Action Links */}
             <div className="relative z-10 border-t border-white/5 pt-8 mt-6 grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
               <div className="col-span-1 md:col-span-2 grid grid-cols-3 gap-4">
-                {featuredProject.metrics.map((metric) => (
+                {featuredProject.metrics && featuredProject.metrics.map((metric) => (
                   <div key={metric.label}>
-                    <span className={`text-2xl md:text-3xl font-serif italic block font-medium text-glow-blue ${
+                    <span className={`text-2xl md:text-3xl font-serif italic block font-medium text-[#007AFF] ${
                       isDark ? 'text-white' : 'text-neutral-900'
                     }`}>
                       {metric.value}
@@ -232,28 +319,25 @@ export default function Projects({ projects, currentMode, isDark }: ProjectsPage
                 ))}
               </div>
 
-              {/* Links */}
               <div className="col-span-1 flex items-center justify-end gap-4">
                 <a
                   href={featuredProject.githubUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className={`p-3 rounded-2xl border flex items-center justify-center transition-all duration-300 ${
+                  className={`p-3 rounded-2xl border flex items-center justify-center transition-all duration-300 cursor-pointer ${
                     isDark 
                       ? 'bg-white/5 border-white/5 text-slate-300 hover:text-white hover:bg-[#007AFF]/10 hover:border-[#007AFF]/25' 
                       : 'bg-slate-100 border-slate-200 text-slate-700 hover:text-neutral-950 hover:bg-[#007AFF]/5 hover:border-[#007AFF]/20'
                   }`}
-                  aria-label="GitHub Repository"
                 >
                   <Github className="w-4 h-4" />
                 </a>
-                
                 {featuredProject.demoUrl && (
                   <a
                     href={featuredProject.demoUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className={`px-5 py-3 rounded-2xl text-xs font-bold uppercase tracking-widest flex items-center gap-1.5 transition-all duration-300 border ${
+                    className={`px-5 py-3 rounded-2xl text-xs font-bold uppercase tracking-widest flex items-center gap-1.5 transition-all duration-300 border cursor-pointer ${
                       isDark 
                         ? 'bg-white text-black border-transparent hover:bg-neutral-200 shadow-glow' 
                         : 'bg-neutral-900 text-white border-transparent hover:bg-neutral-800'
@@ -268,10 +352,10 @@ export default function Projects({ projects, currentMode, isDark }: ProjectsPage
           </motion.div>
         )}
 
-        {/* Render OTHER Projects dynamically */}
+        {/* Other Projects */}
         <AnimatePresence mode="popLayout">
           {filteredProjects
-            .filter(p => p.id !== featuredProject.id)
+            .filter(p => !featuredProject || p.id !== featuredProject.id)
             .map((proj, idx) => {
               const isLarge = idx % 3 === 0;
               return (
@@ -280,7 +364,8 @@ export default function Projects({ projects, currentMode, isDark }: ProjectsPage
                   layout
                   variants={itemVariants}
                   exit="exit"
-                  className={`p-6 md:p-8 rounded-[32px] border transition-all duration-500 hover:shadow-xl ${
+                  onClick={(e) => handleCardClick(proj, e)}
+                  className={`p-6 md:p-8 rounded-[32px] border transition-all duration-500 hover:shadow-xl cursor-pointer ${
                     isLarge ? 'col-span-1 lg:col-span-8' : 'col-span-1 lg:col-span-4'
                   } ${
                     isDark 
@@ -289,7 +374,6 @@ export default function Projects({ projects, currentMode, isDark }: ProjectsPage
                   } flex flex-col justify-between group`}
                 >
                   <div>
-                    {/* Top Status */}
                     <div className="flex items-center justify-between mb-5">
                       <span className={`text-[9px] uppercase font-sans tracking-widest px-2.5 py-1 rounded-full font-bold border ${
                         isDark
@@ -298,55 +382,33 @@ export default function Projects({ projects, currentMode, isDark }: ProjectsPage
                             : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
                           : proj.status === 'Deployed'
                             ? 'bg-[#007AFF]/5 text-[#007AFF] border-[#007AFF]/10'
-                            : 'bg-amber-50 text-amber-700 border-amber-200'
+                            : 'bg-amber-500/5 text-amber-600 border-amber-500/10'
                       }`}>
                         {proj.status}
                       </span>
-                      <span className={`text-[10px] font-mono ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                        P-{proj.priority[currentMode]}
-                      </span>
                     </div>
 
-                    <h3 className="text-xl font-semibold font-sans tracking-tight mb-3 group-hover:text-[#007AFF] transition-colors duration-300">
+                    <h3 className="text-xl font-sans font-semibold tracking-tight mb-2 group-hover:text-[#007AFF] transition-colors duration-300">
                       {proj.title}
                     </h3>
                     <p className={`text-xs font-light leading-relaxed mb-6 ${
                       isDark ? 'text-slate-300' : 'text-slate-600'
                     }`}>
-                      {proj.description}
+                      {proj.description.substring(0, 160)}...
                     </p>
+                  </div>
 
-                    {/* Tech Badges */}
-                    <div className="flex flex-wrap gap-1.5 mb-6">
-                      {proj.technologies.map((tech) => (
-                        <span
-                          key={tech}
-                          className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold tracking-wide border ${
-                            isDark 
-                              ? 'bg-white/5 border-white/5 text-slate-400' 
-                              : 'bg-slate-100 border-slate-200/60 text-slate-600'
+                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
+                    <div className="flex flex-wrap gap-1.5">
+                      {proj.technologies.slice(0, 3).map((tech) => (
+                        <span 
+                          key={tech} 
+                          className={`px-2 py-1 rounded-lg text-[9px] font-mono border ${
+                            isDark ? 'bg-white/5 border-white/5 text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-600'
                           }`}
                         >
                           {tech}
                         </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Metrics & Links */}
-                  <div className="border-t border-white/5 pt-5 mt-4 flex items-center justify-between gap-4">
-                    <div className="flex gap-4">
-                      {proj.metrics.slice(0, 2).map((m) => (
-                        <div key={m.label}>
-                          <span className="text-lg font-serif italic font-medium block text-[#007AFF] text-glow-blue leading-none">
-                            {m.value}
-                          </span>
-                          <span className={`text-[8px] uppercase font-sans tracking-wider block mt-1 ${
-                            isDark ? 'text-slate-400' : 'text-slate-600'
-                          }`}>
-                            {m.label}
-                          </span>
-                        </div>
                       ))}
                     </div>
 
@@ -355,38 +417,32 @@ export default function Projects({ projects, currentMode, isDark }: ProjectsPage
                         href={proj.githubUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className={`p-2.5 rounded-xl border flex items-center justify-center transition-colors ${
-                          isDark 
-                            ? 'bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10' 
-                            : 'bg-slate-100 border-slate-200 text-slate-600 hover:text-neutral-900 hover:bg-slate-200'
+                        className={`p-2.5 rounded-xl border flex items-center justify-center transition-all cursor-pointer ${
+                          isDark ? 'bg-white/5 border-white/5 hover:bg-white/10 text-slate-300' : 'bg-slate-100 border-slate-250 hover:bg-slate-200 text-slate-700'
                         }`}
-                        aria-label="GitHub Repository"
                       >
                         <Github className="w-3.5 h-3.5" />
                       </a>
-                      
-                      {proj.demoUrl && (
-                        <a
-                          href={proj.demoUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className={`p-2.5 rounded-xl border flex items-center justify-center transition-colors ${
-                            isDark 
-                              ? 'bg-[#007AFF]/10 border-[#007AFF]/20 text-[#007AFF] hover:bg-[#007AFF]/20' 
-                              : 'bg-[#007AFF]/5 border-[#007AFF]/15 text-[#007AFF] hover:bg-[#007AFF]/10'
-                          }`}
-                          aria-label="Live Demo"
-                        >
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                      )}
                     </div>
                   </div>
                 </motion.div>
               );
             })}
         </AnimatePresence>
+
       </motion.div>
+
+      {/* Detail Edit Modal */}
+      <DetailEditModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        type="project"
+        item={selectedProject}
+        onSave={handleSave}
+        onDelete={handleDelete}
+        isAdmin={isAdmin}
+        isDark={isDark}
+      />
     </div>
   );
 }

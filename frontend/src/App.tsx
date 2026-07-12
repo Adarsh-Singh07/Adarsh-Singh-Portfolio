@@ -12,12 +12,14 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Projects from './pages/Projects';
 import Skills from './pages/Skills';
+import Certifications from './pages/Certifications';
 import Timeline from './pages/Timeline';
 import Contact from './pages/Contact';
 import Blog from './pages/Blog';
 import { Loader2 } from 'lucide-react';
 import Chatbot from './components/Chatbot';
 import Dashboard from './pages/Dashboard';
+import Admin from './pages/Admin';
 
 
 declare global {
@@ -42,7 +44,17 @@ function AnalyticsTracker() {
 }
 
 // Wrapper component to enable useLocation for transitions
-function AnimatedRoutes({ profileData, currentMode, isDark }: { profileData: ProfileData; currentMode: ProfileMode; isDark: boolean }) {
+function AnimatedRoutes({ 
+  profileData, 
+  currentMode, 
+  isDark, 
+  onRefreshData 
+}: { 
+  profileData: ProfileData; 
+  currentMode: ProfileMode; 
+  isDark: boolean; 
+  onRefreshData: () => void 
+}) {
   const location = useLocation();
 
   return (
@@ -56,13 +68,15 @@ function AnimatedRoutes({ profileData, currentMode, isDark }: { profileData: Pro
         className="w-full flex-grow"
       >
         <Routes location={location}>
-          <Route path="/" element={<Home config={profileData.hero} isDark={isDark} />} />
-          <Route path="/projects" element={<Projects projects={profileData.projects} currentMode={currentMode} isDark={isDark} />} />
-          <Route path="/skills" element={<Skills categories={profileData.skills} certifications={profileData.certifications} currentMode={currentMode} isDark={isDark} />} />
+          <Route path="/" element={<Home config={profileData.hero} homeCards={profileData.homeCards} currentMode={currentMode} isDark={isDark} onRefreshData={onRefreshData} />} />
+          <Route path="/projects" element={<Projects projects={profileData.projects} currentMode={currentMode} isDark={isDark} onRefreshData={onRefreshData} />} />
+          <Route path="/skills" element={<Skills categories={profileData.skills} strengths={profileData.strengths || []} currentMode={currentMode} isDark={isDark} onRefreshData={onRefreshData} />} />
+          <Route path="/certifications" element={<Certifications certifications={profileData.certifications} currentMode={currentMode} isDark={isDark} onRefreshData={onRefreshData} />} />
           <Route path="/timeline" element={<Timeline journey={profileData.journey} currentMode={currentMode} isDark={isDark} />} />
-          <Route path="/blog" element={<Blog blogs={profileData.blogs} currentMode={currentMode} isDark={isDark} />} />
-          <Route path="/contact" element={<Contact isDark={isDark} />} />
+          <Route path="/blog" element={<Blog blogs={profileData.blogs} currentMode={currentMode} isDark={isDark} onRefreshData={onRefreshData} />} />
+          <Route path="/contact" element={<Contact isDark={isDark} coordinates={profileData.coordinates} currentMode={currentMode} onRefreshData={onRefreshData} />} />
           <Route path="/dashboard" element={<Dashboard isDark={isDark} />} />
+          <Route path="/admin" element={<Admin isDark={isDark} onRefreshData={onRefreshData} />} />
         </Routes>
       </motion.div>
     </AnimatePresence>
@@ -78,6 +92,7 @@ export default function App() {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState<RoleDefinition[]>([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Load roles dynamically from the backend on startup
   useEffect(() => {
@@ -93,7 +108,7 @@ export default function App() {
       }
     };
     fetchRoles();
-  }, []);
+  }, [refreshTrigger]);
 
   // Auto-detect system color scheme preference & persistent state
   useEffect(() => {
@@ -127,7 +142,7 @@ export default function App() {
 
     loadModeData();
     return () => { active = false; };
-  }, [currentMode]);
+  }, [currentMode, refreshTrigger]);
 
   const toggleTheme = () => {
     const nextTheme = !isDark;
@@ -164,6 +179,7 @@ export default function App() {
               profileData={profileData} 
               currentMode={currentMode} 
               isDark={isDark} 
+              onRefreshData={() => setRefreshTrigger(prev => prev + 1)}
             />
           </main>
         ) : loading ? (

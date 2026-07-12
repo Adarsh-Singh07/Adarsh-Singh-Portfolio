@@ -142,6 +142,18 @@ def chunk_data():
                     "content": content
                 })
                 
+            # 2.6 Chunk FAQs
+            for faq in data.get("faqs", []):
+                q = faq.get("question", "")
+                a = faq.get("answer", "")
+                if q and a:
+                    content = f"Question: {q}\nAnswer: {a}"
+                    chunks.append({
+                        "source_file": "profile.json",
+                        "chunk_title": f"FAQ: {q[:40]}",
+                        "content": content
+                    })
+                
         except Exception as e:
             print(f"Error chunking profile.json: {e}")
             

@@ -1,4 +1,21 @@
 {
+  "roles": [
+    {
+      "id": "general",
+      "label": "General AI/Data",
+      "icon": "Layers"
+    },
+    {
+      "id": "data-engineer",
+      "label": "Data Engineer",
+      "icon": "Database"
+    },
+    {
+      "id": "ai-engineer",
+      "label": "Gen AI Engineer",
+      "icon": "Cpu"
+    }
+  ],
   "general": {
     "hero": {
       "badge": "AI & Data Engineering Innovator",
@@ -620,7 +637,110 @@
         }
       }
     ],
-    "philosophy": "My passion lies at the intersection of data and intelligence, where complex data ecosystems meet cutting-edge AI. I am driven by the challenge of transforming raw data into actionable insights and building intelligent systems that not only solve real-world problems but also scale efficiently. From architecting robust ETL pipelines to deploying advanced Generative AI and Machine Learning models, I believe in a holistic approach that combines engineering rigor with innovative AI capabilities to create truly transformative solutions."
+    "philosophy": "My passion lies at the intersection of data and intelligence, where complex data ecosystems meet cutting-edge AI. I am driven by the challenge of transforming raw data into actionable insights and building intelligent systems that not only solve real-world problems but also scale efficiently. From architecting robust ETL pipelines to deploying advanced Generative AI and Machine Learning models, I believe in a holistic approach that combines engineering rigor with innovative AI capabilities to create truly transformative solutions.",
+    "homeCards": [
+      {
+        "id": "ai-assistant",
+        "title": "Ask My AI Assistant",
+        "subtitle": "Interactive Chatbot",
+        "description": "Engage with my digital twin to query my expertise, work experience, and RAG architectures in real-time.",
+        "buttonText": "Start Chat",
+        "badge": "Active Now",
+        "extra": [
+          "Ask about Spark",
+          "Ask about Generative AI"
+        ]
+      },
+      {
+        "id": "availability",
+        "title": "Professional Availability",
+        "subtitle": "Current Work Status",
+        "description": "Currently open to senior GenAI and Data Engineering roles, remote consultations, and architecture designs.",
+        "buttonText": "View Availability",
+        "badge": "Open for Roles",
+        "extra": [
+          "Role: Software/Data/AI Engineer",
+          "Location: India"
+        ]
+      },
+      {
+        "id": "featured-stack",
+        "title": "Primary Technical Stack",
+        "subtitle": "Core Technologies",
+        "description": "Advanced proficiency in building end-to-end AI applications, scaling PySpark pipelines, and cloud orchestration.",
+        "buttonText": "View Full Stack",
+        "badge": "10+ Tech Skills",
+        "extra": [
+          "Python",
+          "Azure Databricks",
+          "Delta Lake",
+          "Gemini API"
+        ]
+      },
+      {
+        "id": "quick-connect",
+        "title": "Direct Collaboration Portal",
+        "subtitle": "Let's Connect",
+        "description": "Reach out directly for potential collaboration, projects, or to request a detailed resume breakdown.",
+        "buttonText": "Send Message",
+        "badge": "Response in 24h",
+        "extra": [
+          "Email: adarsh2001gop@gmail.com",
+          "Resume: Available"
+        ]
+      }
+    ],
+    "strengths": [
+      {
+        "id": "etl-pipelines",
+        "title": "Scalable ETL Pipelines",
+        "desc": "Architecting medallion delta lakehouse flows, transforming raw JSON logs to structured BI-ready records.",
+        "signal": "Capgemini Production Lead",
+        "icon": "Database"
+      },
+      {
+        "id": "rag",
+        "title": "Retrieval-Augmented Gen",
+        "desc": "Designing stateful hybrid semantic searches, hybrid query merging, and context caching architectures.",
+        "signal": "98% Citation Accuracy",
+        "icon": "Cpu"
+      },
+      {
+        "id": "cloud-infra",
+        "title": "Cloud Infrastructure",
+        "desc": "Orchestrating Azure Synapse workloads, ADF triggers, and GCP serverless machine learning APIs.",
+        "signal": "Certified Developer Assoc.",
+        "icon": "Cloud"
+      },
+      {
+        "id": "event-apis",
+        "title": "Event-Driven APIs",
+        "desc": "Developing low-latency asynchronous FastAPI routes and WebSocket channels for telemetry dashboards.",
+        "signal": "<45ms response loop",
+        "icon": "Zap"
+      },
+      {
+        "id": "cicd-automation",
+        "title": "CI/CD & Automation",
+        "desc": "Building containerized Docker builds and Github Action runners for automatic code compilation.",
+        "signal": "Agile Standard Compliant",
+        "icon": "Infinity"
+      },
+      {
+        "id": "cv-ml",
+        "title": "Computer Vision ML",
+        "desc": "Deploying optimized gesture translation pipelines and model checkpoints to constraint targets.",
+        "signal": "OpenCV & PyTorch Expert",
+        "icon": "ShieldCheck"
+      }
+    ],
+    "coordinates": {
+      "email": "adarsh2001gop@gmail.com",
+      "linkedin": "linkedin.com/in/adarshsingh45",
+      "github": "github.com/Adarsh-Singh-07",
+      "location": "Noida, Uttar Pradesh, India",
+      "hours": "Mon - Fri, 9:00 AM - 6:00 PM IST"
+    }
   },
   "data-engineer": {
     "hero": {
@@ -1152,7 +1272,110 @@
         }
       }
     ],
-    "philosophy": "My philosophy as a Data Engineer is to forge robust, scalable, and intelligent data foundations that empower informed decision-making and fuel the next generation of AI applications. I am passionate about architecting efficient ETL pipelines, leveraging Azure Databricks, Apache Spark, and Delta Lake to transform raw data into a trusted, accessible asset. My goal is to build data ecosystems that are not only performant and reliable but also seamlessly integrate with advanced analytics and Generative AI, driving innovation and tangible business value."
+    "philosophy": "My philosophy as a Data Engineer is to forge robust, scalable, and intelligent data foundations that empower informed decision-making and fuel the next generation of AI applications. I am passionate about architecting efficient ETL pipelines, leveraging Azure Databricks, Apache Spark, and Delta Lake to transform raw data into a trusted, accessible asset. My goal is to build data ecosystems that are not only performant and reliable but also seamlessly integrate with advanced analytics and Generative AI, driving innovation and tangible business value.",
+    "homeCards": [
+      {
+        "id": "ai-assistant",
+        "title": "Ask My AI Assistant",
+        "subtitle": "Interactive Chatbot",
+        "description": "Engage with my digital twin to query my expertise, work experience, and RAG architectures in real-time.",
+        "buttonText": "Start Chat",
+        "badge": "Active Now",
+        "extra": [
+          "Ask about Spark",
+          "Ask about Generative AI"
+        ]
+      },
+      {
+        "id": "availability",
+        "title": "Professional Availability",
+        "subtitle": "Current Work Status",
+        "description": "Currently open to senior GenAI and Data Engineering roles, remote consultations, and architecture designs.",
+        "buttonText": "View Availability",
+        "badge": "Open for Roles",
+        "extra": [
+          "Role: Software/Data/AI Engineer",
+          "Location: India"
+        ]
+      },
+      {
+        "id": "featured-stack",
+        "title": "Primary Technical Stack",
+        "subtitle": "Core Technologies",
+        "description": "Advanced proficiency in building end-to-end AI applications, scaling PySpark pipelines, and cloud orchestration.",
+        "buttonText": "View Full Stack",
+        "badge": "10+ Tech Skills",
+        "extra": [
+          "Python",
+          "Azure Databricks",
+          "Delta Lake",
+          "Gemini API"
+        ]
+      },
+      {
+        "id": "quick-connect",
+        "title": "Direct Collaboration Portal",
+        "subtitle": "Let's Connect",
+        "description": "Reach out directly for potential collaboration, projects, or to request a detailed resume breakdown.",
+        "buttonText": "Send Message",
+        "badge": "Response in 24h",
+        "extra": [
+          "Email: adarsh2001gop@gmail.com",
+          "Resume: Available"
+        ]
+      }
+    ],
+    "strengths": [
+      {
+        "id": "etl-pipelines",
+        "title": "Scalable ETL Pipelines",
+        "desc": "Architecting medallion delta lakehouse flows, transforming raw JSON logs to structured BI-ready records.",
+        "signal": "Capgemini Production Lead",
+        "icon": "Database"
+      },
+      {
+        "id": "rag",
+        "title": "Retrieval-Augmented Gen",
+        "desc": "Designing stateful hybrid semantic searches, hybrid query merging, and context caching architectures.",
+        "signal": "98% Citation Accuracy",
+        "icon": "Cpu"
+      },
+      {
+        "id": "cloud-infra",
+        "title": "Cloud Infrastructure",
+        "desc": "Orchestrating Azure Synapse workloads, ADF triggers, and GCP serverless machine learning APIs.",
+        "signal": "Certified Developer Assoc.",
+        "icon": "Cloud"
+      },
+      {
+        "id": "event-apis",
+        "title": "Event-Driven APIs",
+        "desc": "Developing low-latency asynchronous FastAPI routes and WebSocket channels for telemetry dashboards.",
+        "signal": "<45ms response loop",
+        "icon": "Zap"
+      },
+      {
+        "id": "cicd-automation",
+        "title": "CI/CD & Automation",
+        "desc": "Building containerized Docker builds and Github Action runners for automatic code compilation.",
+        "signal": "Agile Standard Compliant",
+        "icon": "Infinity"
+      },
+      {
+        "id": "cv-ml",
+        "title": "Computer Vision ML",
+        "desc": "Deploying optimized gesture translation pipelines and model checkpoints to constraint targets.",
+        "signal": "OpenCV & PyTorch Expert",
+        "icon": "ShieldCheck"
+      }
+    ],
+    "coordinates": {
+      "email": "adarsh2001gop@gmail.com",
+      "linkedin": "linkedin.com/in/adarshsingh45",
+      "github": "github.com/Adarsh-Singh-07",
+      "location": "Noida, Uttar Pradesh, India",
+      "hours": "Mon - Fri, 9:00 AM - 6:00 PM IST"
+    }
   },
   "ai-engineer": {
     "hero": {
@@ -1696,6 +1919,109 @@
         }
       }
     ],
-    "philosophy": "My philosophy as an AI Engineer is to build intelligent systems that are not only innovative but also robust, scalable, and ethically sound. I am driven by the potential of Generative AI, RAG, and Agentic AI to solve complex real-world problems, transforming data into actionable intelligence. My passion lies in architecting and deploying cutting-edge LLM applications, ensuring they deliver tangible value and push the boundaries of what's possible in artificial intelligence."
+    "philosophy": "My philosophy as an AI Engineer is to build intelligent systems that are not only innovative but also robust, scalable, and ethically sound. I am driven by the potential of Generative AI, RAG, and Agentic AI to solve complex real-world problems, transforming data into actionable intelligence. My passion lies in architecting and deploying cutting-edge LLM applications, ensuring they deliver tangible value and push the boundaries of what's possible in artificial intelligence.",
+    "homeCards": [
+      {
+        "id": "ai-assistant",
+        "title": "Ask My AI Assistant",
+        "subtitle": "Interactive Chatbot",
+        "description": "Engage with my digital twin to query my expertise, work experience, and RAG architectures in real-time.",
+        "buttonText": "Start Chat",
+        "badge": "Active Now",
+        "extra": [
+          "Ask about Spark",
+          "Ask about Generative AI"
+        ]
+      },
+      {
+        "id": "availability",
+        "title": "Professional Availability",
+        "subtitle": "Current Work Status",
+        "description": "Currently open to senior GenAI and Data Engineering roles, remote consultations, and architecture designs.",
+        "buttonText": "View Availability",
+        "badge": "Open for Roles",
+        "extra": [
+          "Role: Software/Data/AI Engineer",
+          "Location: India"
+        ]
+      },
+      {
+        "id": "featured-stack",
+        "title": "Primary Technical Stack",
+        "subtitle": "Core Technologies",
+        "description": "Advanced proficiency in building end-to-end AI applications, scaling PySpark pipelines, and cloud orchestration.",
+        "buttonText": "View Full Stack",
+        "badge": "10+ Tech Skills",
+        "extra": [
+          "Python",
+          "Azure Databricks",
+          "Delta Lake",
+          "Gemini API"
+        ]
+      },
+      {
+        "id": "quick-connect",
+        "title": "Direct Collaboration Portal",
+        "subtitle": "Let's Connect",
+        "description": "Reach out directly for potential collaboration, projects, or to request a detailed resume breakdown.",
+        "buttonText": "Send Message",
+        "badge": "Response in 24h",
+        "extra": [
+          "Email: adarsh2001gop@gmail.com",
+          "Resume: Available"
+        ]
+      }
+    ],
+    "strengths": [
+      {
+        "id": "etl-pipelines",
+        "title": "Scalable ETL Pipelines",
+        "desc": "Architecting medallion delta lakehouse flows, transforming raw JSON logs to structured BI-ready records.",
+        "signal": "Capgemini Production Lead",
+        "icon": "Database"
+      },
+      {
+        "id": "rag",
+        "title": "Retrieval-Augmented Gen",
+        "desc": "Designing stateful hybrid semantic searches, hybrid query merging, and context caching architectures.",
+        "signal": "98% Citation Accuracy",
+        "icon": "Cpu"
+      },
+      {
+        "id": "cloud-infra",
+        "title": "Cloud Infrastructure",
+        "desc": "Orchestrating Azure Synapse workloads, ADF triggers, and GCP serverless machine learning APIs.",
+        "signal": "Certified Developer Assoc.",
+        "icon": "Cloud"
+      },
+      {
+        "id": "event-apis",
+        "title": "Event-Driven APIs",
+        "desc": "Developing low-latency asynchronous FastAPI routes and WebSocket channels for telemetry dashboards.",
+        "signal": "<45ms response loop",
+        "icon": "Zap"
+      },
+      {
+        "id": "cicd-automation",
+        "title": "CI/CD & Automation",
+        "desc": "Building containerized Docker builds and Github Action runners for automatic code compilation.",
+        "signal": "Agile Standard Compliant",
+        "icon": "Infinity"
+      },
+      {
+        "id": "cv-ml",
+        "title": "Computer Vision ML",
+        "desc": "Deploying optimized gesture translation pipelines and model checkpoints to constraint targets.",
+        "signal": "OpenCV & PyTorch Expert",
+        "icon": "ShieldCheck"
+      }
+    ],
+    "coordinates": {
+      "email": "adarsh2001gop@gmail.com",
+      "linkedin": "linkedin.com/in/adarshsingh45",
+      "github": "github.com/Adarsh-Singh-07",
+      "location": "Noida, Uttar Pradesh, India",
+      "hours": "Mon - Fri, 9:00 AM - 6:00 PM IST"
+    }
   }
 }

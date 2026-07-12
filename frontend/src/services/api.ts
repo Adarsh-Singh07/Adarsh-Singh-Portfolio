@@ -512,5 +512,120 @@ export class PortfolioService {
     }
     return await response.json();
   }
+
+  /**
+   * Retrieves SMTP and Resend configuration (passwords masked).
+   */
+  public static async getSmtpSettings(token: string): Promise<any> {
+    if (this.useMock) {
+      return {
+        SMTP_HOST: 'smtp.gmail.com',
+        SMTP_PORT: 587,
+        SMTP_USER: 'adarsh2001gop@gmail.com',
+        SMTP_PASSWORD: '********',
+        SMTP_TO: 'adarsh2001gop@gmail.com',
+        RESEND_API_KEY: '********',
+        RESEND_FROM: 'onboarding@resend.dev'
+      };
+    }
+    const response = await fetch(`${this.apiBaseUrl}/admin/smtp`, {
+      method: 'GET',
+      headers: {
+        'X-Admin-Token': token,
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error('Failed to retrieve SMTP settings.');
+    }
+    return await response.json();
+  }
+
+  /**
+   * Saves SMTP and Resend API settings.
+   */
+  public static async saveSmtpSettings(token: string, settings: any): Promise<{ success: boolean; message: string }> {
+    if (this.useMock) {
+      return { success: true, message: 'SMTP settings saved mock mode.' };
+    }
+    const response = await fetch(`${this.apiBaseUrl}/admin/smtp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Token': token,
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(settings)
+    });
+    if (!response.ok) {
+      throw new Error('Failed to save SMTP settings.');
+    }
+    return await response.json();
+  }
+
+  /**
+   * Adds or updates a dynamic profile role switcher.
+   */
+  public static async addOrUpdateRole(token: string, roleData: { id: string; label: string; icon: string; copy_from?: string }): Promise<{ success: boolean; message: string }> {
+    if (this.useMock) {
+      return { success: true, message: 'Role saved mock mode.' };
+    }
+    const response = await fetch(`${this.apiBaseUrl}/admin/roles`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Token': token,
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(roleData)
+    });
+    if (!response.ok) {
+      throw new Error('Failed to configure dynamic profile role.');
+    }
+    return await response.json();
+  }
+
+  /**
+   * Deletes a dynamic profile role switcher.
+   */
+  public static async deleteRole(roleId: string, token: string): Promise<{ success: boolean; message: string }> {
+    if (this.useMock) {
+      return { success: true, message: 'Role deleted mock mode.' };
+    }
+    const response = await fetch(`${this.apiBaseUrl}/admin/roles/${roleId}`, {
+      method: 'DELETE',
+      headers: {
+        'X-Admin-Token': token,
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete dynamic profile role.');
+    }
+    return await response.json();
+  }
+
+  /**
+   * Submits an answer for an unanswered recruiter query.
+   */
+  public static async answerUnansweredQuestion(q_id: number, question: string, answer: string, token: string): Promise<{ success: boolean; message: string }> {
+    if (this.useMock) {
+      return { success: true, message: 'Answer saved mock mode.' };
+    }
+    const response = await fetch(`${this.apiBaseUrl}/analytics/unanswered/answer`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Passcode': token,
+        'X-Admin-Token': token,
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ q_id, question, answer })
+    });
+    if (!response.ok) {
+      throw new Error('Failed to submit question answer.');
+    }
+    return await response.json();
+  }
 }
 export default PortfolioService;

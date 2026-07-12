@@ -3,52 +3,72 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { HeroConfig } from '../types';
+import { HeroConfig, HomeCard, ProfileMode } from '../types';
 import Hero from '../sections/Hero';
-import { Code2, Award, Briefcase, BookOpen, ArrowRight } from 'lucide-react';
+import { Sparkles, Award, Database, Cpu, MessageSquare, Mail, Layers, ArrowRight } from 'lucide-react';
+import DetailEditModal from '../components/DetailEditModal';
+import PortfolioService from '../services/api';
 
 interface HomeProps {
   config: HeroConfig;
+  homeCards?: HomeCard[];
+  currentMode: ProfileMode;
   isDark: boolean;
+  onRefreshData?: () => void;
 }
 
-export default function Home({ config, isDark }: HomeProps) {
-  const teasers = [
-    {
-      title: 'Featured Bento Showcase',
-      label: 'Projects',
-      path: '/projects',
-      description: 'Explore the Agentic AI platform, real-time sign language models, and cloud-native databases.',
-      icon: Code2,
-      color: 'from-blue-500/10 to-indigo-500/10 hover:border-blue-500/30'
-    },
-    {
-      title: 'Skills & Accreditations',
-      label: 'Expertise',
-      path: '/skills',
-      description: 'Prestige wall showcasing Generative AI, Medallion ETL architectures, and cloud credentials.',
-      icon: Award,
-      color: 'from-purple-500/10 to-pink-500/10 hover:border-purple-500/30'
-    },
-    {
-      title: 'Chronological Journey',
-      label: 'Career timeline',
-      path: '/timeline',
-      description: 'A storytelling retrospective tracing progress from academic mathematics to capgemini analytics.',
-      icon: Briefcase,
-      color: 'from-emerald-500/10 to-teal-500/10 hover:border-emerald-500/30'
-    },
-    {
-      title: 'Editorial Notes & Blogs',
-      label: 'Insights',
-      path: '/blog',
-      description: 'Deep architectural dives into hybrid vector indexing, RAG, and Spark pipelines.',
-      icon: BookOpen,
-      color: 'from-amber-500/10 to-orange-500/10 hover:border-amber-500/30'
+export default function Home({ config, homeCards = [], currentMode, isDark, onRefreshData }: HomeProps) {
+  const [selectedCard, setSelectedCard] = useState<HomeCard | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const token = sessionStorage.getItem('admin-token') || localStorage.getItem('admin-token');
+  const isAdmin = !!token;
+
+  // Map icon strings to Lucide components
+  const getCardIcon = (id: string) => {
+    switch (id) {
+      case 'ai-assistant': return Cpu;
+      case 'availability': return Award;
+      case 'featured-stack': return Database;
+      case 'quick-connect': return Mail;
+      default: return Layers;
     }
-  ];
+  };
+
+  const handleCardClick = (card: HomeCard) => {
+    setSelectedCard(card);
+    setIsModalOpen(true);
+  };
+
+  const handleSave = async (updatedCard: HomeCard) => {
+    if (!token) return;
+    try {
+      const fullConfig = await PortfolioService.getAdminConfig(token);
+      const activeProfile = fullConfig[currentMode];
+      if (!activeProfile) return;
+
+      if (!activeProfile.homeCards) {
+        activeProfile.homeCards = [];
+      }
+
+      const existingIndex = activeProfile.homeCards.findIndex(c => c.id === updatedCard.id);
+      if (existingIndex >= 0) {
+        activeProfile.homeCards[existingIndex] = updatedCard;
+      } else {
+        activeProfile.homeCards.push(updatedCard);
+      }
+
+      await PortfolioService.saveAdminConfig(token, fullConfig);
+      if (onRefreshData) onRefreshData();
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error('Failed to save home card details:', err);
+      alert('Failed to save card config.');
+    }
+  };
 
   // Container animation variants for stagger entry
   const containerVariants = {
@@ -90,72 +110,108 @@ export default function Home({ config, isDark }: HomeProps) {
           {/* Section Heading */}
           <div className="mb-12 text-left">
             <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#007AFF] block mb-2">
-              System Navigation
+              System Console
             </span>
             <h2 className="text-3xl md:text-4xl font-sans font-semibold tracking-tight">
-              Explore the Portfolios
+              Interactive Spotlights
             </h2>
           </div>
 
           {/* Cards Grid */}
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-          >
-            {teasers.map((teaser) => {
-              const Icon = teaser.icon;
-              return (
-                <motion.div
-                  key={teaser.label}
-                  variants={cardVariants}
-                  whileHover={{ y: -6, scale: 1.01 }}
-                  className="h-full"
-                >
-                  <Link
-                    to={teaser.path}
-                    className={`h-full flex flex-col justify-between p-6 md:p-7 rounded-[30px] border transition-all duration-500 bg-gradient-to-br ${teaser.color} ${
-                      isDark 
-                        ? 'bg-neutral-900/40 border-white/5 hover:shadow-[0_20px_40px_rgba(0,122,255,0.08)]' 
-                        : 'bg-white border-neutral-200/60 hover:shadow-[0_15px_30px_rgba(0,0,0,0.03)]'
-                    } group cursor-pointer`}
+          {homeCards.length > 0 ? (
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+            >
+              {homeCards.map((card) => {
+                const Icon = getCardIcon(card.id);
+                return (
+                  <motion.div
+                    key={card.id}
+                    variants={cardVariants}
+                    onClick={() => handleCardClick(card)}
+                    whileHover={{ y: -6, scale: 1.01 }}
+                    className="h-full"
                   >
-                    <div>
-                      <div className="flex items-center justify-between mb-6">
-                        <div className={`p-3 rounded-2xl ${
-                          isDark ? 'bg-white/5 text-white/80' : 'bg-slate-100 text-neutral-800'
-                        } transition-colors group-hover:bg-[#007AFF] group-hover:text-white`}>
-                          <Icon className="w-5 h-5" />
+                    <div
+                      className={`h-full flex flex-col justify-between p-6 md:p-7 rounded-[30px] border transition-all duration-500 bg-gradient-to-br hover:border-[#007AFF]/30 ${
+                        isDark 
+                          ? 'bg-neutral-900/40 border-white/5 hover:shadow-[0_20px_40px_rgba(0,122,255,0.08)]' 
+                          : 'bg-white border-neutral-200/60 hover:shadow-[0_15px_30px_rgba(0,0,0,0.03)]'
+                      } group cursor-pointer`}
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-6">
+                          <div className={`p-3 rounded-2xl ${
+                            isDark ? 'bg-white/5 text-white/80' : 'bg-slate-100 text-neutral-800'
+                          } transition-colors group-hover:bg-[#007AFF] group-hover:text-white`}>
+                            <Icon className="w-5 h-5" />
+                          </div>
+                          <span className={`text-[10px] uppercase font-mono tracking-widest ${
+                            isDark ? 'text-slate-400' : 'text-slate-600'
+                          }`}>
+                            {card.badge}
+                          </span>
                         </div>
-                        <span className={`text-[10px] uppercase font-mono tracking-widest ${
-                          isDark ? 'text-slate-400' : 'text-slate-600'
+
+                        <h3 className="text-lg font-sans font-semibold tracking-tight mb-2 group-hover:text-[#007AFF] transition-colors duration-300">
+                          {card.title}
+                        </h3>
+                        <p className={`text-xs font-light leading-relaxed mb-6 ${
+                          isDark ? 'text-slate-300' : 'text-slate-600'
                         }`}>
-                          {teaser.label}
-                        </span>
+                          {card.description}
+                        </p>
                       </div>
 
-                      <h3 className="text-lg font-sans font-semibold tracking-tight mb-2 group-hover:text-[#007AFF] transition-colors duration-300">
-                        {teaser.title}
-                      </h3>
-                      <p className={`text-xs font-light leading-relaxed mb-6 ${
-                        isDark ? 'text-slate-300' : 'text-slate-600'
-                      }`}>
-                        {teaser.description}
-                      </p>
+                      {card.id === 'ai-assistant' ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.dispatchEvent(new CustomEvent('open-chatbot'));
+                          }}
+                          className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#007AFF] self-start mt-auto hover:text-[#007AFF]/80 transition-colors"
+                        >
+                          <span>{card.buttonText || 'Explore'}</span>
+                          <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
+                        </button>
+                      ) : (
+                        <Link
+                          to={card.id === 'availability' ? '/timeline' : card.id === 'featured-stack' ? '/skills' : '/contact'}
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#007AFF] self-start mt-auto hover:text-[#007AFF]/80 transition-colors"
+                        >
+                          <span>{card.buttonText || 'Explore'}</span>
+                          <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                      )}
                     </div>
-
-                    <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#007AFF] self-start mt-auto">
-                      <span>Enter Panel</span>
-                      <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </Link>
-                </motion.div>
-              );
-            })}
-          </motion.div>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          ) : (
+            <div className="text-center py-10">
+              <span className="text-xs text-slate-500 font-mono">No spotlight cards loaded from profile configurations.</span>
+            </div>
+          )}
         </div>
       </section>
+
+      {/* Detail Edit Modal */}
+      {selectedCard && (
+        <DetailEditModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          type="homeCard"
+          item={selectedCard}
+          onSave={handleSave}
+          isAdmin={isAdmin}
+          isDark={isDark}
+        />
+      )}
     </div>
   );
 }

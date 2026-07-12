@@ -73,6 +73,7 @@ async def add_security_headers(request: Request, call_next):
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 PROFILE_JSON = os.path.join(DATA_DIR, "profile.json")
 MESSAGES_JSON = os.path.join(DATA_DIR, "contact_messages.json")
+SMTP_CONFIG_JSON = os.path.join(DATA_DIR, "smtp_config.json")
 
 @app.on_event("startup")
 def on_startup():
@@ -345,6 +346,21 @@ class ContactPayload(BaseModel):
 class PasscodePayload(BaseModel):
     passcode: str
 
+class SmtpConfigPayload(BaseModel):
+    SMTP_HOST: str
+    SMTP_PORT: int
+    SMTP_USER: str
+    SMTP_PASSWORD: str
+    SMTP_TO: str
+    RESEND_API_KEY: str
+    RESEND_FROM: str
+
+class RoleCreatePayload(BaseModel):
+    id: str
+    label: str
+    icon: str
+    copy_from: str = "general"
+
 @app.get("/api/v1/portfolio/roles")
 async def get_roles():
     """Returns the list of available dynamic profile roles and their metadata."""
@@ -352,6 +368,12 @@ async def get_roles():
     if not profiles:
         return []
     
+    # 1. Check if roles list exists in profile.json
+    roles_list = profiles.get("roles")
+    if roles_list and isinstance(roles_list, list):
+        return roles_list
+        
+    # 2. Fallback to default roles if roles array is not present (migration/backward compatibility)
     role_meta = {
         "general": {"label": "General AI/Data", "icon": "Layers"},
         "data-engineer": {"label": "Data Engineer", "icon": "Database"},
@@ -363,13 +385,128 @@ async def get_roles():
     keys_to_process = [k for k in ordered_keys if k in profiles]
     
     for key in keys_to_process:
-        meta = role_meta[key]
+        meta = role_meta.get(key, {"label": key.replace("-", " ").title(), "icon": "Layers"})
         result.append({
             "id": key,
             "label": meta["label"],
             "icon": meta["icon"]
         })
     return result
+
+@app.post("/api/v1/portfolio/admin/roles")
+async def add_or_update_role(payload: RoleCreatePayload, request: Request):
+    """Adds a new dynamic role or updates an existing one in profile.json."""
+    token = get_token_from_request(request)
+    if not verify_session_token(token):
+        raise HTTPException(status_code=401, detail="Unauthorized session.")
+        
+    profiles = load_profiles()
+    if not profiles:
+        profiles = {}
+        
+    # Ensure "roles" key exists at root
+    if "roles" not in profiles or not isinstance(profiles["roles"], list):
+        profiles["roles"] = [
+            {"id": "general", "label": "General AI/Data", "icon": "Layers"},
+            {"id": "data-engineer", "label": "Data Engineer", "icon": "Database"},
+            {"id": "ai-engineer", "label": "Gen AI Engineer", "icon": "Cpu"}
+        ]
+        
+    # Check if role already exists in dynamic roles list
+    role_index = -1
+    for idx, r in enumerate(profiles["roles"]):
+        if r["id"] == payload.id:
+            role_index = idx
+            break
+            
+    if role_index >= 0:
+        # Update metadata
+        profiles["roles"][role_index]["label"] = payload.label
+        profiles["roles"][role_index]["icon"] = payload.icon
+    else:
+        # Create new metadata
+        profiles["roles"].append({
+            "id": payload.id,
+            "label": payload.label,
+            "icon": payload.icon
+        })
+        
+    # If the profile data for this role key does not exist, initialize it by copying from template
+    if payload.id not in profiles:
+        source_profile = profiles.get(payload.copy_from) or profiles.get("general") or {}
+        profiles[payload.id] = json.loads(json.dumps(source_profile))
+        
+    # Save the updated profile.json
+    try:
+        with open(PROFILE_JSON, "w", encoding="utf-8") as f:
+            json.dump(profiles, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save profiles: {str(e)}")
+        
+    return {"success": True, "message": f"Role '{payload.label}' configured successfully."}
+
+@app.get("/api/v1/portfolio/admin/smtp")
+async def get_smtp_settings(request: Request):
+    """Retrieves current SMTP and Resend configuration (passwords masked)."""
+    token = get_token_from_request(request)
+    if not verify_session_token(token):
+        raise HTTPException(status_code=401, detail="Unauthorized session.")
+        
+    from mail_helper import get_smtp_config
+    cfg = get_smtp_config()
+    
+    password_mask = "********" if cfg["password"] else ""
+    resend_key_mask = "********" if cfg["resend_api_key"] else ""
+    
+    return {
+        "SMTP_HOST": cfg["host"] or "",
+        "SMTP_PORT": cfg["port"],
+        "SMTP_USER": cfg["user"] or "",
+        "SMTP_PASSWORD": password_mask,
+        "SMTP_TO": cfg["to"] or "",
+        "RESEND_API_KEY": resend_key_mask,
+        "RESEND_FROM": cfg["resend_from"] or "onboarding@resend.dev"
+    }
+
+@app.post("/api/v1/portfolio/admin/smtp")
+async def save_smtp_settings(payload: SmtpConfigPayload, request: Request):
+    """Saves SMTP and Resend API settings to persistent smtp_config.json."""
+    token = get_token_from_request(request)
+    if not verify_session_token(token):
+        raise HTTPException(status_code=401, detail="Unauthorized session.")
+        
+    current_data = {}
+    if os.path.exists(SMTP_CONFIG_JSON):
+        try:
+            with open(SMTP_CONFIG_JSON, "r", encoding="utf-8") as f:
+                current_data = json.load(f)
+        except Exception:
+            pass
+            
+    current_password = current_data.get("SMTP_PASSWORD") or os.getenv("SMTP_PASSWORD") or ""
+    current_resend_key = current_data.get("RESEND_API_KEY") or os.getenv("RESEND_API_KEY") or ""
+    
+    saved_password = payload.SMTP_PASSWORD if payload.SMTP_PASSWORD != "********" else current_password
+    saved_resend_key = payload.RESEND_API_KEY if payload.RESEND_API_KEY != "********" else current_resend_key
+    
+    new_config = {
+        "SMTP_HOST": payload.SMTP_HOST,
+        "SMTP_PORT": payload.SMTP_PORT,
+        "SMTP_USER": payload.SMTP_USER,
+        "SMTP_PASSWORD": saved_password,
+        "SMTP_TO": payload.SMTP_TO,
+        "RESEND_API_KEY": saved_resend_key,
+        "RESEND_FROM": payload.RESEND_FROM
+    }
+    
+    try:
+        os.makedirs(DATA_DIR, exist_ok=True)
+        with open(SMTP_CONFIG_JSON, "w", encoding="utf-8") as f:
+            json.dump(new_config, f, indent=2)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save SMTP config: {str(e)}")
+        
+    return {"success": True, "message": "SMTP settings saved successfully."}
 
 @app.get("/api/v1/portfolio/profile")
 async def get_profile(mode: str = Query(default="general")):
@@ -748,6 +885,84 @@ async def resolve_unanswered_question_endpoint(q_id: int, payload: PasscodePaylo
     except Exception as e:
         print(f"Error resolving question: {e}")
         raise HTTPException(status_code=500, detail="Failed to resolve question.")
+
+class AnswerQuestionPayload(BaseModel):
+    q_id: int
+    question: str
+    answer: str
+    passcode: str = None
+
+@app.post("/api/v1/portfolio/analytics/unanswered/answer")
+async def answer_unanswered_question_endpoint(payload: AnswerQuestionPayload, request: Request, background_tasks: BackgroundTasks):
+    """Answers an unanswered question, adds it to the profile FAQs, marks it as resolved, and triggers RAG index rebuild."""
+    header_pass = request.headers.get("X-Admin-Passcode")
+    check_code = header_pass or payload.passcode
+    token = get_token_from_request(request)
+    is_authorized = False
+    if (check_code and hmac.compare_digest(check_code, admin_pass)) or verify_session_token(token):
+        is_authorized = True
+        
+    if not is_authorized:
+        raise HTTPException(status_code=401, detail="Unauthorized access. Invalid passcode or token.")
+        
+    # 1. Update SQLite resolved status
+    try:
+        db.resolve_unanswered_question(payload.q_id)
+    except Exception as e:
+        print(f"SQLite unresolved marker update error: {e}")
+        
+    # 2. Add to general FAQs in profile.json
+    try:
+        profiles = load_profiles()
+        general = profiles.setdefault("general", {})
+        faqs = general.setdefault("faqs", [])
+        
+        # Check if already added
+        exists = False
+        for f in faqs:
+            if f.get("question") == payload.question:
+                f["answer"] = payload.answer
+                exists = True
+                break
+                
+        if not exists:
+            faqs.append({
+                "question": payload.question,
+                "answer": payload.answer
+            })
+            
+        save_profiles(profiles)
+        
+        # 3. Trigger RAG rebuild in background
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if api_key:
+            background_tasks.add_task(rag.index_knowledge_base, api_key)
+            
+        return {"success": True, "message": "Answer saved to FAQ database and RAG index rebuild scheduled."}
+    except Exception as e:
+        print(f"Failed to save FAQ answer: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to record FAQ answer: {str(e)}")
+
+@app.delete("/api/v1/portfolio/admin/roles/{role_id}")
+async def delete_role_endpoint(role_id: str, request: Request):
+    """Deletes a dynamic role metadata configuration and its profile data structure from profile.json."""
+    token = get_token_from_request(request)
+    if not verify_session_token(token):
+        raise HTTPException(status_code=401, detail="Unauthorized session.")
+        
+    if role_id in ["general", "data-engineer", "ai-engineer"]:
+        raise HTTPException(status_code=400, detail="Cannot delete core system profiles.")
+        
+    try:
+        profiles = load_profiles()
+        if "roles" in profiles:
+            profiles["roles"] = [r for r in profiles["roles"] if r["id"] != role_id]
+        profiles.pop(role_id, None)
+        save_profiles(profiles)
+        return {"success": True, "message": f"Role '{role_id}' deleted successfully."}
+    except Exception as e:
+        print(f"Failed to delete dynamic role '{role_id}': {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete role: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn

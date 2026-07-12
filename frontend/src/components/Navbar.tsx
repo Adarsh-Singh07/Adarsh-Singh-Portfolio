@@ -31,10 +31,12 @@ export default function Navbar({ isDark, toggleTheme, currentMode, onModeChange,
     { label: 'Home', path: '/' },
     { label: 'Projects', path: '/projects' },
     { label: 'Skills', path: '/skills' },
+    { label: 'Certifications', path: '/certifications' },
     { label: 'Timeline', path: '/timeline' },
     { label: 'Blogs', path: '/blog' },
     { label: 'Contact', path: '/contact' },
-    { label: 'Dashboard', path: '/dashboard' },
+    { label: 'Semantic Explorer', path: '/dashboard' },
+    { label: 'Admin Panel', path: '/admin' },
   ];
 
   // Close dropdown on click outside

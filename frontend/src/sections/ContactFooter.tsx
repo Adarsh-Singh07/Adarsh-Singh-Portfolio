@@ -5,6 +5,7 @@
 
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { motion } from 'motion/react';
+import { Link } from 'react-router-dom';
 import PortfolioService from '../services/api';
 import { 
   Send, 
@@ -344,8 +345,10 @@ export default function ContactFooter({ isDark }: ContactFooterProps) {
         <div className={`mt-24 pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-4 select-none ${
           isDark ? 'border-white/5 text-white/30' : 'border-slate-100 text-slate-400'
         }`}>
-          <div className="text-xs font-sans font-medium">
-            © 2026 Adarsh Singh. All Systems Operational.
+          <div className="text-xs font-sans font-medium flex items-center gap-2">
+            <span>© 2026 Adarsh Singh. All Systems Operational.</span>
+            <span>&bull;</span>
+            <Link to="/admin" className="hover:text-[#007AFF] transition-colors underline decoration-dotted decoration-neutral-700 hover:decoration-[#007AFF]">Admin Panel</Link>
           </div>
           <div className="flex items-center gap-2 text-[10px] font-sans tracking-widest uppercase font-bold">
             <span>Crafted with precision</span>

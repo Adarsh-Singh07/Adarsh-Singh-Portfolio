@@ -85,11 +85,38 @@ export interface BlogNote {
   category: string;
   date: string;
   url: string;
+  content?: string; // Rich article markdown or text content
   priority: {
     general: number;
     'data-engineer': number;
     'ai-engineer'?: number;
   };
+}
+
+export interface HomeCard {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  buttonText: string;
+  badge: string;
+  extra: string[];
+}
+
+export interface Coordinates {
+  email: string;
+  linkedin: string;
+  github: string;
+  location: string;
+  hours: string;
+}
+
+export interface PrestigeStrength {
+  id: string;
+  title: string;
+  desc: string;
+  signal: string;
+  icon: string;
 }
 
 export interface ProfileData {
@@ -99,5 +126,8 @@ export interface ProfileData {
   certifications: Certification[];
   journey: JourneyMilestone[];
   blogs: BlogNote[];
+  homeCards?: HomeCard[]; // Editable homepage navigation cards
+  coordinates?: Coordinates; // Dynamic contact coordinates
+  strengths?: PrestigeStrength[]; // Dynamic core engineering strengths
   philosophy: string;
 }

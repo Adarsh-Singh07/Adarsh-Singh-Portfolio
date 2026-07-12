@@ -170,6 +170,17 @@ export default function Chatbot({ isDark, currentMode = 'general' }: { isDark: b
     setSessionId(sid);
   }, []);
 
+  // Listen to open-chatbot custom event from spotlight cards
+  useEffect(() => {
+    const handleOpenChat = () => {
+      setIsOpen(true);
+    };
+    window.addEventListener('open-chatbot', handleOpenChat);
+    return () => {
+      window.removeEventListener('open-chatbot', handleOpenChat);
+    };
+  }, []);
+
   // Show a pulsing alert if there's a greeting reminder and chat is closed
   useEffect(() => {
     const timer = setTimeout(() => {
