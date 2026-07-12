@@ -42,6 +42,7 @@ export interface Skill {
 }
 
 export interface SkillCategory {
+  id?: string;
   title: string;
   skills: Skill[];
   priority: {
