@@ -1,0 +1,49 @@
+name: Deploy Backend to Cloud Run
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - 'Dockerfile'
+      - '.github/workflows/backend.yml'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-backend:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud via OIDC
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for GCP
+        run: |
+          gcloud auth configure-docker us-central1-docker.pkg.dev
+
+      - name: Build & Push Backend Container
+        run: |
+          docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/portfolio/backend:latest ./backend
+          docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/portfolio/backend:latest
+
+      - name: Deploy Backend to Cloud Run
+        run: |
+          gcloud run deploy portfolio-backend \
+            --image us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/portfolio/backend:latest \
+            --region us-central1 \
+            --add-volume=name=db-volume,type=cloud-storage,bucket=${{ secrets.GCS_BUCKET_NAME }} \
+            --add-volume-mount=volume=db-volume,mount-path=/app/data \
+            --update-env-vars "^#^ALLOWED_ORIGINS=https://${{ secrets.GCP_PROJECT_ID }}.web.app,https://${{ secrets.GCP_PROJECT_ID }}.firebaseapp.com" \
+            --allow-unauthenticated

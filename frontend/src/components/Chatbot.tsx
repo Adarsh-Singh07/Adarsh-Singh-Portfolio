@@ -21,32 +21,72 @@ import {
 } from 'lucide-react';
 import PortfolioService from '../services/api';
 
-// Formatting component to handle markdown links and bold formatting
+// Futuristic custom bot icon with glowing concentric animate rings
+const CustomBotIcon = ({ className = "w-6 h-6" }: { className?: string }) => (
+  <div className={`relative ${className} flex items-center justify-center`}>
+    <div className="absolute inset-0 rounded-full border border-cyan-400/25 animate-[spin_6s_linear_infinite] pointer-events-none" />
+    <div className="absolute inset-1 rounded-full border border-dashed border-indigo-400/35 animate-[spin_10s_linear_infinite_reverse] pointer-events-none" />
+    <svg viewBox="0 0 24 24" fill="none" className="w-5.5 h-5.5 z-10 drop-shadow-[0_0_8px_rgba(0,229,255,0.85)]" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2a10 10 0 0 0-10 10c0 3.3.8 4.7 1.8 5.6v2.4a1 1 0 0 0 1.5.8l2.7-1.6c1.2.5 2.6.8 4 .8a10 10 0 0 0 10-10A10 10 0 0 0 12 2z" fill="url(#botGrad)" />
+      <circle cx="9" cy="12" r="1.5" fill="#FFFFFF" />
+      <circle cx="15" cy="12" r="1.5" fill="#FFFFFF" />
+      <path d="M9 15.5c1.5 0.8 4.5 0.8 6 0" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" />
+      <defs>
+        <linearGradient id="botGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#00E5FF" />
+          <stop offset="100%" stopColor="#4F46E5" />
+        </linearGradient>
+      </defs>
+    </svg>
+  </div>
+);
+
+// Formatting component to handle markdown links, bold formatting, headers, list items and code tags
 function FormattedMessage({ text, isDark }: { text: string; isDark: boolean }) {
-  const lines = text.split('\n');
+  const blocks = text.split('\n');
   
   return (
-    <div className="space-y-1 text-xs md:text-sm leading-relaxed font-sans">
-      {lines.map((line, idx) => {
-        const trimmed = line.trim();
-        const isBullet = trimmed.startsWith('* ') || trimmed.startsWith('- ');
-        let lineContent = trimmed;
-        if (isBullet) {
-          lineContent = lineContent.substring(2);
+    <div className="space-y-1.5 text-xs md:text-sm leading-relaxed font-sans select-text">
+      {blocks.map((block, idx) => {
+        const trimmed = block.trim();
+        if (trimmed === '') return <div key={idx} className="h-1.5" />;
+        
+        // 1. Headers Check (### or ####)
+        const isHeader3 = trimmed.startsWith('###');
+        const isHeader4 = trimmed.startsWith('####');
+        if (isHeader3 || isHeader4) {
+          const title = trimmed.replace(/^#+\s*/, '');
+          return (
+            <h4 
+              key={idx} 
+              className={`font-semibold tracking-tight mt-3 mb-1 text-sm md:text-base ${
+                isDark ? 'text-cyan-400' : 'text-sky-700'
+              }`}
+            >
+              {title}
+            </h4>
+          );
         }
         
+        // 2. Bullet Points Check
+        const isBullet = trimmed.startsWith('* ') || trimmed.startsWith('- ') || trimmed.startsWith('• ');
+        let content = trimmed;
+        if (isBullet) {
+          content = content.replace(/^[*•-]\s*/, '');
+        }
+
         const parsedElements: React.ReactNode[] = [];
         let cursor = 0;
-        const tokenRegex = /(\*\*([^*]+)\*\*|\[([^\]]+)\]\(([^)]+)\))/g;
+        const tokenRegex = /(\*\*([^*]+)\*\*|\[([^\]]+)\]\(([^)]+)\)|`([^`]+)`)/g;
         let match;
         let keyCounter = 0;
         
-        while ((match = tokenRegex.exec(lineContent)) !== null) {
+        while ((match = tokenRegex.exec(content)) !== null) {
           const matchIndex = match.index;
           
           if (matchIndex > cursor) {
             parsedElements.push(
-              <span key={`txt-${keyCounter++}`}>{lineContent.substring(cursor, matchIndex)}</span>
+              <span key={`txt-${keyCounter++}`}>{content.substring(cursor, matchIndex)}</span>
             );
           }
           
@@ -58,6 +98,19 @@ function FormattedMessage({ text, isDark }: { text: string; isDark: boolean }) {
               >
                 {match[2]}
               </strong>
+            );
+          } else if (match[0].startsWith('`')) {
+            parsedElements.push(
+              <code 
+                key={`code-${keyCounter++}`} 
+                className={`px-1.5 py-0.5 rounded font-mono text-[10px] md:text-xs border ${
+                  isDark 
+                    ? 'bg-slate-950/80 border-slate-800 text-cyan-400' 
+                    : 'bg-slate-100 border-slate-200 text-sky-700'
+                }`}
+              >
+                {match[5]}
+              </code>
             );
           } else {
             const label = match[3];
@@ -71,7 +124,7 @@ function FormattedMessage({ text, isDark }: { text: string; isDark: boolean }) {
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-cyan-400 hover:text-cyan-300 dark:text-cyan-400 dark:hover:text-cyan-300 light:text-sky-600 light:hover:text-sky-700 underline font-medium inline-flex items-center gap-0.5"
+                  className="text-cyan-400 hover:text-cyan-300 dark:text-cyan-400 dark:hover:text-cyan-300 light:text-sky-600 light:hover:text-sky-750 underline font-medium inline-flex items-center gap-0.5"
                 >
                   {label}
                 </a>
@@ -81,7 +134,7 @@ function FormattedMessage({ text, isDark }: { text: string; isDark: boolean }) {
                 <Link
                   key={`link-${keyCounter++}`}
                   to={url}
-                  className="text-cyan-400 hover:text-cyan-300 dark:text-cyan-400 dark:hover:text-cyan-300 light:text-sky-600 light:hover:text-sky-700 underline font-medium transition-colors"
+                  className="text-cyan-400 hover:text-cyan-300 dark:text-cyan-400 dark:hover:text-cyan-300 light:text-sky-600 light:hover:text-sky-750 underline font-medium transition-colors"
                 >
                   {label}
                 </Link>
@@ -92,26 +145,26 @@ function FormattedMessage({ text, isDark }: { text: string; isDark: boolean }) {
           cursor = tokenRegex.lastIndex;
         }
         
-        if (cursor < lineContent.length) {
+        if (cursor < content.length) {
           parsedElements.push(
-            <span key={`txt-${keyCounter++}`}>{lineContent.substring(cursor)}</span>
+            <span key={`txt-${keyCounter++}`}>{content.substring(cursor)}</span>
           );
         }
         
         if (isBullet) {
           return (
-            <div key={idx} className="flex items-start gap-1.5 pl-1.5 my-0.5">
-              <span className="text-cyan-400 mt-1.5 shrink-0 block w-1.5 h-1.5 rounded-full bg-cyan-400" />
+            <div key={idx} className="flex items-start gap-2 pl-1.5 my-1">
+              <span className="text-cyan-400 mt-2 shrink-0 block w-1.5 h-1.5 rounded-full bg-cyan-450 shadow-[0_0_6px_#00E5FF]" />
               <span className={isDark ? 'text-slate-200' : 'text-slate-700'}>
-                {parsedElements.length > 0 ? parsedElements : lineContent}
+                {parsedElements.length > 0 ? parsedElements : content}
               </span>
             </div>
           );
         }
         
         return (
-          <p key={idx} className={`${trimmed === '' ? 'h-1.5' : ''} ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
-            {parsedElements.length > 0 ? parsedElements : line}
+          <p key={idx} className={isDark ? 'text-slate-200' : 'text-slate-700'}>
+            {parsedElements.length > 0 ? parsedElements : block}
           </p>
         );
       })}
@@ -309,15 +362,15 @@ export default function Chatbot({ isDark, currentMode = 'general' }: { isDark: b
           }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className={`relative p-4 rounded-full shadow-2xl flex items-center justify-center border cursor-pointer ${
+          className={`relative p-3.5 rounded-full shadow-2xl flex items-center justify-center border cursor-pointer transition-all duration-300 ${
             isOpen 
               ? 'bg-slate-800 border-slate-700 text-white' 
-              : 'bg-gradient-to-tr from-[#00E5FF] to-indigo-600 text-white border-transparent'
+              : 'bg-gradient-to-tr from-[#00E5FF]/95 to-indigo-600/95 text-white border-transparent shadow-[0_4px_25px_rgba(0,229,255,0.35)]'
           }`}
         >
-          {isOpen ? <X className="w-6 h-6" /> : <MessageSquare className="w-6 h-6" />}
+          {isOpen ? <X className="w-6 h-6" /> : <CustomBotIcon className="w-8 h-8" />}
           {!isOpen && hasNewMessage && (
-            <span className="absolute top-0 right-0 block h-3.5 w-3.5 rounded-full bg-pink-500 ring-2 ring-white animate-ping" />
+            <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-pink-500 ring-2 ring-white animate-ping" />
           )}
         </motion.button>
       </div>
@@ -330,10 +383,10 @@ export default function Chatbot({ isDark, currentMode = 'general' }: { isDark: b
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className={`fixed bottom-24 right-6 w-[360px] md:w-[400px] h-[550px] z-50 rounded-2xl flex flex-col shadow-2xl border overflow-hidden backdrop-blur-xl ${
+            className={`fixed bottom-24 right-6 w-[360px] md:w-[400px] h-[550px] z-50 rounded-2xl flex flex-col shadow-2xl border overflow-hidden backdrop-blur-xl transition-all duration-300 ${
               isDark 
-                ? 'bg-[#0a0a0c]/90 border-slate-800/80 text-slate-100 shadow-cyan-950/20' 
-                : 'bg-white/95 border-slate-200/80 text-slate-900 shadow-slate-300/40'
+                ? 'bg-[#0a0a0c]/90 border-slate-800/80 text-slate-100 shadow-cyan-950/20 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]' 
+                : 'bg-white/95 border-slate-200/80 text-slate-900 shadow-slate-300/40 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.4)]'
             }`}
           >
             {/* Header */}
@@ -342,8 +395,8 @@ export default function Chatbot({ isDark, currentMode = 'general' }: { isDark: b
             }`}>
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-400 to-indigo-500 flex items-center justify-center text-white font-bold shadow-md shadow-cyan-500/20">
-                    <Bot className="w-5 h-5" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-400 to-indigo-500 flex items-center justify-center text-white font-bold shadow-md shadow-cyan-500/20 overflow-hidden">
+                    <CustomBotIcon className="w-10 h-10 scale-125" />
                   </div>
                   <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-[#0a0a0c] animate-pulse" />
                 </div>

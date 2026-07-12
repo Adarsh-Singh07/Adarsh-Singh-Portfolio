@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useNavigate } from 'react-router-dom';
 import { 
   X, 
   Edit, 
@@ -64,6 +65,90 @@ const renderDynamicIcon = (iconName: string, className = "w-6 h-6") => {
   }
 };
 
+// Brand SVGs for verified credentials in modal
+const MicrosoftLogo = ({ className = "w-6 h-6" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 0h11v11H0z" fill="#F25022"/>
+    <path d="M12 0h11v11H12z" fill="#7FBA00"/>
+    <path d="M0 12h11v11H0z" fill="#00A4EF"/>
+    <path d="M12 12h11v11H12z" fill="#FFB900"/>
+  </svg>
+);
+
+const GoogleCloudLogo = ({ className = "w-6 h-6" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12.04 20.73L3.82 16v-9.5l8.22-4.73 8.22 4.73V16l-8.22 4.73z" fill="#F4B400" opacity="0.15" />
+    <path d="M12.04 2.23L3.82 6.97v9.49l8.22 4.75 8.22-4.75V6.97l-8.22-4.74zm0 2.87l5.72 3.3v6.61l-5.72 3.3-5.72-3.3V8.4l5.72-3.3z" fill="#4285F4" />
+    <path d="M12.04 5.1L6.32 8.4v6.61l5.72 3.3V5.1z" fill="#34A853" />
+    <path d="M12.04 11.7l5.72-3.3v6.61l-5.72 3.3v-6.61z" fill="#EA4335" />
+  </svg>
+);
+
+const AWSLogo = ({ className = "w-7 h-7" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12.2 20.9c-4.9 0-8.9-3-8.9-6.7 0-2.3 1.6-4.3 4.1-5.4.3-.1.6.1.6.4v.1c0 .2-.1.4-.4.5C5.5 10.7 4.3 12.3 4.3 14.2c0 3 3.5 5.5 7.9 5.5.9 0 1.8-.1 2.6-.4.3-.1.6.1.7.3.1.2 0 .5-.2.6-.9.4-2 .7-3.1.7zm5.5-3.6c-.3 0-.6-.2-.7-.4l-2.4-3.8c-.1-.2-.1-.4 0-.6s.3-.3.5-.3h4.7c.3 0 .5.1.6.3s.1.4 0 .6l-2.4 3.8c-.1.2-.2.4-.3.4zm.5-8.5v3.1c0 .4-.3.7-.7.7h-3.1c-.4 0-.7-.3-.7-.7V8.8c0-.4.3-.7.7-.7H17.5c.4 0 .7.3.7.7z" fill="#FF9900"/>
+  </svg>
+);
+
+const CourseraLogo = ({ className = "w-7 h-7" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" fill="#0056B3"/>
+    <path d="M14.5 15.5a3.5 3.5 0 0 1-3.5-3.5 3.5 3.5 0 0 1 3.5-3.5h1v-2h-1a5.5 5.5 0 0 0-5.5 5.5 5.5 5.5 0 0 0 5.5 5.5h1v-2h-1z" fill="#FFFFFF"/>
+  </svg>
+);
+
+const getIssuerTheme = (issuer: string, isDark: boolean) => {
+  const norm = (issuer || '').toLowerCase();
+  
+  if (norm.includes('google') || norm.includes('gcp') || norm.includes('cloud')) {
+    return {
+      logoBtn: (
+        <div className="w-20 h-20 rounded-3xl bg-[#4285F4]/10 border border-[#4285F4]/20 flex items-center justify-center text-[#4285F4] transition-all duration-300">
+          <GoogleCloudLogo className="w-10 h-10" />
+        </div>
+      )
+    };
+  }
+  
+  if (norm.includes('microsoft') || norm.includes('azure')) {
+    return {
+      logoBtn: (
+        <div className="w-20 h-20 rounded-3xl bg-[#7FBA00]/10 border border-[#7FBA00]/20 flex items-center justify-center text-[#7FBA00] transition-all duration-300">
+          <MicrosoftLogo className="w-9 h-9" />
+        </div>
+      )
+    };
+  }
+  
+  if (norm.includes('amazon') || norm.includes('aws') || norm.includes('services')) {
+    return {
+      logoBtn: (
+        <div className="w-20 h-20 rounded-3xl bg-[#FF9900]/10 border border-[#FF9900]/20 flex items-center justify-center text-[#FF9900] transition-all duration-300">
+          <AWSLogo className="w-11 h-11" />
+        </div>
+      )
+    };
+  }
+  
+  if (norm.includes('coursera')) {
+    return {
+      logoBtn: (
+        <div className="w-20 h-20 rounded-3xl bg-[#0056B3]/10 border border-[#0056B3]/25 flex items-center justify-center text-[#0056B3] transition-all duration-300">
+          <CourseraLogo className="w-10 h-10" />
+        </div>
+      )
+    };
+  }
+  
+  return {
+    logoBtn: (
+      <div className="w-20 h-20 rounded-3xl bg-[#007AFF]/10 border border-[#007AFF]/20 flex items-center justify-center text-[#007AFF] transition-all duration-300">
+        <Award className="w-10 h-10" />
+      </div>
+    )
+  };
+};
+
 export default function DetailEditModal({
   isOpen,
   onClose,
@@ -74,11 +159,26 @@ export default function DetailEditModal({
   isAdmin,
   isDark
 }: DetailEditModalProps) {
+  const navigate = useNavigate();
   const isCreateMode = !item;
   const [isEditing, setIsEditing] = useState(isCreateMode);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<any>({});
   const [copied, setCopied] = useState(false);
+
+  const handleHomeCardAction = () => {
+    if (!item) return;
+    onClose();
+    if (item.id === 'ai-assistant') {
+      window.dispatchEvent(new CustomEvent('open-chatbot'));
+    } else if (item.id === 'availability') {
+      navigate('/timeline');
+    } else if (item.id === 'featured-stack') {
+      navigate('/skills');
+    } else if (item.id === 'quick-connect') {
+      navigate('/contact');
+    }
+  };
 
   // Initialize form fields
   useEffect(() => {
@@ -1067,14 +1167,24 @@ export default function DetailEditModal({
                 {type === 'certification' && (
                   <div className="flex flex-col items-center text-center py-4">
                     {item.badgeUrl ? (
-                      <img 
-                        src={item.badgeUrl} 
-                        alt="Badge" 
-                        className="w-24 h-24 object-contain mb-6 drop-shadow-lg"
-                      />
+                      <>
+                        <img 
+                          src={item.badgeUrl} 
+                          alt="Badge" 
+                          className="w-24 h-24 object-contain mb-6 drop-shadow-lg"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            const fallback = document.getElementById('modal-fallback-badge');
+                            if (fallback) fallback.style.display = 'block';
+                          }}
+                        />
+                        <div id="modal-fallback-badge" style={{ display: 'none' }} className="mb-6">
+                          {getIssuerTheme(item.issuer, isDark).logoBtn}
+                        </div>
+                      </>
                     ) : (
-                      <div className="w-20 h-20 rounded-2xl bg-[#007AFF]/10 border border-[#007AFF]/20 flex items-center justify-center text-[#007AFF] mb-6">
-                        {renderDynamicIcon(item.issuer === 'AWS' ? 'cloud' : item.issuer === 'Microsoft' ? 'cpu' : 'award', "w-10 h-10")}
+                      <div className="mb-6">
+                        {getIssuerTheme(item.issuer, isDark).logoBtn}
                       </div>
                     )}
 
@@ -1157,23 +1267,41 @@ export default function DetailEditModal({
 
                 {/* 4. HOME CARD VIEW */}
                 {type === 'homeCard' && (
-                  <div className="flex flex-col gap-5 py-2">
-                    <div>
-                      <span className="px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider bg-[#007AFF]/15 text-[#007AFF] border border-[#007AFF]/25">
-                        {item.badge}
-                      </span>
-                      <h2 className="text-xl font-bold font-sans tracking-tight mt-3 mb-1">{item.title}</h2>
-                      <span className="text-xs text-slate-400 font-mono block mb-4">{item.subtitle}</span>
+                  <div className="flex flex-col items-center py-6 text-center">
+                    {/* Glowing Accent Icon */}
+                    <div className="w-20 h-20 rounded-3xl bg-[#007AFF]/10 border border-[#007AFF]/25 flex items-center justify-center text-[#007AFF] mb-6 shadow-[0_8px_30px_rgba(0,122,255,0.15)]">
+                      {item.id === 'ai-assistant' ? <Cpu className="w-10 h-10" /> :
+                       item.id === 'availability' ? <Award className="w-10 h-10" /> :
+                       item.id === 'featured-stack' ? <Database className="w-10 h-10" /> :
+                       <Mail className="w-10 h-10" />}
                     </div>
 
-                    <p className={`text-sm leading-relaxed ${isDark ? 'text-slate-300' : 'text-neutral-700'}`}>
+                    <span className="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider bg-[#007AFF]/15 text-[#007AFF] border border-[#007AFF]/20 mb-3">
+                      {item.badge}
+                    </span>
+
+                    <h2 className="text-2xl font-bold font-sans tracking-tight mb-2">{item.title}</h2>
+                    <span className="text-xs text-slate-450 font-mono block mb-6">{item.subtitle}</span>
+
+                    <p className={`text-sm leading-relaxed max-w-lg mb-8 ${isDark ? 'text-slate-350' : 'text-neutral-700'}`}>
                       {item.description}
                     </p>
 
+                    {/* Interactive Call to Action Button */}
+                    <button
+                      type="button"
+                      onClick={handleHomeCardAction}
+                      className="px-8 py-3.5 bg-gradient-to-r from-sky-500 to-[#007AFF] hover:from-sky-600 hover:to-[#007AFF]/90 text-white text-xs font-bold uppercase tracking-widest rounded-xl shadow-[0_4px_20px_rgba(0,229,255,0.25)] hover:shadow-[0_4px_30px_rgba(0,229,255,0.4)] transition-all duration-300 flex items-center gap-2 cursor-pointer"
+                    >
+                      <span>{item.buttonText || 'Explore Detail'}</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+
                     {item.extra && item.extra.length > 0 && (
-                      <div className={`p-5 rounded-2xl border flex flex-col gap-2 mt-2 ${
+                      <div className={`w-full max-w-md p-5 rounded-2xl border flex flex-col gap-2.5 mt-8 text-left ${
                         isDark ? 'bg-neutral-900/40 border-white/5' : 'bg-slate-50 border-neutral-200'
                       }`}>
+                        <span className="text-[9px] font-mono uppercase text-[#007AFF] tracking-wider font-bold mb-1">Key Context Parameters</span>
                         {item.extra.map((ext: string, idx: number) => (
                           <div key={idx} className="flex items-center gap-2 text-xs font-mono text-slate-300">
                             <ArrowRight className="w-3.5 h-3.5 text-[#007AFF]" />
