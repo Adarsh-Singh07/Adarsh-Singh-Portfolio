@@ -24,6 +24,7 @@ interface HomeProps {
 export default function Home({ config, homeCards = [], currentMode, isDark, onRefreshData }: HomeProps) {
   const [selectedCard, setSelectedCard] = useState<HomeCard | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(null);
 
   const token = sessionStorage.getItem('admin-token') || localStorage.getItem('admin-token');
   const isAdmin = !!token;
@@ -106,6 +107,11 @@ export default function Home({ config, homeCards = [], currentMode, isDark, onRe
         "description": "Portfolio of Adarsh Singh, showcasing advanced machine learning, RAG pipelines, and cloud analytics platforms.",
         "publisher": {
           "@id": "https://adarshsingh.in/#person"
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://adarshsingh.in/projects?q={search_term_string}",
+          "query-input": "required name=search_term_string"
         }
       },
       {
@@ -118,9 +124,90 @@ export default function Home({ config, homeCards = [], currentMode, isDark, onRe
           "https://github.com/Adarsh-Singh07",
           "https://www.linkedin.com/in/adarsh-singh07"
         ]
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://adarshsingh.in/#organization",
+        "name": "Adarsh Singh Engineering Solutions",
+        "url": "https://adarshsingh.in",
+        "logo": "https://adarshsingh.in/favicon.png",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "hire",
+          "url": "https://adarshsingh.in/contact"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://adarshsingh.in/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Who is Adarsh Singh?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Adarsh Singh is an AI & Data Engineer specializing in building robust, scalable generative AI applications, retrieval-augmented generation (RAG) systems, distributed data engineering pipelines, and cloud database architectures."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What technical stack does Adarsh use?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "His primary stack includes Python (FastAPI, PySpark, PyTorch), TypeScript/React, SQL, Docker, Google Cloud Platform (Cloud Run, BigQuery), and Azure (Databricks, Delta Lake, ADF) for enterprise deployments."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What major AI systems has he engineered?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Key systems include an On-Demand Service Platform utilizing Agentic AI and multi-agent RAG pipelines for dynamic real-time updates, and an automated Indian Sign Language ML translation pipeline built with TensorFlow and OpenCV."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is Adarsh available for contract consulting or freelance work?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, Adarsh is available for consulting on AI system design, enterprise RAG integration, data warehouse migrations, and FastAPI/React pipeline engineering. You can connect via the contact form or LinkedIn."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How can I contact him directly?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "You can send an encrypted message directly through the secure contact form on this website or reach out via his verified LinkedIn profile."
+            }
+          }
+        ]
       }
     ]
   };
+
+  const faqData = [
+    {
+      q: "Who is Adarsh Singh?",
+      a: "Adarsh Singh is an AI & Data Engineer specializing in building robust, scalable generative AI applications, retrieval-augmented generation (RAG) systems, distributed data engineering pipelines, and cloud database architectures."
+    },
+    {
+      q: "What technical stack does Adarsh use?",
+      a: "His primary stack includes Python (FastAPI, PySpark, PyTorch), TypeScript/React, SQL, Docker, Google Cloud Platform (Cloud Run, BigQuery), and Azure (Databricks, Delta Lake, ADF) for enterprise deployments."
+    },
+    {
+      q: "What major AI systems has he engineered?",
+      a: "Key systems include an On-Demand Service Platform utilizing Agentic AI and multi-agent RAG pipelines for dynamic real-time updates, and an automated Indian Sign Language ML translation pipeline built with TensorFlow and OpenCV."
+    },
+    {
+      q: "Is Adarsh available for contract consulting or freelance work?",
+      a: "Yes, Adarsh is available for consulting on AI system design, enterprise RAG integration, data warehouse migrations, and FastAPI/React pipeline engineering. You can connect via the contact form or LinkedIn."
+    },
+    {
+      q: "How can I contact him directly?",
+      a: "You can send an encrypted message directly through the secure contact form on this website or reach out via his verified LinkedIn profile."
+    }
+  ];
 
   return (
     <div className="w-full">
@@ -231,6 +318,64 @@ export default function Home({ config, homeCards = [], currentMode, isDark, onRe
               <span className="text-xs text-slate-500 font-mono">No spotlight cards loaded from profile configurations.</span>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* FAQ Accordion Section for SEO & LLM Scraping */}
+      <section className={`py-16 md:py-24 border-t relative overflow-hidden transition-colors duration-1000 ${
+        isDark ? 'bg-[#050505] border-white/5' : 'bg-slate-50 border-black/5'
+      }`}>
+        <div className="max-w-4xl mx-auto px-6 md:px-12 relative z-10 w-full text-left">
+          <div className="mb-12">
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#007AFF] block mb-2">
+              Common Inquiries
+            </span>
+            <h2 className="text-3xl md:text-4xl font-sans font-semibold tracking-tight">
+              Frequently Asked Questions
+            </h2>
+          </div>
+
+          <div className="space-y-4">
+            {faqData.map((faq, idx) => {
+              const isOpen = openFaqIdx === idx;
+              return (
+                <div 
+                  key={idx}
+                  className={`border rounded-2xl transition-all duration-300 overflow-hidden ${
+                    isDark 
+                      ? 'border-white/5 bg-neutral-900/20' 
+                      : 'border-slate-200 bg-white'
+                  }`}
+                >
+                  <button
+                    onClick={() => setOpenFaqIdx(isOpen ? null : idx)}
+                    className="w-full py-5 px-6 flex items-center justify-between text-left font-semibold text-sm md:text-base cursor-pointer focus:outline-none"
+                    aria-expanded={isOpen}
+                    aria-controls={`faq-answer-${idx}`}
+                  >
+                    <span>{faq.q}</span>
+                    <span className={`text-[#007AFF] transform transition-transform duration-300 font-mono ${
+                      isOpen ? 'rotate-45' : ''
+                    }`}>
+                      +
+                    </span>
+                  </button>
+                  <div 
+                    id={`faq-answer-${idx}`}
+                    className={`transition-all duration-500 ease-in-out ${
+                      isOpen ? 'max-h-40 opacity-100 border-t border-white/5' : 'max-h-0 opacity-0 pointer-events-none'
+                    }`}
+                  >
+                    <p className={`p-6 text-xs md:text-sm font-light leading-relaxed ${
+                      isDark ? 'text-slate-300' : 'text-slate-650'
+                    }`}>
+                      {faq.a}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 

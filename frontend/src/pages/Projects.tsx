@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useNavigate } from 'react-router-dom';
 import { Project, ProfileMode } from '../types';
 import { ArrowRight, Github, ExternalLink, Plus, Layers, Cpu, Database } from 'lucide-react';
 import DetailEditModal from '../components/DetailEditModal';
@@ -21,6 +22,7 @@ interface ProjectsPageProps {
 type ProjectCategory = 'All' | 'AI' | 'Data Engineering' | 'GenAI' | 'ETL' | 'Cloud';
 
 export default function Projects({ projects, currentMode, isDark, onRefreshData }: ProjectsPageProps) {
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<ProjectCategory>('All');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -76,13 +78,10 @@ export default function Projects({ projects, currentMode, isDark, onRefreshData 
   const featuredProject = sortedProjects.find(p => p.id === 'agentic-rag-platform') || sortedProjects[0];
 
   const handleCardClick = (project: Project, e: React.MouseEvent) => {
-    // Prevent opening modal if user clicks directly on GitHub/Demo link tags
     const target = e.target as HTMLElement;
     if (target.closest('a')) return;
     
-    setSelectedProject(project);
-    setModalMode('view');
-    setIsModalOpen(true);
+    navigate(`/projects/${project.id}`);
   };
 
   const handleAddNew = () => {
