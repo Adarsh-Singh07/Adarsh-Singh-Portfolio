@@ -26,6 +26,7 @@ const Admin = lazy(() => import('./pages/Admin'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const Resume = lazy(() => import('./pages/Resume'));
 const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
+const BlogDetail = lazy(() => import('./pages/BlogDetail'));
 
 
 declare global {
@@ -82,7 +83,8 @@ function AnimatedRoutes({
           <Route path="/blog" element={<Blog blogs={profileData.blogs} currentMode={currentMode} isDark={isDark} onRefreshData={onRefreshData} />} />
           <Route path="/contact" element={<Contact isDark={isDark} coordinates={profileData.coordinates} currentMode={currentMode} onRefreshData={onRefreshData} />} />
           <Route path="/resume" element={<Resume profileData={profileData} isDark={isDark} />} />
-          <Route path="/projects/:projectId" element={<ProjectDetail projects={profileData.projects} isDark={isDark} />} />
+          <Route path="/projects/:projectId" element={<ProjectDetail projects={profileData.projects} currentMode={currentMode} isDark={isDark} onRefreshData={onRefreshData} />} />
+          <Route path="/blog/:blogId" element={<BlogDetail blogs={profileData.blogs} currentMode={currentMode} isDark={isDark} onRefreshData={onRefreshData} />} />
           <Route path="/dashboard" element={<Dashboard isDark={isDark} />} />
           <Route path="/admin" element={<Admin isDark={isDark} onRefreshData={onRefreshData} />} />
           <Route path="*" element={<NotFound isDark={isDark} />} />

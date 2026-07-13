@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useNavigate } from 'react-router-dom';
 import { BlogNote, ProfileMode } from '../types';
 import { BookOpen, Calendar, Clock, Search, Plus, ArrowRight } from 'lucide-react';
 import DetailEditModal from '../components/DetailEditModal';
@@ -19,6 +20,7 @@ interface BlogProps {
 }
 
 export default function Blog({ blogs, currentMode, isDark, onRefreshData }: BlogProps) {
+  const navigate = useNavigate();
   const [filter, setFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedBlog, setSelectedBlog] = useState<BlogNote | null>(null);
@@ -26,13 +28,93 @@ export default function Blog({ blogs, currentMode, isDark, onRefreshData }: Blog
   const [modalMode, setModalMode] = useState<'view' | 'create'>('view');
 
   const token = sessionStorage.getItem('admin-token') || localStorage.getItem('admin-token');
-  const isAdmin = !!token;
+  const isAdmin = !!token;  // Predefined high-quality articles metadata
+  const staticMetadata: BlogNote[] = [
+    {
+      id: "langgraph-agents",
+      title: "Orchestrating Multi-Agent Workflows with LangGraph",
+      excerpt: "Learn how to build cyclical, stateful agent systems using LangGraph to handle complex, multi-step tasks in production environments.",
+      readTime: "8 min read",
+      category: "AI Agents",
+      date: "2026-07-10",
+      url: "#",
+      priority: { general: 5, 'data-engineer': 5 }
+    },
+    {
+      id: "rag-system",
+      title: "Production-Grade Retrieval-Augmented Generation (RAG)",
+      excerpt: "A deep dive into building highly accurate, low-latency RAG systems using advanced chunking, hybrid search, and LLM reranking.",
+      readTime: "10 min read",
+      category: "Generative AI",
+      date: "2026-07-05",
+      url: "#",
+      priority: { general: 6, 'data-engineer': 6 }
+    },
+    {
+      id: "interviewos",
+      title: "Case Study: Engineering InterviewOS Platform",
+      excerpt: "An architectural review of InterviewOS, a mock interviewing system utilizing LLM evaluators and real-time audio streams.",
+      readTime: "9 min read",
+      category: "AI Systems",
+      date: "2026-06-28",
+      url: "#",
+      priority: { general: 7, 'data-engineer': 7 }
+    },
+    {
+      id: "google-cloud-run",
+      title: "Zero to Hero: Deploying FastAPI on Google Cloud Run",
+      excerpt: "A technical guide to containerizing FastAPI applications, configuring CPU bounds, and deploying securely on Google Cloud Run.",
+      readTime: "7 min read",
+      category: "Cloud",
+      date: "2026-06-18",
+      url: "#",
+      priority: { general: 8, 'data-engineer': 8 }
+    },
+    {
+      id: "vector-search",
+      title: "High-Dimensional Vector Databases & Semantic Search",
+      excerpt: "Comparing performance metrics, recall rates, and index types across Pinecone, Pgvector, and Weaviate databases.",
+      readTime: "8 min read",
+      category: "Databases",
+      date: "2026-06-02",
+      url: "#",
+      priority: { general: 9, 'data-engineer': 9 }
+    },
+    {
+      id: "fastapi-production",
+      title: "Asynchronous Python: FastAPI Production Guide",
+      excerpt: "Best practices for structural logging, connection pooling, exception handling, and production uvicorn configurations.",
+      readTime: "6 min read",
+      category: "Backend",
+      date: "2026-05-20",
+      url: "#",
+      priority: { general: 10, 'data-engineer': 10 }
+    },
+    {
+      id: "vercel-vs-firebase",
+      title: "Firebase Hosting vs Vercel Edge for React Deployments",
+      excerpt: "Comparing routing rewrite configurations, caching structures, CDN distributions, and build speeds on Vercel and Firebase.",
+      readTime: "7 min read",
+      category: "Frontend",
+      date: "2026-05-12",
+      url: "#",
+      priority: { general: 11, 'data-engineer': 11 }
+    }
+  ];
 
-  // Extract unique categories dynamically from blogs
-  const categories = ['all', ...Array.from(new Set(blogs.map(blog => blog.category)))];
+  // Merge static metadata with database items
+  const allBlogs = [...blogs];
+  staticMetadata.forEach(staticItem => {
+    if (!allBlogs.some(b => b.id === staticItem.id)) {
+      allBlogs.push(staticItem);
+    }
+  });
+
+  // Extract unique categories dynamically from merged list
+  const categories = ['all', ...Array.from(new Set(allBlogs.map(blog => blog.category)))];
 
   // Filter & sort blogs by priority, excluding hidden ones
-  const filteredBlogs = blogs
+  const filteredBlogs = allBlogs
     .filter(blog => {
       const prio = blog.priority?.[currentMode];
       if (prio === 99 || prio === undefined) return false;
@@ -49,11 +131,8 @@ export default function Blog({ blogs, currentMode, isDark, onRefreshData }: Blog
       const bPriority = b.priority?.[currentMode] ?? 99;
       return aPriority - bPriority;
     });
-
   const handleCardClick = (blog: BlogNote) => {
-    setSelectedBlog(blog);
-    setModalMode('view');
-    setIsModalOpen(true);
+    navigate(`/blog/${blog.id}`);
   };
 
   const handleAddNew = () => {
