@@ -9,6 +9,7 @@ import { Project, ProfileMode } from '../types';
 import { ArrowRight, Github, ExternalLink, Plus, Layers, Cpu, Database } from 'lucide-react';
 import DetailEditModal from '../components/DetailEditModal';
 import PortfolioService from '../services/api';
+import SEO from '../components/SEO';
 
 interface ProjectsPageProps {
   projects: Project[];
@@ -162,8 +163,28 @@ export default function Projects({ projects, currentMode, isDark, onRefreshData 
     exit: { opacity: 0, y: -20, scale: 0.98, transition: { duration: 0.3 } }
   };
 
+  const projectsSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://adarshsingh.in/projects/#webpage",
+        "url": "https://adarshsingh.in/projects",
+        "name": "AI & Data Projects Catalog | Adarsh Singh",
+        "description": "Portfolio projects page showcasing generative AI systems, RAG networks, and data platforms built by Adarsh Singh."
+      }
+    ]
+  };
+
   return (
     <div className="min-h-screen py-28 px-6 md:px-12 max-w-7xl mx-auto w-full">
+      <SEO 
+        title="AI & Data Engineering Projects | Adarsh Singh"
+        description="Browse the collection of AI and Data Engineering projects built by Adarsh Singh, showcasing Large Language Models (LLMs), RAG pipelines, and automated analytics."
+        keywords="AI Projects, Machine Learning, RAG Pipelines, Python Backend, Vercel Deploy, Cloud Run, Data Analytics"
+        canonicalUrl="https://adarshsingh.in/projects"
+        schema={projectsSchema}
+      />
       
       {/* Editorial Page Header */}
       <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">

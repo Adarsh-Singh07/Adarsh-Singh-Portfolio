@@ -3,24 +3,27 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { ProfileMode, ProfileData, RoleDefinition } from './types';
 import PortfolioService from './services/api';
 import Navbar from './components/Navbar';
-import Home from './pages/Home';
-import Projects from './pages/Projects';
-import Skills from './pages/Skills';
-import Certifications from './pages/Certifications';
-import Timeline from './pages/Timeline';
-import Contact from './pages/Contact';
-import Blog from './pages/Blog';
+import Breadcrumbs from './components/Breadcrumbs';
 import { Loader2 } from 'lucide-react';
 import Chatbot from './components/Chatbot';
-import Dashboard from './pages/Dashboard';
-import Admin from './pages/Admin';
-import NotFound from './pages/NotFound';
+
+// Lazy load route pages for performance & LCP bundles optimizations
+const Home = lazy(() => import('./pages/Home'));
+const Projects = lazy(() => import('./pages/Projects'));
+const Skills = lazy(() => import('./pages/Skills'));
+const Certifications = lazy(() => import('./pages/Certifications'));
+const Timeline = lazy(() => import('./pages/Timeline'));
+const Contact = lazy(() => import('./pages/Contact'));
+const Blog = lazy(() => import('./pages/Blog'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Admin = lazy(() => import('./pages/Admin'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 
 declare global {
@@ -177,12 +180,19 @@ export default function App() {
             {loading && (
               <div className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#00E5FF] via-indigo-500 to-pink-500 animate-pulse z-[60]" />
             )}
-            <AnimatedRoutes 
-              profileData={profileData} 
-              currentMode={currentMode} 
-              isDark={isDark} 
-              onRefreshData={() => setRefreshTrigger(prev => prev + 1)}
-            />
+            <Breadcrumbs isDark={isDark} />
+            <Suspense fallback={
+              <div className="flex-grow flex items-center justify-center min-h-[50vh]">
+                <Loader2 className="w-8 h-8 animate-spin text-[#007AFF]" />
+              </div>
+            }>
+              <AnimatedRoutes 
+                profileData={profileData} 
+                currentMode={currentMode} 
+                isDark={isDark} 
+                onRefreshData={() => setRefreshTrigger(prev => prev + 1)}
+              />
+            </Suspense>
           </main>
         ) : loading ? (
           <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#050505] text-white">

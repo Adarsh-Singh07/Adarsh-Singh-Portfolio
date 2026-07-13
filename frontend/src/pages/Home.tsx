@@ -8,6 +8,7 @@ import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { HeroConfig, HomeCard, ProfileMode } from '../types';
 import Hero from '../sections/Hero';
+import SEO from '../components/SEO';
 import { Sparkles, Award, Database, Cpu, MessageSquare, Mail, Layers, ArrowRight } from 'lucide-react';
 import DetailEditModal from '../components/DetailEditModal';
 import PortfolioService from '../services/api';
@@ -94,8 +95,41 @@ export default function Home({ config, homeCards = [], currentMode, isDark, onRe
     }
   };
 
+  const homeSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://adarshsingh.in/#website",
+        "url": "https://adarshsingh.in",
+        "name": "Adarsh Singh | AI & Data Engineering",
+        "description": "Portfolio of Adarsh Singh, showcasing advanced machine learning, RAG pipelines, and cloud analytics platforms.",
+        "publisher": {
+          "@id": "https://adarshsingh.in/#person"
+        }
+      },
+      {
+        "@type": "Person",
+        "@id": "https://adarshsingh.in/#person",
+        "name": "Adarsh Singh",
+        "jobTitle": "AI & Data Engineer",
+        "url": "https://adarshsingh.in",
+        "sameAs": [
+          "https://github.com/Adarsh-Singh07",
+          "https://www.linkedin.com/in/adarsh-singh07"
+        ]
+      }
+    ]
+  };
+
   return (
     <div className="w-full">
+      <SEO 
+        title="Adarsh Singh | AI & Data Engineering Portfolio"
+        description="Explore the AI & Data Engineering portfolio of Adarsh Singh. Featuring production-ready RAG systems, LLM fine-tuning, and scalable data streaming architectures."
+        keywords="Adarsh Singh, AI Engineer, Data Engineer, Generative AI, RAG, LLMs, Big Data, FastAPI, React"
+        schema={homeSchema}
+      />
       {/* Spotlight Hero V2 */}
       <Hero config={config} isDark={isDark} />
 

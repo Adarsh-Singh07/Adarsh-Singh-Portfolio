@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { Coordinates, ProfileMode } from '../types';
 import DetailEditModal from '../components/DetailEditModal';
+import SEO from '../components/SEO';
 
 interface ContactProps {
   isDark: boolean;
@@ -148,8 +149,28 @@ export default function Contact({ isDark, coordinates, currentMode, onRefreshDat
     }
   };
 
+  const contactSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://adarshsingh.in/contact/#webpage",
+        "url": "https://adarshsingh.in/contact",
+        "name": "Operational Outreach & Collaboration | Adarsh Singh",
+        "description": "Secure form gateway to establish communications, request AI consultation, or explore data pipelines proposals with Adarsh Singh."
+      }
+    ]
+  };
+
   return (
     <div className="min-h-screen py-28 px-6 md:px-12 max-w-7xl mx-auto w-full select-none">
+      <SEO 
+        title="Connect & Collaborate | Adarsh Singh"
+        description="Get in touch with Adarsh Singh for AI system design consulting, big data pipeline contracts, or professional collaborations."
+        keywords="Contact, Project Inquiries, Professional Hiring, Consultation"
+        canonicalUrl="https://adarshsingh.in/contact"
+        schema={contactSchema}
+      />
       
       {/* 1. HERO HEADER */}
       <div className="mb-20 text-left max-w-3xl">

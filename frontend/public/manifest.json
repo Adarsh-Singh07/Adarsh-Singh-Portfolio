@@ -1,0 +1,17 @@
+{
+  "short_name": "Adarsh Portfolio",
+  "name": "Adarsh Singh | AI & Data Engineering Portfolio",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#050505",
+  "theme_color": "#007AFF",
+  "display": "standalone",
+  "orientation": "portrait"
+}

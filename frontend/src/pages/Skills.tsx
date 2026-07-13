@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import DetailEditModal from '../components/DetailEditModal';
 import PortfolioService from '../services/api';
+import SEO from '../components/SEO';
 
 interface SkillsProps {
   categories: SkillCategory[];
@@ -207,8 +208,28 @@ export default function Skills({ categories, strengths, currentMode, isDark, onR
     }
   };
 
+  const skillsSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://adarshsingh.in/skills/#webpage",
+        "url": "https://adarshsingh.in/skills",
+        "name": "Skills Stack & Technical Core | Adarsh Singh",
+        "description": "Bento Grid directory mapping out the programming languages, cloud frameworks, and databases mastered by Adarsh Singh."
+      }
+    ]
+  };
+
   return (
     <div className="min-h-screen py-28 px-6 md:px-12 max-w-7xl mx-auto w-full select-none animate-[fadeIn_0.5s_ease-out]">
+      <SEO 
+        title="Technical Stack & Core Proficiencies | Adarsh Singh"
+        description="Review the technical stack, programming languages, cloud frameworks, and databases mastered by Adarsh Singh."
+        keywords="Python, React, TypeScript, PostgreSQL, Apache Spark, Docker, Cloud Run, GCP, BigQuery"
+        canonicalUrl="https://adarshsingh.in/skills"
+        schema={skillsSchema}
+      />
       
       {/* 1. HERO INTRO */}
       <div className="mb-20 text-left max-w-4xl">

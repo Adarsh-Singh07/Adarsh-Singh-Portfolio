@@ -18,6 +18,7 @@ import {
 import PortfolioService from '../services/api';
 import { Certification, ProfileMode } from '../types';
 import DetailEditModal from '../components/DetailEditModal';
+import SEO from '../components/SEO';
 
 interface CertificationsProps {
   certifications?: Certification[];
@@ -209,10 +210,30 @@ export default function Certifications({ certifications, currentMode, isDark, on
     }
   };
 
+  const certsSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://adarshsingh.in/certifications/#webpage",
+        "url": "https://adarshsingh.in/certifications",
+        "name": "Verified Professional Credentials | Adarsh Singh",
+        "description": "Directory of cloud computing, machine learning, and database systems credentials verified by Google Cloud, AWS, and Coursera."
+      }
+    ]
+  };
+
   return (
     <div className={`min-h-screen py-24 px-6 md:px-12 transition-colors duration-1000 ${
       isDark ? 'bg-[#050505] text-white' : 'bg-slate-50 text-neutral-900'
     }`}>
+      <SEO 
+        title="Professional Certifications & Accreditations | Adarsh Singh"
+        description="Verified professional accreditations, cloud system certifications, and software training courses completed by Adarsh Singh."
+        keywords="AWS Certifications, Google Cloud, Microsoft Azure, Coursera, Professional Credentials"
+        canonicalUrl="https://adarshsingh.in/certifications"
+        schema={certsSchema}
+      />
       <div className="max-w-7xl mx-auto w-full">
         
         {/* Page Header */}

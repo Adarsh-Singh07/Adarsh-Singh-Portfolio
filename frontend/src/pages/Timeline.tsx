@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { JourneyMilestone, ProfileMode } from '../types';
 import { Briefcase, GraduationCap, Calendar, Zap, ChevronRight, MapPin } from 'lucide-react';
+import SEO from '../components/SEO';
 
 interface TimelineProps {
   journey: JourneyMilestone[];
@@ -49,8 +50,28 @@ export default function Timeline({ journey, currentMode, isDark }: TimelineProps
     }
   };
 
+  const timelineSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://adarshsingh.in/timeline/#webpage",
+        "url": "https://adarshsingh.in/timeline",
+        "name": "Career Timeline & Experiences | Adarsh Singh",
+        "description": "Professional history, corporate milestones, and academic backgrounds of Adarsh Singh in AI and Data Systems."
+      }
+    ]
+  };
+
   return (
     <div className="min-h-screen py-28 px-6 md:px-12 max-w-7xl mx-auto w-full select-none">
+      <SEO 
+        title="Professional Journey & Experience | Adarsh Singh"
+        description="Chronological career timeline of Adarsh Singh detailing positions, technical milestones, and project contributions in data systems and intelligence development."
+        keywords="Work History, Professional Experience, Tech Timeline, Career Milestones"
+        canonicalUrl="https://adarshsingh.in/timeline"
+        schema={timelineSchema}
+      />
       
       {/* 1. HERO HEADER */}
       <div className="mb-16 text-left max-w-3xl">

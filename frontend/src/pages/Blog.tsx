@@ -9,6 +9,7 @@ import { BlogNote, ProfileMode } from '../types';
 import { BookOpen, Calendar, Clock, Search, Plus, ArrowRight } from 'lucide-react';
 import DetailEditModal from '../components/DetailEditModal';
 import PortfolioService from '../services/api';
+import SEO from '../components/SEO';
 
 interface BlogProps {
   blogs: BlogNote[];
@@ -128,10 +129,30 @@ export default function Blog({ blogs, currentMode, isDark, onRefreshData }: Blog
     }
   };
 
+  const blogSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://adarshsingh.in/blog/#webpage",
+        "url": "https://adarshsingh.in/blog",
+        "name": "Engineering Chronicle & AI Blog | Adarsh Singh",
+        "description": "Technical insights, architectural tutorials, and deep-dives into vector databases and GenAI search written by Adarsh Singh."
+      }
+    ]
+  };
+
   return (
     <div className={`min-h-screen py-24 px-6 md:px-12 transition-colors duration-1000 ${
       isDark ? 'bg-[#050505] text-white' : 'bg-slate-50 text-neutral-900'
     }`}>
+      <SEO 
+        title="Technical Articles & AI Engineering Blog | Adarsh Singh"
+        description="Read the latest guides, design patterns, and engineering blogs about LLMs, data form pipelines, and vector search systems written by Adarsh Singh."
+        keywords="Technical Blog, AI Articles, Data Engineering Tutorials, LLM System Architecture"
+        canonicalUrl="https://adarshsingh.in/blog"
+        schema={blogSchema}
+      />
       <div className="max-w-7xl mx-auto w-full">
         
         {/* Header Console Row */}
