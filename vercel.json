@@ -26,7 +26,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://www.clarity.ms; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https:; media-src 'self'; frame-src 'self';"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://*.clarity.ms https://scripts.clarity.ms; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https:; media-src 'self'; frame-src 'self';"
         }
       ]
     }
@@ -37,7 +37,11 @@
       "destination": "https://portfolio-backend-1033309957480.us-central1.run.app/api/v1/:path*"
     },
     {
-      "source": "/(.*)",
+      "source": "/api/:path*",
+      "destination": "https://portfolio-backend-1033309957480.us-central1.run.app/api/:path*"
+    },
+    {
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ]
