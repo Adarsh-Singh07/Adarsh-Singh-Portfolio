@@ -20,6 +20,7 @@ import { Loader2 } from 'lucide-react';
 import Chatbot from './components/Chatbot';
 import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
+import NotFound from './pages/NotFound';
 
 
 declare global {
@@ -77,6 +78,7 @@ function AnimatedRoutes({
           <Route path="/contact" element={<Contact isDark={isDark} coordinates={profileData.coordinates} currentMode={currentMode} onRefreshData={onRefreshData} />} />
           <Route path="/dashboard" element={<Dashboard isDark={isDark} />} />
           <Route path="/admin" element={<Admin isDark={isDark} onRefreshData={onRefreshData} />} />
+          <Route path="*" element={<NotFound isDark={isDark} />} />
         </Routes>
       </motion.div>
     </AnimatePresence>
