@@ -136,10 +136,10 @@ export default function Resume({ profileData, isDark }: ResumeProps) {
                   <div key={index} className="text-left group relative pl-4 border-l-2 border-[#007AFF30] hover:border-[#007AFF] transition-colors duration-300">
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-2">
                       <h3 className="font-semibold text-base">{exp.title}</h3>
-                      <span className="text-xs font-mono opacity-60">{exp.date}</span>
+                      <span className="text-xs font-mono opacity-60">{exp.period}</span>
                     </div>
                     <p className={`text-xs font-mono mb-3 ${isDark ? 'text-[#007AFF]' : 'text-indigo-600'}`}>{exp.subtitle}</p>
-                    <p className={`text-xs md:text-sm font-light leading-relaxed whitespace-pre-line ${isDark ? 'text-slate-355' : 'text-slate-650'}`}>
+                    <p className={`text-xs md:text-sm font-light leading-relaxed whitespace-pre-line ${isDark ? 'text-slate-355' : 'text-slate-655'}`}>
                       {exp.description}
                     </p>
                   </div>
@@ -162,7 +162,7 @@ export default function Resume({ profileData, isDark }: ResumeProps) {
                   <div key={index} className="text-left pl-4 border-l-2 border-[#007AFF20]">
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-2">
                       <h3 className="font-semibold text-base">{edu.title}</h3>
-                      <span className="text-xs font-mono opacity-60">{edu.date}</span>
+                      <span className="text-xs font-mono opacity-60">{edu.period}</span>
                     </div>
                     <p className={`text-xs font-mono mb-2 ${isDark ? 'text-slate-400' : 'text-slate-655'}`}>{edu.subtitle}</p>
                     <p className={`text-xs md:text-sm font-light leading-relaxed ${isDark ? 'text-slate-350' : 'text-slate-650'}`}>
@@ -191,17 +191,17 @@ export default function Resume({ profileData, isDark }: ResumeProps) {
                   }`}
                 >
                   <h3 className="font-semibold text-sm mb-4 text-[#007AFF] uppercase tracking-wide">
-                    {category.name}
+                    {category.title}
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {category.items.map((skill, sIdx) => (
+                    {category.skills.map((skill, sIdx) => (
                       <span 
                         key={sIdx} 
                         className={`text-xs px-2.5 py-1 rounded-lg ${
                           isDark ? 'bg-white/5 text-slate-300' : 'bg-white text-slate-700 border border-slate-200'
                         }`}
                       >
-                        {skill}
+                        {skill.name}
                       </span>
                     ))}
                   </div>
@@ -229,7 +229,7 @@ export default function Resume({ profileData, isDark }: ResumeProps) {
                       <Award className="w-4 h-4" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-xs md:text-sm line-clamp-1">{cert.name}</h3>
+                      <h3 className="font-semibold text-xs md:text-sm line-clamp-1">{cert.title}</h3>
                       <p className="text-[10px] font-mono opacity-60 mb-1">{cert.issuer}</p>
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-semibold">
                         Verified

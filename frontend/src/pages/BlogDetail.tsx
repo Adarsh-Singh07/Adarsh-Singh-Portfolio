@@ -315,8 +315,9 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
           onSave={handleSave}
           onDelete={handleDelete}
           item={activeBlog}
-          type="blogNote"
-          mode="edit"
+          type="blog"
+          isAdmin={isAdmin}
+          isDark={isDark}
         />
       )}
     </div>

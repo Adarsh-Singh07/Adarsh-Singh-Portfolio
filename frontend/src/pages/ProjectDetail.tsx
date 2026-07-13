@@ -277,7 +277,8 @@ export default function ProjectDetail({ projects, currentMode = 'general', isDar
           onDelete={handleDelete}
           item={project}
           type="project"
-          mode="edit"
+          isAdmin={isAdmin}
+          isDark={isDark}
         />
       )}
     </div>
