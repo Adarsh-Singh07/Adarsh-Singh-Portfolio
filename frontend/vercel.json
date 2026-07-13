@@ -31,21 +31,58 @@
       ]
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/v1/(.*)",
-      "dest": "https://portfolio-backend-1033309957480.us-central1.run.app/api/v1/$1"
+      "source": "/api/v1/:path*",
+      "destination": "https://portfolio-backend-1033309957480.us-central1.run.app/api/v1/:path*"
     },
     {
-      "src": "/api/(.*)",
-      "dest": "https://portfolio-backend-1033309957480.us-central1.run.app/api/$1"
+      "source": "/api/:path*",
+      "destination": "https://portfolio-backend-1033309957480.us-central1.run.app/api/:path*"
     },
     {
-      "handle": "filesystem"
+      "source": "/resume",
+      "destination": "/index.html"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/projects",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/projects/:projectId",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/blog",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/blog/:blogId",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/skills",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/timeline",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/certifications",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/contact",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/index.html"
     }
   ]
 }
