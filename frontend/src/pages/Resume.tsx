@@ -86,7 +86,7 @@ export default function Resume({ profileData, isDark }: ResumeProps) {
           </div>
 
           <a 
-            href="/Adarsh_Singh_Resume.pdf" 
+            href="/Adarsh_Singh_CV.pdf" 
             download 
             className="px-5 py-3 bg-[#007AFF] hover:bg-[#007AFF]/90 text-white rounded-full flex items-center gap-2.5 text-xs font-semibold shadow-glow cursor-pointer transition-colors"
             aria-label="Download Resume PDF file"

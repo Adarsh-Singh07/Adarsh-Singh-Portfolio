@@ -26,62 +26,18 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://*.clarity.ms https://scripts.clarity.ms; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https:; media-src 'self'; frame-src 'self';"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://*.clarity.ms https://scripts.clarity.ms; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://*.google-analytics.com https://*.analytics.google.com https://*.clarity.ms https://*.googletagmanager.com https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.clarity.ms https://portfolio-backend-1033309957480.us-central1.run.app; media-src 'self'; frame-src 'self';"
         }
       ]
     }
   ],
   "rewrites": [
     {
-      "source": "/api/v1/:path*",
-      "destination": "https://portfolio-backend-1033309957480.us-central1.run.app/api/v1/:path*"
-    },
-    {
       "source": "/api/:path*",
       "destination": "https://portfolio-backend-1033309957480.us-central1.run.app/api/:path*"
     },
     {
-      "source": "/resume",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/projects",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/projects/:projectId",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/blog",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/blog/:blogId",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/skills",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/timeline",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/certifications",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/contact",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/dashboard",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/admin",
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ]
