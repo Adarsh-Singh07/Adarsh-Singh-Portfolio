@@ -525,10 +525,10 @@
       {
         "id": "analyst-ai-data-engineering-capgemini",
         "era": "Professional Experience",
-        "title": "Analyst – AI & Data Engineering",
+        "title": "Analyst \u00e2\u20ac\u201c AI & Data Engineering",
         "subtitle": "Capgemini",
         "description": "Building automated ETL pipelines and data transformation workflows using Python and Azure Databricks for an enterprise-scale Financial Data Lake (FDL) BI engagement. Integrating Retrieval-Augmented Generation (RAG) and Generative AI techniques to enhance data querying and insight generation on large structured datasets. Developing Power BI dashboards tracking key performance metrics and working with Azure cloud-native services for scalable distributed data processing and ML model deployment.",
-        "period": "Aug 2025 – Present",
+        "period": "Aug 2025 \u00e2\u20ac\u201c Present",
         "emphasis": {
           "general": true,
           "data-engineer": true,
@@ -539,10 +539,10 @@
       {
         "id": "software-engineering-intern-capgemini",
         "era": "Professional Experience",
-        "title": "Software Engineering Intern – Python & RAG",
+        "title": "Software Engineering Intern \u00e2\u20ac\u201c Python & RAG",
         "subtitle": "Capgemini",
         "description": "Developed Python-based backend services and integrated RAG pipelines to power intelligent document retrieval and response generation. Built and tested REST API endpoints, contributing to end-to-end feature delivery in an Agile sprint-based environment. Collaborated with cross-functional teams on deploying AI-powered features, gaining exposure to CI/CD workflows and distributed service architecture.",
-        "period": "Apr 2025 – Jun 2025",
+        "period": "Apr 2025 \u00e2\u20ac\u201c Jun 2025",
         "emphasis": {
           "general": true,
           "data-engineer": true,
@@ -553,10 +553,10 @@
       {
         "id": "mca-lovely-professional-university",
         "era": "Education",
-        "title": "Master of Computer Applications – Computer Science",
+        "title": "Master of Computer Applications \u00e2\u20ac\u201c Computer Science",
         "subtitle": "Lovely Professional University (Jalandhar, India)",
         "description": "Completed Master of Computer Applications with a CGPA of 8.35, focusing on advanced computer science concepts relevant to modern software development and data-intensive applications.",
-        "period": "Aug 2023 – Jul 2025",
+        "period": "Aug 2023 \u00e2\u20ac\u201c Jul 2025",
         "emphasis": {
           "general": true,
           "data-engineer": true,
@@ -567,10 +567,10 @@
       {
         "id": "bsc-deen-dayal-upadhyay-gorakhpur-university",
         "era": "Education",
-        "title": "Bachelor of Science – Mathematics & Computer Science",
+        "title": "Bachelor of Science \u00e2\u20ac\u201c Mathematics & Computer Science",
         "subtitle": "Deen Dayal Upadhyay Gorakhpur University (Gorakhpur, UP, India)",
         "description": "Graduated with a Bachelor of Science degree, building a strong foundation in mathematics and computer science principles essential for analytical and technical roles.",
-        "period": "Apr 2018 – Sep 2021",
+        "period": "Apr 2018 \u00e2\u20ac\u201c Sep 2021",
         "emphasis": {
           "general": true,
           "data-engineer": true,
@@ -582,8 +582,8 @@
     "blogs": [
       {
         "id": "scalable-etl-azure-databricks",
-        "title": "Building Scalable ETL Pipelines with Azure Databricks for Financial Data Lakes",
-        "excerpt": "Explore the architecture and implementation of robust ETL pipelines using Python and Azure Databricks, specifically tailored for handling large-scale financial datasets and enabling advanced BI analytics.",
+        "title": "Scaling Up: ETL Pipelines with Azure Databricks",
+        "excerpt": "When your data goes from Megabytes to Petabytes, Excel won't cut it. Learn how Azure Databricks acts as a massive industrial factory for cleaning financial data.",
         "readTime": "7 min read",
         "category": "Data Engineering",
         "date": "2024-07-15",
@@ -592,12 +592,15 @@
           "general": 2,
           "data-engineer": 1,
           "ai-engineer": 99
-        }
+        },
+        "content": "Imagine trying to filter the ocean for gold flakes using a coffee filter. That's what traditional ETL (Extract, Transform, Load) feels like when handling terabytes of financial transaction data.\n\n### The Industrial Factory\nAzure Databricks is the equivalent of building an industrial water purification plant. It takes massive streams of raw, messy data from financial institutions and pipelines it into pristine, analytical tables.\n\nBy leveraging Apache Spark under the hood, Databricks doesn't just process one row at a time. It spreads the workload across hundreds of cloud machines simultaneously. \n\n### Why it Matters for Finance\nIn the financial world, data freshness is currency. A dashboard showing yesterday's stock trades is useless. By utilizing Databricks Structured Streaming, we ensure that as soon as a transaction hits the data lake, it is cleaned, verified, and pushed to BI analysts in near real-time, all while maintaining perfect ACID compliance so no data is ever lost or duplicated.",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/azure/azure-original.svg",
+        "brandColor": "#0078D4"
       },
       {
         "id": "agentic-ai-rag-dynamic-pricing",
-        "title": "Leveraging Agentic AI and RAG for Dynamic Pricing in On-Demand Services",
-        "excerpt": "Dive into how Agentic AI and Retrieval-Augmented Generation (RAG) can be integrated into microservices architectures to enable real-time, data-driven dynamic pricing and enhance customer support through LLM-powered chatbots.",
+        "title": "Agentic AI: The Brains Behind Dynamic Pricing",
+        "excerpt": "Have you ever wondered why Uber surges exactly when it starts raining? The answer is AI agents constantly monitoring the world, running RAG, and adjusting prices in real-time.",
         "readTime": "9 min read",
         "category": "Generative AI",
         "date": "2024-06-20",
@@ -606,12 +609,15 @@
           "general": 1,
           "data-engineer": 2,
           "ai-engineer": 1
-        }
+        },
+        "content": "Most software is reactive. You click a button, and the software does what it was programmed to do. \n\nBut **Agentic AI** is proactive. It doesn't wait for a button press. It constantly monitors its environment, makes decisions, and takes actions autonomously.\n\n### The Dynamic Pricing Problem\nIn on-demand services (like ride-sharing or delivery), pricing needs to balance supply and demand. If a concert lets out and 5,000 people need a ride, prices must increase to encourage more drivers to head to that area.\n\nInstead of a human manually watching the weather and local events, an AI Agent uses Retrieval-Augmented Generation (RAG) to scan live news, weather reports, and historical data. \n\n### The Feedback Loop\nThe AI says, 'It just started snowing in downtown, and historical RAG data shows traffic slows by 40%. I will increase pricing by 1.5x to compensate drivers.'\n\nBy building LLMs directly into the microservice architecture, we give our pricing engine the ability to literally 'read the room' and adapt instantly.",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/openai/openai-original.svg",
+        "brandColor": "#412991"
       },
       {
         "id": "personalizing-email-openai-llm",
-        "title": "Personalizing Email Campaigns with OpenAI: A Practical Guide to LLM Integration",
-        "excerpt": "Learn how to build an automated email campaign tool using Python and the OpenAI API to generate personalized content at scale, improving engagement and campaign effectiveness.",
+        "title": "Hyper-Personalization: Crafting Emails with LLMs",
+        "excerpt": "Say goodbye to 'Dear [First Name]'. We integrated OpenAI into our marketing pipeline to write emails so personalized they feel hand-typed.",
         "readTime": "6 min read",
         "category": "AI/ML",
         "date": "2024-05-10",
@@ -620,12 +626,15 @@
           "general": 3,
           "data-engineer": 3,
           "ai-engineer": 2
-        }
+        },
+        "content": "We have all received those terrible automated emails: 'Hi valued customer, we noticed you like [Product_Name]. Buy more!'\n\nThey feel cold, robotic, and immediately go to the spam folder. \n\n### The LLM Revolution\nBy integrating the OpenAI API directly into our email pipeline, we threw out the rigid templates. Instead, we feed the LLM a context profile of the user. \n\nFor example, the system tells the AI: 'This user is a software engineer who frequently buys mechanical keyboards and prefers short, technical language.'\n\nThe LLM then drafts a unique, highly specific email tailored exactly to that user's vibe.\n\n### Scaling Authenticity\nThe magic here is scale. You could always hire a human to write 10 personalized emails a day. But an automated LLM pipeline can write 100,000 personalized emails an hour, drastically increasing open rates, engagement, and ultimately, revenue.",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg",
+        "brandColor": "#FFD43B"
       },
       {
         "id": "real-time-isl-translation-ml",
-        "title": "Real-Time Indian Sign Language Translation: An ML Pipeline with TensorFlow & OpenCV",
-        "excerpt": "Discover the technical challenges and solutions in developing a low-latency, real-time machine learning system for Indian Sign Language translation, from model optimization to deployment.",
+        "title": "Breaking Barriers: Real-Time Sign Language Translation",
+        "excerpt": "Translating spoken language is easy. Translating hand movements, facial expressions, and timing in real-time? That requires serious Computer Vision engineering.",
         "readTime": "8 min read",
         "category": "Machine Learning",
         "date": "2024-04-01",
@@ -634,7 +643,10 @@
           "general": 4,
           "data-engineer": 99,
           "ai-engineer": 3
-        }
+        },
+        "content": "Machine Learning is at its best when it bridges gaps between people. \n\nTranslating Indian Sign Language (ISL) into text in real-time is a massive technical challenge. Sign language is not just about the position of your hands; it's about movement, speed, and facial expressions.\n\n### The Computer Vision Pipeline\nWe used OpenCV to capture live video feeds and extract the subject's skeleton using MediaPipe. Instead of analyzing raw pixels (which is incredibly slow), we track the specific coordinates of the user's fingers, elbows, and shoulders.\n\n### The LSTM Network\nBecause gestures happen over time, a static image classifier wouldn't work. We fed these coordinates into an LSTM (Long Short-Term Memory) neural network. LSTMs are perfect for this because they 'remember' the sequence of movements.\n\nBy aggressively optimizing the model in TensorFlow Lite, we brought the latency down to under 50 milliseconds, making the translation feel truly instantaneous and conversational.",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/opencv/opencv-original.svg",
+        "brandColor": "#5C3EE8"
       }
     ],
     "philosophy": "My passion lies at the intersection of data and intelligence, where complex data ecosystems meet cutting-edge AI. I am driven by the challenge of transforming raw data into actionable insights and building intelligent systems that not only solve real-world problems but also scale efficiently. From architecting robust ETL pipelines to deploying advanced Generative AI and Machine Learning models, I believe in a holistic approach that combines engineering rigor with innovative AI capabilities to create truly transformative solutions.",
@@ -1174,10 +1186,10 @@
       {
         "id": "capgemini-analyst",
         "era": "Professional Experience",
-        "title": "Analyst – AI & Data Engineering",
+        "title": "Analyst \u00e2\u20ac\u201c AI & Data Engineering",
         "subtitle": "Capgemini",
         "description": "Building automated ETL pipelines and data transformation workflows using Python and Azure Databricks for an enterprise-scale Financial Data Lake (FDL) BI engagement. Integrating Retrieval-Augmented Generation (RAG) and Generative AI techniques to enhance data querying and insight generation on large structured datasets. Developing Power BI dashboards tracking key performance metrics and working with Azure cloud-native services for scalable distributed data processing and ML model deployment.",
-        "period": "Aug 2025 – Present",
+        "period": "Aug 2025 \u00e2\u20ac\u201c Present",
         "emphasis": {
           "general": true,
           "data-engineer": true,
@@ -1188,10 +1200,10 @@
       {
         "id": "capgemini-intern",
         "era": "Professional Experience",
-        "title": "Software Engineering Intern – Python & RAG",
+        "title": "Software Engineering Intern \u00e2\u20ac\u201c Python & RAG",
         "subtitle": "Capgemini",
         "description": "Developed Python-based backend services and integrated RAG pipelines to power intelligent document retrieval and response generation. Built and tested REST API endpoints, contributing to end-to-end feature delivery in an Agile sprint-based environment. Collaborated with cross-functional teams on deploying AI-powered features, gaining exposure to CI/CD workflows and distributed service architecture.",
-        "period": "Apr 2025 – Jun 2025",
+        "period": "Apr 2025 \u00e2\u20ac\u201c Jun 2025",
         "emphasis": {
           "general": true,
           "data-engineer": true,
@@ -1202,10 +1214,10 @@
       {
         "id": "mca-lpu",
         "era": "Education",
-        "title": "Master of Computer Applications – Computer Science",
+        "title": "Master of Computer Applications \u00e2\u20ac\u201c Computer Science",
         "subtitle": "Lovely Professional University (Jalandhar, India)",
         "description": "Completed Master of Computer Applications with a CGPA of 8.35, focusing on advanced computer science concepts relevant to software and data engineering.",
-        "period": "Aug 2023 – Jul 2025",
+        "period": "Aug 2023 \u00e2\u20ac\u201c Jul 2025",
         "emphasis": {
           "general": true,
           "data-engineer": true,
@@ -1216,10 +1228,10 @@
       {
         "id": "bsc-ddugu",
         "era": "Education",
-        "title": "Bachelor of Science – Mathematics & Computer Science",
+        "title": "Bachelor of Science \u00e2\u20ac\u201c Mathematics & Computer Science",
         "subtitle": "Deen Dayal Upadhyay Gorakhpur University (Gorakhpur, UP, India)",
         "description": "Graduated with a Bachelor of Science, building foundational knowledge in mathematics and computer science.",
-        "period": "Apr 2018 – Sep 2021",
+        "period": "Apr 2018 \u00e2\u20ac\u201c Sep 2021",
         "emphasis": {
           "general": true,
           "data-engineer": false,
@@ -1821,10 +1833,10 @@
       {
         "id": "capgemini-analyst",
         "era": "Professional Experience",
-        "title": "Analyst – AI & Data Engineering",
+        "title": "Analyst \u00e2\u20ac\u201c AI & Data Engineering",
         "subtitle": "Capgemini",
         "description": "Building automated ETL pipelines and data transformation workflows using Python and Azure Databricks for an enterprise-scale Financial Data Lake (FDL) BI engagement. Integrating Retrieval-Augmented Generation (RAG) and Generative AI techniques to enhance data querying and insight generation on large structured datasets. Developing Power BI dashboards tracking key performance metrics, presenting data-driven insights to technical and non-technical stakeholders. Working with Azure cloud-native services (Databricks, ADF) for scalable distributed data processing and ML model deployment.",
-        "period": "Aug 2025 – Present",
+        "period": "Aug 2025 \u00e2\u20ac\u201c Present",
         "emphasis": {
           "general": true,
           "data-engineer": true,
@@ -1835,10 +1847,10 @@
       {
         "id": "capgemini-intern",
         "era": "Professional Experience",
-        "title": "Software Engineering Intern – Python & RAG",
+        "title": "Software Engineering Intern \u00e2\u20ac\u201c Python & RAG",
         "subtitle": "Capgemini",
         "description": "Developed Python-based backend services and integrated RAG pipelines to power intelligent document retrieval and response generation. Built and tested REST API endpoints, contributing to end-to-end feature delivery in an Agile sprint-based environment. Collaborated with cross-functional teams on deploying AI-powered features, gaining exposure to CI/CD workflows and distributed service architecture.",
-        "period": "Apr 2025 – Jun 2025",
+        "period": "Apr 2025 \u00e2\u20ac\u201c Jun 2025",
         "emphasis": {
           "general": true,
           "data-engineer": false,
@@ -1849,10 +1861,10 @@
       {
         "id": "lpu-mca",
         "era": "Education",
-        "title": "Master of Computer Applications – Computer Science",
+        "title": "Master of Computer Applications \u00e2\u20ac\u201c Computer Science",
         "subtitle": "Lovely Professional University (Jalandhar, India)",
         "description": "Completed Master of Computer Applications with a CGPA of 8.35, focusing on advanced computer science concepts relevant to modern software and AI development.",
-        "period": "Aug 2023 – Jul 2025",
+        "period": "Aug 2023 \u00e2\u20ac\u201c Jul 2025",
         "emphasis": {
           "general": true,
           "data-engineer": true,
@@ -1863,10 +1875,10 @@
       {
         "id": "ddu-bsc",
         "era": "Education",
-        "title": "Bachelor of Science – Mathematics & Computer Science",
+        "title": "Bachelor of Science \u00e2\u20ac\u201c Mathematics & Computer Science",
         "subtitle": "Deen Dayal Upadhyay Gorakhpur University (Gorakhpur, UP, India)",
         "description": "Earned a Bachelor of Science degree with a focus on Mathematics and Computer Science, providing a strong foundational understanding for a career in technology.",
-        "period": "Apr 2018 – Sep 2021",
+        "period": "Apr 2018 \u00e2\u20ac\u201c Sep 2021",
         "emphasis": {
           "general": true,
           "data-engineer": false,
