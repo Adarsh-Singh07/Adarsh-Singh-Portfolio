@@ -6,6 +6,7 @@ import json
 from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.utils import formataddr
 
 SMTP_CONFIG_JSON = "/app/data/smtp_config.json"
 if not os.path.exists("/app/data"):
@@ -110,16 +111,43 @@ def send_outreach_email(visitor_name: str, visitor_email: str, subject: str, mes
     
     # Define Notification HTML for Adarsh
     html_admin = f"""
+    <!DOCTYPE html>
     <html>
-    <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px;">
-        <h2 style="color: #007AFF; border-bottom: 1px solid #eaeaea; padding-bottom: 10px;">New Portfolio Outreach Connection</h2>
-        <p><strong>From:</strong> {escaped_name} ({escaped_email})</p>
-        <p><strong>Subject:</strong> {escaped_subject}</p>
-        <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; border-left: 4px solid #007AFF; margin-top: 15px;">
-            <p style="white-space: pre-wrap; margin: 0;">{escaped_message}</p>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+        body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 40px 0; color: #2c3e50; }}
+        .wrapper {{ max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.04); overflow: hidden; }}
+        .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 35px 30px; text-align: center; color: white; }}
+        .header h2 {{ margin: 0; font-size: 24px; font-weight: 600; letter-spacing: 0.5px; }}
+        .content {{ padding: 40px 35px; }}
+        .meta-data {{ background-color: #f8fafc; border-radius: 8px; padding: 20px; margin-bottom: 30px; border-left: 4px solid #667eea; }}
+        .meta-item {{ margin-bottom: 10px; font-size: 15px; }}
+        .meta-item:last-child {{ margin-bottom: 0; }}
+        .meta-label {{ font-weight: 600; color: #475569; width: 80px; display: inline-block; }}
+        .message-body {{ font-size: 16px; line-height: 1.7; color: #334155; white-space: pre-wrap; }}
+        .footer {{ text-align: center; padding: 25px; background-color: #f8fafc; border-top: 1px solid #edf2f7; color: #94a3b8; font-size: 13px; }}
+      </style>
+    </head>
+    <body>
+      <div class="wrapper">
+        <div class="header">
+          <h2>New Portfolio Inquiry</h2>
         </div>
-        <hr style="border: none; border-top: 1px solid #eaeaea; margin: 20px 0;" />
-        <p style="font-size: 10px; color: #888; text-align: center;">This message was dispatched securely via your Portfolio Core email service.</p>
+        <div class="content">
+          <div class="meta-data">
+            <div class="meta-item"><span class="meta-label">From:</span> {escaped_name} ({escaped_email})</div>
+            <div class="meta-item"><span class="meta-label">Subject:</span> {escaped_subject}</div>
+            <div class="meta-item"><span class="meta-label">Date:</span> {datetime.now().strftime("%B %d, %Y at %I:%M %p")}</div>
+          </div>
+          <h3 style="margin-top: 0; color: #1e293b; font-size: 18px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">Message</h3>
+          <div class="message-body">{escaped_message}</div>
+        </div>
+        <div class="footer">
+          This secure notification was dispatched from your Adarsh Singh Portfolio.
+        </div>
+      </div>
     </body>
     </html>
     """
@@ -129,44 +157,51 @@ def send_outreach_email(visitor_name: str, visitor_email: str, subject: str, mes
     <!DOCTYPE html>
     <html>
     <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <style>
-        body {{ font-family: 'Inter', Helvetica, Arial, sans-serif; color: #1e293b; background-color: #f8fafc; line-height: 1.6; margin: 0; padding: 0; }}
-        .container {{ max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }}
-        .header {{ background: #0f172a; padding: 32px; text-align: center; }}
-        .header h2 {{ color: #ffffff; margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.025em; }}
-        .content {{ padding: 40px 32px; }}
-        .content p {{ margin: 0 0 16px; font-size: 16px; color: #334155; }}
-        .content p.strong {{ font-weight: 600; color: #0f172a; }}
-        .quote-box {{ background-color: #f1f5f9; padding: 20px; border-radius: 8px; border-left: 4px solid #007AFF; margin: 24px 0; }}
-        .quote-box p {{ margin: 0; font-size: 14px; font-style: italic; color: #475569; }}
-        .button-container {{ text-align: center; margin: 32px 0 16px; }}
-        .button {{ background-color: #007AFF; color: #ffffff !important; padding: 12px 28px; border-radius: 9999px; text-decoration: none; font-size: 14px; font-weight: 600; display: inline-block; transition: background-color 0.2s; }}
-        .footer {{ background-color: #f8fafc; padding: 24px 32px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 12px; color: #64748b; }}
-        .footer a {{ color: #007AFF; text-decoration: none; }}
+        body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 40px 0; color: #2c3e50; }}
+        .wrapper {{ max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.04); overflow: hidden; }}
+        .header {{ background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 40px 30px; text-align: center; color: white; }}
+        .header h2 {{ margin: 0; font-size: 26px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }}
+        .header p {{ margin: 10px 0 0 0; color: #94a3b8; font-size: 15px; }}
+        .content {{ padding: 40px 35px; }}
+        .greeting {{ font-size: 20px; font-weight: 600; color: #1e293b; margin-bottom: 20px; }}
+        .body-text {{ font-size: 16px; line-height: 1.7; color: #475569; margin-bottom: 25px; }}
+        .quote-box {{ background-color: #f8fafc; padding: 25px; border-radius: 8px; border-left: 4px solid #3b82f6; margin: 30px 0; }}
+        .quote-title {{ font-size: 14px; text-transform: uppercase; color: #94a3b8; font-weight: 700; margin-bottom: 15px; letter-spacing: 0.5px; }}
+        .quote-content {{ font-style: italic; color: #334155; font-size: 15px; white-space: pre-wrap; margin: 0; }}
+        .action-button {{ display: inline-block; background-color: #3b82f6; color: white !important; padding: 14px 32px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 15px; text-align: center; transition: background-color 0.3s ease; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3); }}
+        .action-container {{ text-align: center; margin: 35px 0 20px; }}
+        .footer {{ text-align: center; padding: 30px; background-color: #f8fafc; border-top: 1px solid #edf2f7; color: #64748b; font-size: 13px; line-height: 1.5; }}
+        .footer a {{ color: #3b82f6; text-decoration: none; }}
       </style>
     </head>
     <body>
-      <div class="container">
+      <div class="wrapper">
         <div class="header">
-          <h2>Connection Confirmed</h2>
+          <h2>Adarsh Singh</h2>
+          <p>Software Engineer & Developer</p>
         </div>
         <div class="content">
-          <p class="strong">Hello {escaped_name},</p>
-          <p>Thank you for reaching out and establishing contact. This is an automated confirmation that your message packet has successfully routed to my inbox.</p>
-          <p>Here is a copy of your transmission details:</p>
-          <div class="quote-box">
-            <p><strong>Subject:</strong> {escaped_subject}</p>
-            <p style="margin-top: 8px; white-space: pre-wrap;">{escaped_message}</p>
+          <div class="greeting">Hi {escaped_name},</div>
+          <div class="body-text">
+            Thank you for reaching out! I have received your message and will review it shortly. I typically respond to all inquiries within 24 hours.
           </div>
-          <p>I will personally review your inquiry and follow up with an operational response within 24 hours.</p>
-          <p>In the meantime, feel free to explore my latest projects or review my professional journey:</p>
-          <div class="button-container">
-            <a href="https://github.com/Adarsh-Singh07" class="button" style="color: #ffffff;">View GitHub Projects</a>
+          <div class="quote-box">
+            <div class="quote-title">Your Message Summary</div>
+            <div class="quote-content"><strong>Subject:</strong> {escaped_subject}<br><br>{escaped_message}</div>
+          </div>
+          <div class="body-text" style="text-align: center; font-weight: 500;">
+            While you wait, feel free to check out my latest work.
+          </div>
+          <div class="action-container">
+            <a href="https://adarshsingh.in/#projects" class="action-button">View My Portfolio</a>
           </div>
         </div>
         <div class="footer">
-          <p>Sent securely via Adarsh Singh's Portfolio API.</p>
-          <p>&copy; {current_year} Adarsh Singh. All rights reserved.</p>
+          &copy; {current_year} Adarsh Singh. All rights reserved.<br>
+          <a href="https://adarshsingh.in">adarshsingh.in</a> | <a href="https://github.com/Adarsh-Singh07">GitHub</a> | <a href="https://www.linkedin.com/in/adarsh-singh-07/">LinkedIn</a>
         </div>
       </div>
     </body>
@@ -192,7 +227,7 @@ def send_outreach_email(visitor_name: str, visitor_email: str, subject: str, mes
                 html_content=html_admin,
                 reply_to=visitor_email,
                 bcc=personal_bcc,
-                from_email="contact@adarshsingh.in"
+                from_email="Adarsh Singh <contact@adarshsingh.in>"
             )
         except Exception as e:
             print(f"Resend Admin Notification failed: {e}")
@@ -204,7 +239,7 @@ def send_outreach_email(visitor_name: str, visitor_email: str, subject: str, mes
             if smtp_config["host"] and smtp_config["user"] and smtp_config["password"]:
                 msg_admin = MIMEMultipart("alternative")
                 msg_admin["Subject"] = f"[Portfolio Outreach] {escaped_subject}"
-                msg_admin["From"] = "contact@adarshsingh.in"
+                msg_admin["From"] = formataddr(("Adarsh Singh", "contact@adarshsingh.in"))
                 msg_admin["To"] = admin_recipient
                 msg_admin["Reply-To"] = escaped_email
                 msg_admin.attach(MIMEText(f"Outreach from {escaped_name} ({escaped_email}): {escaped_message}", "plain", "utf-8"))
@@ -232,7 +267,7 @@ def send_outreach_email(visitor_name: str, visitor_email: str, subject: str, mes
                 subject="Thank you for contacting Adarsh Singh",
                 html_content=html_visitor,
                 reply_to=reply_to_address,
-                from_email="noreply@adarshsingh.in"
+                from_email="Adarsh Singh <noreply@adarshsingh.in>"
             )
         except Exception as e:
             print(f"Resend Visitor Auto-responder failed (likely Sandbox restriction): {e}")
@@ -244,7 +279,7 @@ def send_outreach_email(visitor_name: str, visitor_email: str, subject: str, mes
             if smtp_config["host"] and smtp_config["user"] and smtp_config["password"]:
                 msg_visitor = MIMEMultipart("alternative")
                 msg_visitor["Subject"] = "Thank you for contacting Adarsh Singh"
-                msg_visitor["From"] = "noreply@adarshsingh.in"
+                msg_visitor["From"] = formataddr(("Adarsh Singh", "noreply@adarshsingh.in"))
                 msg_visitor["To"] = visitor_email
                 msg_visitor["Reply-To"] = reply_to_address
                 msg_visitor.attach(MIMEText("Thank you for reaching out! We received your message.", "plain", "utf-8"))
