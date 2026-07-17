@@ -46,7 +46,7 @@ export default function Timeline({ journey, currentMode, isDark }: TimelineProps
       opacity: 1,
       y: 0,
       filter: 'blur(0px)',
-      transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] }
+      transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] as any }
     }
   };
 
@@ -139,7 +139,7 @@ export default function Timeline({ journey, currentMode, isDark }: TimelineProps
                     className={`absolute inset-0 rounded-xl -z-10 ${
                       isDark ? 'bg-white' : 'bg-neutral-950'
                     }`}
-                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                    transition={{ type: 'spring' as any, stiffness: 380, damping: 30 }}
                   />
                 )}
                 <span>{label}</span>
@@ -247,7 +247,7 @@ export default function Timeline({ journey, currentMode, isDark }: TimelineProps
                   <div className="w-full md:w-1/2 px-12">
                     <motion.div
                       whileHover={{ y: -4, scale: 1.01 }}
-                      transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                      transition={{ type: 'spring' as any, stiffness: 450, damping: 20 }}
                       className={`p-6 md:p-8 rounded-[32px] border relative group overflow-hidden flex flex-col justify-between h-full transition-all duration-300 ${
                         isDark 
                           ? `bg-gradient-to-b from-[#141416]/90 to-[#09090b]/95 border-white/[0.08] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] ${eraTheme.borderHover} ${

@@ -26,7 +26,7 @@ export default function ThemeToggle({ isDark, toggleTheme }: ThemeToggleProps) {
       <motion.div
         initial={false}
         animate={{ y: isDark ? -30 : 0, opacity: isDark ? 0 : 1 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as any }}
         className="flex items-center justify-center"
       >
         <Sun className="w-4.5 h-4.5" />
@@ -35,7 +35,7 @@ export default function ThemeToggle({ isDark, toggleTheme }: ThemeToggleProps) {
       <motion.div
         initial={false}
         animate={{ y: isDark ? 0 : 30, opacity: isDark ? 1 : 0 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as any }}
         className="absolute inset-0 flex items-center justify-center"
       >
         <Moon className="w-4.5 h-4.5" />

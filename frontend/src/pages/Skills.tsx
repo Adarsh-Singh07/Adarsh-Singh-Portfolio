@@ -204,7 +204,7 @@ export default function Skills({ categories, strengths, currentMode, isDark, onR
     visible: { 
       opacity: 1, 
       y: 0, 
-      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } 
+      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as any } 
     }
   };
 
@@ -341,7 +341,7 @@ export default function Skills({ categories, strengths, currentMode, isDark, onR
                         <motion.span
                           key={skill.name}
                           whileHover={{ y: -2, scale: 1.03 }}
-                          transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                          transition={{ type: 'spring' as any, stiffness: 400, damping: 15 }}
                           className={`px-3 py-1.5 rounded-xl text-xs font-semibold tracking-wide border cursor-default select-none ${
                             isDark 
                               ? 'bg-white/[0.04] border-white/[0.06] text-white/80 hover:bg-white/[0.08] hover:border-white/15 hover:text-white' 

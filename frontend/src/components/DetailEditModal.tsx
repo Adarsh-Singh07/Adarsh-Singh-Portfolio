@@ -328,7 +328,7 @@ export default function DetailEditModal({
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] as any }}
           className={`relative w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-[32px] border p-6 md:p-10 shadow-2xl z-10 scrollbar-thin ${
             isDark 
               ? 'bg-neutral-950/90 border-white/10 text-white shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)]' 

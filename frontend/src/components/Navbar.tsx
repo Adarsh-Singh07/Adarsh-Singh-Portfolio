@@ -246,7 +246,7 @@ export default function Navbar({ isDark, toggleTheme, currentMode, onModeChange,
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] as any }}
             className={`fixed inset-x-0 top-[76px] z-40 p-6 flex flex-col gap-6 lg:hidden border-b ${
               isDark 
                 ? 'bg-black/95 backdrop-blur-xl border-neutral-900 text-white shadow-2xl' 

@@ -156,10 +156,10 @@ export default function AnimatedOrb({ isDark }: AnimatedOrbProps) {
           rotateZ: isHovered ? (coords.x * coords.y) / 250 : 0
         }}
         transition={{ 
-          scale: { type: 'spring', stiffness: 350, damping: 15 },
-          rotateX: { type: 'spring', stiffness: 200, damping: 15 },
-          rotateY: { type: 'spring', stiffness: 200, damping: 15 },
-          rotateZ: { type: 'spring', stiffness: 200, damping: 15 }
+          scale: { type: 'spring' as any, stiffness: 350, damping: 15 },
+          rotateX: { type: 'spring' as any, stiffness: 200, damping: 15 },
+          rotateY: { type: 'spring' as any, stiffness: 200, damping: 15 },
+          rotateZ: { type: 'spring' as any, stiffness: 200, damping: 15 }
         }}
         className="relative z-10 w-[180px] h-[180px] md:w-[240px] md:h-[240px] rounded-full flex items-center justify-center"
       >
@@ -208,7 +208,7 @@ export default function AnimatedOrb({ isDark }: AnimatedOrbProps) {
         }}
         transition={{ 
           rotate: { repeat: Infinity, duration: isHovered ? 6 : 25, ease: "linear" },
-          scale: { type: 'spring', stiffness: 300, damping: 20 }
+          scale: { type: 'spring' as any, stiffness: 300, damping: 20 }
         }}
         style={{ transformOrigin: 'center' }}
         className={`absolute w-[290px] h-[290px] md:w-[380px] md:h-[380px] rounded-full border border-dashed pointer-events-none transition-colors duration-500 ${
@@ -221,7 +221,7 @@ export default function AnimatedOrb({ isDark }: AnimatedOrbProps) {
       {/* Internal Interactive Ring 2 - Glass Refraction */}
       <motion.div 
         animate={{ scale: isHovered ? 1.18 : 1 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        transition={{ type: 'spring' as any, stiffness: 300, damping: 20 }}
         style={{ transform: 'rotateX(65deg) rotateY(15deg)', transformStyle: 'preserve-3d' }}
         className="absolute w-[230px] h-[230px] md:w-[310px] md:h-[310px] pointer-events-none"
       >
@@ -241,7 +241,7 @@ export default function AnimatedOrb({ isDark }: AnimatedOrbProps) {
       {/* Inner Metallic Precision Orbit Ring 3 */}
       <motion.div 
         animate={{ scale: isHovered ? 1.22 : 1 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        transition={{ type: 'spring' as any, stiffness: 300, damping: 20 }}
         style={{ transform: 'rotateX(45deg) rotateY(-30deg)', transformStyle: 'preserve-3d' }}
         className="absolute w-[320px] h-[320px] md:w-[410px] md:h-[410px] pointer-events-none"
       >

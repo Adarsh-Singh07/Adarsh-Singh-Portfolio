@@ -153,7 +153,7 @@ export default function Projects({ projects, currentMode, isDark, onRefreshData 
       y: 0,
       scale: 1,
       transition: {
-        type: 'spring',
+        type: 'spring' as any,
         stiffness: 100,
         damping: 18,
         duration: 0.8
@@ -242,7 +242,7 @@ export default function Projects({ projects, currentMode, isDark, onRefreshData 
                       ? 'bg-white/5 border border-white/10 shadow-[0_8px_16px_rgba(0,0,0,0.4)] backdrop-blur-md' 
                       : 'bg-white border border-slate-200 shadow-[0_4px_12px_rgba(0,0,0,0.05)]'
                   }`}
-                  transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+                  transition={{ type: 'spring' as any, stiffness: 350, damping: 25 }}
                 />
               )}
               <span className="relative z-10">{cat}</span>
