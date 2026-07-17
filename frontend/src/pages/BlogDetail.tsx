@@ -5,6 +5,8 @@ import { BlogNote, ProfileMode } from '../types';
 import SEO from '../components/SEO';
 import DetailEditModal from '../components/DetailEditModal';
 import PortfolioService from '../services/api';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface BlogDetailProps {
   blogs: BlogNote[];
@@ -14,116 +16,166 @@ interface BlogDetailProps {
 }
 
 // Predefined high-quality articles mapping to requested SEO slugs
-const staticArticles: Record<string, { title: string; excerpt: string; readTime: string; category: string; date: string; content: string }> = {
+const staticArticles: Record<string, { title: string; excerpt: string; readTime: string; category: string; date: string; content: string; logoUrl: string; brandColor: string }> = {
+  "databricks-lakehouse": {
+    title: "The Magic of Databricks: Building a Data Lakehouse",
+    excerpt: "Imagine having the vast, bottomless storage of a data lake combined with the organized, easy-to-search structure of a data warehouse. That's the Databricks Lakehouse.",
+    readTime: "8 min read",
+    category: "Data Engineering",
+    date: "2026-07-15",
+    logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/databricks/databricks-original.svg",
+    brandColor: "#FF3621",
+    content: `Imagine you're running a massive library. 
+Traditionally, you had two choices:
+1. **The Data Lake**: A giant warehouse where people just dump books in random piles. It holds everything, but finding a specific book is a nightmare.
+2. **The Data Warehouse**: A perfectly organized bookshelf. It's easy to search, but it's incredibly expensive to maintain, and it can only hold specific types of books.
+
+What if you could have the unlimited storage of the warehouse pile, but the perfect organization of the bookshelf? 
+
+That's the **Databricks Lakehouse**.
+
+### How it works
+Databricks uses a technology called Delta Lake. Think of Delta Lake as an incredibly smart librarian who stands at the door of your warehouse. 
+
+Every time you throw a massive pile of messy data (like JSON logs or CSV files) into the lake, the librarian instantly catalogs it, cleans it up, and adds "transactions." If someone tries to read the data while it's being updated, the librarian ensures they don't see a broken half-written file.
+
+### The Magic of Spark
+Under the hood, Databricks is powered by Apache Spark. Imagine hiring 1,000 workers to read 1,000 different pages of a book at the exact same time. Spark breaks down massive data jobs into tiny pieces and processes them in parallel across a cluster of machines.
+
+Next time you need to process terabytes of data, don't build a fragile pipeline. Just let the Lakehouse handle it.`
+  },
   "langgraph-agents": {
-    title: "Orchestrating Multi-Agent Workflows with LangGraph",
-    excerpt: "Learn how to build cyclical, stateful agent systems using LangGraph to handle complex, multi-step tasks in production environments.",
+    title: "Teaching AI to Think in Loops with LangGraph",
+    excerpt: "Standard AI bots just give one answer and stop. But what if they could double-check their own work, fix their mistakes, and think in continuous loops? Enter LangGraph.",
     readTime: "8 min read",
     category: "AI Agents",
     date: "2026-07-10",
-    content: `Building autonomous systems with Large Language Models (LLMs) requires structured orchestrations. While simple linear chains are suitable for basic tasks, real-world engineering often demands loops, branching logic, and state preservation. This is where LangGraph shines.
+    logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg",
+    brandColor: "#3776AB",
+    content: `Most AI systems work like a drive-thru window. You ask a question, the AI gives you an answer, and the interaction is over. 
 
-### 1. The Core Architecture: State and Graphs
-Unlike typical DAG (Directed Acyclic Graph) models, LangGraph introduces cycles into LLM chains. It organizes applications as state machines defined by:
-- **State:** A shared database or key-value object containing the conversation history, parsed metrics, and agent tasks.
-- **Nodes:** Individual execution steps (often containing LLM prompts, tool invocations, or data processing scripts).
-- **Edges:** Decision paths routing nodes based on conditions.
+But what if you need the AI to do something complex, like write a software program, test it, and fix its own bugs? A simple drive-thru won't work. You need the AI to think in **loops**.
 
-### 2. Implementation Strategy
-By defining a graph where agents evaluate outputs and route feedback loops back to parent nodes, developers can build robust error correction systems. For example, if a code-generation node outputs invalid Python script, a validation node can catch the error and route it back to the generator with the exception logs for corrections.
+### Enter LangGraph
+LangGraph is a framework that allows Large Language Models (LLMs) to operate in cycles. 
 
-This cycle continues autonomously until all compile checks pass, significantly increasing task completion rates compared to zero-shot models.`
+Instead of a straight line, imagine a flowchart. 
+1. The **Generator** writes the code.
+2. The **Reviewer** looks at the code and runs tests.
+3. If the tests fail, the Reviewer sends it *back* to the Generator with a list of errors.
+
+This loop continues until the code works perfectly.
+
+### Why does this matter?
+By giving AI the ability to reflect and retry, we see a massive jump in quality. It's the difference between asking someone to write an essay in one draft without looking at it, versus letting them revise it five times. LangGraph gives your AI the power of revision.`
   },
   "rag-system": {
-    title: "Production-Grade Retrieval-Augmented Generation (RAG)",
-    excerpt: "A deep dive into building highly accurate, low-latency RAG systems using advanced chunking, hybrid search, and LLM reranking.",
+    title: "Giving AI a Perfect Memory: How RAG Actually Works",
+    excerpt: "Ever wish your AI could instantly pull up that one specific sentence from a 500-page manual? Retrieval-Augmented Generation (RAG) is the secret filing system making it happen.",
     readTime: "10 min read",
     category: "Generative AI",
     date: "2026-07-05",
-    content: `Retrieval-Augmented Generation (RAG) is the industry standard for grounding LLMs in proprietary context. However, scaling RAG to production requires more than simply calling vector embeddings.
+    logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tensorflow/tensorflow-original.svg",
+    brandColor: "#FF6F00",
+    content: `Imagine asking an incredibly smart professor a question about a highly specific, top-secret document they have never read. No matter how smart they are, they will either guess or hallucinate an answer. 
 
-### 1. Advanced Chunking and Pre-processing
-Simple sliding window chunking often fragment sentences, breaking semantic linkages. Production RAG pipelines require semantic chunking based on header hierarchies or sentence boundaries, alongside metadata tagging (author, project, page) to improve query alignment.
+This is the problem with ChatGPT and company data.
 
-### 2. Hybrid Retrieval & Reranking
-Combining vector search (dense embeddings) with keyword search (BM25 sparse tokens) yields the highest recall scores. Once the top 50 documents are fetched:
-- **Reranker Models:** Use cross-encoder models to evaluate the exact similarity between the user prompt and context chunks.
-- **Top K Selection:** Limit context injection to the top 5-10 reranked chunks, lowering processing overhead and avoiding context dilution.
+### The RAG Solution
+Retrieval-Augmented Generation (RAG) fixes this by acting as the professor's research assistant. 
 
-This hybrid approach ensures high precision and response reliability under scale.`
+Before the professor (the AI) answers your question, the research assistant (the Vector Database) sprints to the filing cabinet, finds the exactly relevant paragraphs from your company's documents, and hands them to the professor.
+
+"Here, use this context to answer the question," the assistant says.
+
+### The Secret Sauce: Chunking
+You can't just hand the AI a 500-page PDF. It will get overwhelmed. Instead, we "chunk" the document into small paragraphs. When you ask a question, the system uses mathematics (Vector Embeddings) to find the 5 most relevant paragraphs out of millions, in milliseconds.
+
+RAG doesn't just make AI smarter; it gives it a perfect, factual memory of your proprietary data.`
   },
   "interviewos": {
-    title: "Case Study: Engineering InterviewOS Platform",
-    excerpt: "An architectural review of InterviewOS, a mock interviewing system utilizing LLM evaluators and real-time audio streams.",
+    title: "Building an AI Interviewer that Actually Listens",
+    excerpt: "We built InterviewOS to mock-interview engineers. It had to listen in real-time, understand messy coding thoughts, and grade answers fairly. Here is the architecture behind it.",
     readTime: "9 min read",
     category: "AI Systems",
     date: "2026-06-28",
-    content: `InterviewOS was engineered to automate technical mock interviewing. The core challenge was achieving low-latency voice-to-voice loops while maintaining high evaluation accuracy.
+    logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg",
+    brandColor: "#61DAFB",
+    content: `Technical interviews are stressful, subjective, and hard to scale. We wanted to build a platform that could conduct a mock interview just like a real Senior Engineer would—listening, adapting, and evaluating in real-time.
 
-### 1. The Real-time Audio Loop
-The system utilizes WebSockets for duplex audio transmission between the browser client and a FastAPI backend. Incoming audio bytes are parsed on the fly, routed to automatic speech recognition (ASR) engines, and processed by LLM dialogue modules.
+### The Challenge of Latency
+If you've ever talked to a voice AI, you know the awkward 5-second pause before it replies. In an interview, that pause destroys the illusion.
 
-### 2. LLM Judge Orchestration
-To grade the candidate's responses accurately, InterviewOS uses a panel of distinct LLM evaluators specialized in code complexity, architectural patterns, and communication skills. These individual grades are aggregated via consensus algorithms to generate a balanced feedback report, ensuring fair scoring.`
+We had to build a system that was lightning fast. As the user speaks, their audio is streamed over WebSockets directly to the backend. We transcribe the audio on the fly, feeding it to an LLM before the user even finishes their sentence.
+
+### The Panel of Judges
+Instead of using one massive AI to grade the interview, we use a panel of specialized AI judges. 
+- One AI only looks at code efficiency.
+- Another AI only grades communication style.
+- A third AI ensures the candidate didn't cheat.
+
+By breaking the problem down, InterviewOS provides a deeply accurate, unbiased feedback report that actually helps engineers improve.`
   },
   "google-cloud-run": {
-    title: "Zero to Hero: Deploying FastAPI on Google Cloud Run",
-    excerpt: "A technical guide to containerizing FastAPI applications, configuring CPU bounds, and deploying securely on Google Cloud Run.",
+    title: "Scaling Python from Zero to Hero on Cloud Run",
+    excerpt: "Deploying backend servers used to mean paying for machines even when no one was using them. Cloud Run changes the game by shrinking your app to zero when idle.",
     readTime: "7 min read",
     category: "Cloud",
     date: "2026-06-18",
-    content: `Google Cloud Run is an excellent choice for hosting containerized python backends. Since it scales down to zero instances when idle, it is highly cost-effective for portfolio APIs and microservices.
+    logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/googlecloud/googlecloud-original.svg",
+    brandColor: "#4285F4",
+    content: `Back in the day, hosting a server meant paying for a machine to stay awake 24/7, even if no one visited your website at 3 AM. You were paying to cool down idle processors.
 
-### 1. Dockerfile Optimization
-FastAPI requires light container footprints to boot quickly during scaling spikes. Using multi-stage builds and base images like \`python:3.11-slim\` reduces image sizes from 1GB to under 150MB, minimizing cold start delays.
+### The Serverless Revolution
+Google Cloud Run flips the script. Instead of renting a permanent server, you package your code into a "Container" (a standardized box). 
 
-### 2. Production Settings
-When launching in Cloud Run, ensure:
-- **Uvicorn Workers:** Use a single worker per container, allowing Cloud Run's native autoscaler to manage concurrent requests.
-- **CPU Allocation:** Keep CPU allocated only during request processing to lower hosting fees, or enable CPU boost for faster initial container startups.`
+When a user visits your API, Cloud Run instantly spins up a container to serve the request. 
+But here is the magic part: when the user leaves, the container disappears. It scales down to exactly **zero**.
+
+### Why it's a Game Changer
+For portfolio projects and side businesses, this means you pay absolutely $0 when you have no traffic. 
+
+But if your app suddenly goes viral and gets a million hits? Cloud Run will automatically clone your container a thousand times to handle the load, without you lifting a finger. It's the ultimate set-it-and-forget-it deployment strategy.`
   },
   "vector-search": {
-    title: "High-Dimensional Vector Databases & Semantic Search",
-    excerpt: "Comparing performance metrics, recall rates, and index types across Pinecone, Pgvector, and Weaviate databases.",
+    title: "Searching by Meaning, Not Just Keywords",
+    excerpt: "Traditional databases look for exact word matches. Vector databases look for 'vibes' and meanings. Here is how Pgvector and Pinecone are revolutionizing search.",
     readTime: "8 min read",
     category: "Databases",
     date: "2026-06-02",
-    content: `Vector databases are critical components of semantic search applications. Choosing the right database depends on scale, index preferences, and budget constraints.
+    logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg",
+    brandColor: "#4169E1",
+    content: `Traditional databases are incredibly rigid. If you search for "shoes," they will strictly look for the exact word "shoes." If a product is labeled "sneakers," the database will say, "Sorry, I have no idea what that is."
 
-### 1. Pgvector vs Dedicated Vector DBs
-For existing relational workloads, Pgvector (running on PostgreSQL) is highly convenient. It allows querying structured metadata and high-dimensional embeddings in a single SQL statement. However, for datasets containing millions of embeddings, dedicated databases like Pinecone or Weaviate are optimized for fast indexing.
+### Searching by Vibes
+Vector Databases (like Pgvector or Pinecone) don't look at words; they look at **meanings**. 
 
-### 2. Index Types: HNSW vs IVF
-- **HNSW (Hierarchical Navigable Small World):** Builds multi-layer graphs. Offers the highest query speeds and recall rates, but requires significant memory.
-- **IVF (Inverted File Index):** Clusters vectors to limit query spaces. Requires less memory but can suffer from slightly lower recall rates.`
+They convert text, images, and audio into lists of numbers (Vectors). In this numerical space, the word "shoes" and "sneakers" are physically right next to each other. 
+
+So when you search for "shoes," the database finds "sneakers," "boots," and "footwear" because they share the same semantic neighborhood or "vibe."
+
+### Why it's taking over
+This is the engine powering modern AI recommendations, image searches, and RAG pipelines. By storing meaning instead of characters, we finally have search engines that actually understand what we want.`
   },
   "fastapi-production": {
-    title: "Asynchronous Python: FastAPI Production Guide",
-    excerpt: "Best practices for structural logging, connection pooling, exception handling, and production uvicorn configurations.",
+    title: "FastAPI: Making Python Fast Again",
+    excerpt: "FastAPI is incredible, but putting it in production can be tricky. If you block the main thread, the whole app freezes. Here are the secrets to keeping it blazing fast.",
     readTime: "6 min read",
     category: "Backend",
     date: "2026-05-20",
-    content: `FastAPI is incredibly fast due to its asynchronous nature. However, writing async Python in production requires careful handling of blocking operations.
+    logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/fastapi/fastapi-original.svg",
+    brandColor: "#009688",
+    content: `Python has a reputation for being slow. For years, web frameworks handled one request at a time. If user A asked the server to download a large file, user B had to wait in line.
 
-### 1. Asynchronous Database Clients
-Never run synchronous query clients (like default SQLAlchemy) inside async routes. This blocks the main event loop, causing requests to queue up. Instead, use async drivers like \`asyncpg\` and database pools to handle concurrent transactions.
+### The Asynchronous Hero
+FastAPI fixes this by using asynchronous programming (async/await). 
 
-### 2. Structured Middleware
-Always configure JSON logging formatting. In production, logs should be structured (e.g. key-value JSON strings) to allow centralized collectors (like Google Cloud Logging or Datadog) to index and query trace IDs easily during debugging.`
-  },
-  "vercel-vs-firebase": {
-    title: "Firebase Hosting vs Vercel Edge for React Deployments",
-    excerpt: "Comparing routing rewrite configurations, caching structures, CDN distributions, and build speeds on Vercel and Firebase.",
-    readTime: "7 min read",
-    category: "Frontend",
-    date: "2026-05-12",
-    content: `Deploying React single-page applications requires reliable path routing fallbacks. Both Firebase and Vercel are top-tier platforms, but they excel in different areas.
+Imagine a waiter at a restaurant. A "synchronous" waiter takes your order, walks to the kitchen, and stands there staring at the chef until your food is ready. Meanwhile, other tables are starving.
 
-### 1. Vercel: Developer Experience and Edge Power
-Vercel is optimized for seamless deployment workflows. Its edge middleware allows running logic closer to the user, and its routing system handles clean redirects and serverless rewrites out of the box.
+An "asynchronous" waiter takes your order, hands it to the kitchen, and immediately goes to serve the next table. When your food is ready, they bring it to you. 
 
-### 2. Firebase: Cost and Ecosystem Integration
-Firebase Hosting is extremely budget-friendly and integrates directly with Google Cloud services. If your app already relies on Firebase Auth, Firestore, or Cloud Functions, hosting on Firebase keeps all security tokens and environments under a single configuration.`
+### Production Speed
+By freeing up the server to handle thousands of requests while waiting on databases or external APIs, FastAPI allows Python to achieve speeds comparable to NodeJS and Go. It makes Python fast again.`
   }
 };
 
@@ -145,6 +197,8 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
     date: staticBlog.date,
     url: '#',
     content: staticBlog.content,
+    logoUrl: staticBlog.logoUrl,
+    brandColor: staticBlog.brandColor,
     priority: { general: 1, 'data-engineer': 1 }
   } : null);
 
@@ -288,9 +342,22 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
             </div>
           </div>
 
-          <h1 className="text-3xl md:text-5xl font-sans font-bold tracking-tight leading-tight mb-4">
-            {activeBlog.title}
-          </h1>
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-4">
+            {activeBlog.logoUrl && (
+              <div 
+                className="w-16 h-16 rounded-2xl flex items-center justify-center border shadow-sm p-3"
+                style={{ 
+                  backgroundColor: `${activeBlog.brandColor || '#007AFF'}15`,
+                  borderColor: `${activeBlog.brandColor || '#007AFF'}25`
+                }}
+              >
+                <img src={activeBlog.logoUrl} alt={activeBlog.category} className="w-full h-full object-contain" />
+              </div>
+            )}
+            <h1 className="text-3xl md:text-5xl font-sans font-bold tracking-tight leading-tight">
+              {activeBlog.title}
+            </h1>
+          </div>
 
           <p className={`text-base md:text-lg font-light leading-relaxed italic ${
             isDark ? 'text-slate-300' : 'text-slate-600'
@@ -300,11 +367,25 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
         </div>
 
         {/* Article Content Area */}
-        <article className={`text-left prose prose-invert max-w-none text-xs md:text-sm font-light leading-relaxed whitespace-pre-line ${
-          isDark ? 'text-slate-300' : 'text-slate-750'
+        <article className={`text-left max-w-none font-light leading-relaxed ${
+          isDark ? 'text-slate-300 prose-invert' : 'text-slate-700'
         }`}>
-          {activeBlog.content || `### Article Overview
-          No detailed content has been compiled for this article yet. Log in to the administrator portal to draft and publish details.`}
+          <div className={`prose md:prose-lg max-w-none 
+            prose-headings:font-bold prose-headings:tracking-tight 
+            prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6 
+            prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-4
+            prose-p:leading-relaxed prose-p:mb-6
+            prose-a:text-[#007AFF] prose-a:no-underline hover:prose-a:underline
+            prose-strong:font-semibold
+            prose-ul:list-disc prose-ul:pl-6 prose-li:mb-2
+            prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:text-sm prose-code:font-mono
+            ${isDark ? 'prose-code:bg-white/10 prose-code:text-emerald-400' : 'prose-code:bg-slate-100 prose-code:text-emerald-600'}
+            prose-pre:bg-neutral-900 prose-pre:text-emerald-400 prose-pre:border prose-pre:border-white/10 prose-pre:rounded-xl
+          `}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {activeBlog.content || `### Article Overview\nNo detailed content has been compiled for this article yet. Log in to the administrator portal to draft and publish details.`}
+            </ReactMarkdown>
+          </div>
         </article>
       </div>
 

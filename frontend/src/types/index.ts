@@ -87,6 +87,8 @@ export interface BlogNote {
   date: string;
   url: string;
   content?: string; // Rich article markdown or text content
+  logoUrl?: string;
+  brandColor?: string;
   priority: {
     general: number;
     'data-engineer': number;

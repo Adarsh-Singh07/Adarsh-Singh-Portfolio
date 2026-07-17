@@ -31,74 +31,88 @@ export default function Blog({ blogs, currentMode, isDark, onRefreshData }: Blog
   const isAdmin = !!token;  // Predefined high-quality articles metadata
   const staticMetadata: BlogNote[] = [
     {
+      id: "databricks-lakehouse",
+      title: "The Magic of Databricks: Building a Data Lakehouse",
+      excerpt: "Imagine having the vast, bottomless storage of a data lake combined with the organized, easy-to-search structure of a data warehouse. That's the Databricks Lakehouse.",
+      readTime: "8 min read",
+      category: "Data Engineering",
+      date: "2026-07-15",
+      url: "#",
+      logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/databricks/databricks-original.svg",
+      brandColor: "#FF3621",
+      priority: { general: 4, 'data-engineer': 4 }
+    },
+    {
       id: "langgraph-agents",
-      title: "Orchestrating Multi-Agent Workflows with LangGraph",
-      excerpt: "Learn how to build cyclical, stateful agent systems using LangGraph to handle complex, multi-step tasks in production environments.",
+      title: "Teaching AI to Think in Loops with LangGraph",
+      excerpt: "Standard AI bots just give one answer and stop. But what if they could double-check their own work, fix their mistakes, and think in continuous loops? Enter LangGraph.",
       readTime: "8 min read",
       category: "AI Agents",
       date: "2026-07-10",
       url: "#",
+      logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg",
+      brandColor: "#3776AB",
       priority: { general: 5, 'data-engineer': 5 }
     },
     {
       id: "rag-system",
-      title: "Production-Grade Retrieval-Augmented Generation (RAG)",
-      excerpt: "A deep dive into building highly accurate, low-latency RAG systems using advanced chunking, hybrid search, and LLM reranking.",
+      title: "Giving AI a Perfect Memory: How RAG Actually Works",
+      excerpt: "Ever wish your AI could instantly pull up that one specific sentence from a 500-page manual? Retrieval-Augmented Generation (RAG) is the secret filing system making it happen.",
       readTime: "10 min read",
       category: "Generative AI",
       date: "2026-07-05",
       url: "#",
+      logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tensorflow/tensorflow-original.svg",
+      brandColor: "#FF6F00",
       priority: { general: 6, 'data-engineer': 6 }
     },
     {
       id: "interviewos",
-      title: "Case Study: Engineering InterviewOS Platform",
-      excerpt: "An architectural review of InterviewOS, a mock interviewing system utilizing LLM evaluators and real-time audio streams.",
+      title: "Building an AI Interviewer that Actually Listens",
+      excerpt: "We built InterviewOS to mock-interview engineers. It had to listen in real-time, understand messy coding thoughts, and grade answers fairly. Here is the architecture behind it.",
       readTime: "9 min read",
       category: "AI Systems",
       date: "2026-06-28",
       url: "#",
+      logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg",
+      brandColor: "#61DAFB",
       priority: { general: 7, 'data-engineer': 7 }
     },
     {
       id: "google-cloud-run",
-      title: "Zero to Hero: Deploying FastAPI on Google Cloud Run",
-      excerpt: "A technical guide to containerizing FastAPI applications, configuring CPU bounds, and deploying securely on Google Cloud Run.",
+      title: "Scaling Python from Zero to Hero on Cloud Run",
+      excerpt: "Deploying backend servers used to mean paying for machines even when no one was using them. Cloud Run changes the game by shrinking your app to zero when idle.",
       readTime: "7 min read",
       category: "Cloud",
       date: "2026-06-18",
       url: "#",
+      logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/googlecloud/googlecloud-original.svg",
+      brandColor: "#4285F4",
       priority: { general: 8, 'data-engineer': 8 }
     },
     {
       id: "vector-search",
-      title: "High-Dimensional Vector Databases & Semantic Search",
-      excerpt: "Comparing performance metrics, recall rates, and index types across Pinecone, Pgvector, and Weaviate databases.",
+      title: "Searching by Meaning, Not Just Keywords",
+      excerpt: "Traditional databases look for exact word matches. Vector databases look for 'vibes' and meanings. Here is how Pgvector and Pinecone are revolutionizing search.",
       readTime: "8 min read",
       category: "Databases",
       date: "2026-06-02",
       url: "#",
+      logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg",
+      brandColor: "#4169E1",
       priority: { general: 9, 'data-engineer': 9 }
     },
     {
       id: "fastapi-production",
-      title: "Asynchronous Python: FastAPI Production Guide",
-      excerpt: "Best practices for structural logging, connection pooling, exception handling, and production uvicorn configurations.",
+      title: "FastAPI: Making Python Fast Again",
+      excerpt: "FastAPI is incredible, but putting it in production can be tricky. If you block the main thread, the whole app freezes. Here are the secrets to keeping it blazing fast.",
       readTime: "6 min read",
       category: "Backend",
       date: "2026-05-20",
       url: "#",
+      logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/fastapi/fastapi-original.svg",
+      brandColor: "#009688",
       priority: { general: 10, 'data-engineer': 10 }
-    },
-    {
-      id: "vercel-vs-firebase",
-      title: "Firebase Hosting vs Vercel Edge for React Deployments",
-      excerpt: "Comparing routing rewrite configurations, caching structures, CDN distributions, and build speeds on Vercel and Firebase.",
-      readTime: "7 min read",
-      category: "Frontend",
-      date: "2026-05-12",
-      url: "#",
-      priority: { general: 11, 'data-engineer': 11 }
     }
   ];
 
@@ -309,39 +323,59 @@ export default function Blog({ blogs, currentMode, isDark, onRefreshData }: Blog
                 variants={cardVariants}
                 onClick={() => handleCardClick(blog)}
                 whileHover={{ y: -6, scale: 1.01 }}
-                className={`p-6 rounded-[28px] border transition-all duration-500 flex flex-col justify-between cursor-pointer group ${
+                className={`p-6 rounded-[28px] border transition-all duration-500 flex flex-col justify-between cursor-pointer group overflow-hidden relative ${
                   isDark
                     ? 'bg-neutral-900/40 border-white/5 hover:border-white/15 hover:shadow-[0_15px_30px_rgba(0,122,255,0.06)]'
                     : 'bg-white border-neutral-200/60 hover:border-neutral-300 hover:shadow-[0_10px_25px_rgba(0,0,0,0.02)]'
                 }`}
               >
-                <div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-[#007AFF]/15 text-[#007AFF] border border-[#007AFF]/25">
-                      {blog.category}
-                    </span>
-                    <span className="text-[10px] font-mono text-slate-500">{blog.readTime}</span>
+                <div 
+                  className="absolute inset-0 opacity-[0.02] mix-blend-overlay group-hover:opacity-[0.08] transition-opacity duration-500 rounded-[28px]"
+                  style={{ backgroundColor: blog.brandColor || '#007AFF' }}
+                />
+                
+                <div className="relative z-10 flex flex-col h-full">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <span 
+                        className="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border"
+                        style={{ 
+                          color: blog.brandColor || '#007AFF', 
+                          backgroundColor: `${blog.brandColor || '#007AFF'}15`,
+                          borderColor: `${blog.brandColor || '#007AFF'}25`
+                        }}
+                      >
+                        {blog.category}
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-500">{blog.readTime}</span>
+                    </div>
+                    {blog.logoUrl && (
+                      <img src={blog.logoUrl} alt={blog.category} className="w-6 h-6 object-contain opacity-70 group-hover:opacity-100 transition-opacity" />
+                    )}
                   </div>
 
-                  <h3 className="text-lg font-sans font-semibold tracking-tight mb-3 group-hover:text-[#007AFF] transition-colors duration-300">
+                  <h3 className="text-lg font-sans font-semibold tracking-tight mb-3 group-hover:text-[#007AFF] transition-colors duration-300 line-clamp-2">
                     {blog.title}
                   </h3>
-                  <p className={`text-xs font-light leading-relaxed mb-6 ${
+                  <p className={`text-xs font-light leading-relaxed mb-6 flex-grow ${
                     isDark ? 'text-slate-300' : 'text-slate-600'
                   }`}>
-                    {blog.excerpt.substring(0, 150)}...
+                    {blog.excerpt.length > 150 ? blog.excerpt.substring(0, 150) + '...' : blog.excerpt}
                   </p>
-                </div>
 
-                <div className="flex items-center justify-between mt-auto pt-4 border-t border-neutral-800/10">
-                  <div className="flex items-center gap-1.5 text-[10px] font-mono text-slate-500">
-                    <Calendar className="w-3.5 h-3.5 text-[#007AFF]" />
-                    <span>{blog.date}</span>
+                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-neutral-800/10">
+                    <div className="flex items-center gap-1.5 text-[10px] font-mono text-slate-500">
+                      <Calendar className="w-3.5 h-3.5 text-[#007AFF]" />
+                      <span>{blog.date}</span>
+                    </div>
+                    <span 
+                      className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-1"
+                      style={{ color: blog.brandColor || '#007AFF' }}
+                    >
+                      <span>Read Article</span>
+                      <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                    </span>
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#007AFF] flex items-center gap-1">
-                    <span>Read Article</span>
-                    <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-                  </span>
                 </div>
               </motion.div>
             ))}
