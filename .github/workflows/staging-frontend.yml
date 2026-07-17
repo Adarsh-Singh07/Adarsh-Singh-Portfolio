@@ -38,6 +38,6 @@ jobs:
           npm run lint
           npm run build
 
-      - name: Deploy Frontend to Firebase Hosting (Staging Channel)
+      - name: Deploy Frontend to Firebase Hosting (Staging Site)
         run: |
-          npx firebase-tools hosting:channel:deploy staging --token "${{ secrets.FIREBASE_TOKEN }}" --project portfolio2049
+          npx firebase-tools deploy --only hosting:portfolio-staging --token "${{ secrets.FIREBASE_TOKEN }}" --project portfolio2049

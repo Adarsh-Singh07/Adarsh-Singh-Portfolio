@@ -7,6 +7,9 @@
       "hosting": {
         "portfolio-main": [
           "adarshsingh-portfolio"
+        ],
+        "portfolio-staging": [
+          "portfolio2049"
         ]
       }
     }

@@ -1,24 +1,48 @@
 {
-    "hosting":  {
-                    "target":  "portfolio-main",
-                    "public":  "frontend/dist",
-                    "ignore":  [
-                                   "firebase.json",
-                                   "**/.*",
-                                   "**/node_modules/**"
-                               ],
-                    "rewrites":  [
-                                     {
-                                         "source":  "/api/**",
-                                         "run":  {
-                                                     "serviceId":  "portfolio-backend",
-                                                     "region":  "us-central1"
-                                                 }
-                                     },
-                                     {
-                                         "source":  "**",
-                                         "destination":  "/index.html"
-                                     }
-                                 ]
+    "hosting": [
+        {
+            "target": "portfolio-main",
+            "public": "frontend/dist",
+            "ignore": [
+                "firebase.json",
+                "**/.*",
+                "**/node_modules/**"
+            ],
+            "rewrites": [
+                {
+                    "source": "/api/**",
+                    "run": {
+                        "serviceId": "portfolio-backend",
+                        "region": "us-central1"
+                    }
+                },
+                {
+                    "source": "**",
+                    "destination": "/index.html"
                 }
+            ]
+        },
+        {
+            "target": "portfolio-staging",
+            "public": "frontend/dist",
+            "ignore": [
+                "firebase.json",
+                "**/.*",
+                "**/node_modules/**"
+            ],
+            "rewrites": [
+                {
+                    "source": "/api/**",
+                    "run": {
+                        "serviceId": "portfolio-backend-staging",
+                        "region": "us-central1"
+                    }
+                },
+                {
+                    "source": "**",
+                    "destination": "/index.html"
+                }
+            ]
+        }
+    ]
 }
