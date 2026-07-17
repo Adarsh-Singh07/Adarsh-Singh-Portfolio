@@ -52,7 +52,7 @@ export default function Contact({ isDark, coordinates, currentMode, onRefreshDat
 
   // Use dynamic coordinates or default fallbacks
   const coords = coordinates || {
-    email: 'adarsh2001gop@gmail.com',
+    email: 'hello@adarshsingh.in',
     linkedin: 'linkedin.com/in/adarshsingh45',
     github: 'github.com/Adarsh-Singh07',
     location: 'Noida, Uttar Pradesh, India',

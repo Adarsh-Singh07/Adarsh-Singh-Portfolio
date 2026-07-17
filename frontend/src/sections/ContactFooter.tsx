@@ -55,8 +55,8 @@ export default function ContactFooter({ isDark }: ContactFooterProps) {
   const contactCards = [
     {
       title: "Direct Pipeline",
-      value: "adarsh2001gop@gmail.com",
-      href: "mailto:adarsh2001gop@gmail.com",
+      value: "hello@adarshsingh.in",
+      href: "mailto:hello@adarshsingh.in",
       icon: Mail,
       label: "Send direct request"
     },
@@ -179,7 +179,7 @@ export default function ContactFooter({ isDark }: ContactFooterProps) {
                 Grab my comprehensive qualifications catalog containing custom performance indexes, cloud architectures and code bases.
               </p>
               <a
-                href="mailto:adarsh2001gop@gmail.com?subject=Resume%20Request%20-%20AI%20%26%20Data%20Engineer"
+                href="mailto:hello@adarshsingh.in?subject=Resume%20Request%20-%20AI%20%26%20Data%20Engineer"
                 className={`py-2 px-4 rounded-xl text-xs font-bold tracking-wider uppercase inline-flex items-center gap-1.5 transition-all duration-300 cursor-pointer ${
                   isDark 
                     ? 'bg-white/5 hover:bg-[#007AFF]/20 text-white border border-white/5 hover:border-[#007AFF]/30' 

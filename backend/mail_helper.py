@@ -18,9 +18,9 @@ def get_smtp_config():
     smtp_port_str = os.getenv("SMTP_PORT")
     smtp_user = os.getenv("SMTP_USER")
     smtp_password = os.getenv("SMTP_PASSWORD")
-    smtp_to = os.getenv("SMTP_TO") or os.getenv("SMTP_USER") or "adarsh2001gop@gmail.com"
+    smtp_to = os.getenv("SMTP_TO") or "admin@adarshsingh.in"
     resend_api_key = os.getenv("RESEND_API_KEY")
-    resend_from = os.getenv("RESEND_FROM") or "onboarding@resend.dev"
+    resend_from = os.getenv("RESEND_FROM") or "contact@adarshsingh.in"
     
     # 2. Override with JSON if it exists
     if os.path.exists(SMTP_CONFIG_JSON):
@@ -54,7 +54,7 @@ def get_smtp_config():
         "resend_from": resend_from
     }
 
-def send_email_via_resend(to_email: str, subject: str, html_content: str, reply_to: str = None) -> bool:
+def send_email_via_resend(to_email: str, subject: str, html_content: str, reply_to: str = None, bcc: str = None, from_email: str = None) -> bool:
     """Dispatches email using Resend API (HTTP client). Returns True if successful."""
     config = get_smtp_config()
     api_key = config["resend_api_key"]
@@ -67,8 +67,8 @@ def send_email_via_resend(to_email: str, subject: str, html_content: str, reply_
         "Content-Type": "application/json"
     }
     
-    # Resend free tier sends from onboarding@resend.dev by default unless a domain is verified
-    from_email = config["resend_from"]
+    if not from_email:
+        from_email = config["resend_from"]
     
     payload = {
         "from": from_email,
@@ -78,6 +78,8 @@ def send_email_via_resend(to_email: str, subject: str, html_content: str, reply_
     }
     if reply_to:
         payload["reply_to"] = reply_to
+    if bcc:
+        payload["bcc"] = bcc
         
     try:
         req = urllib.request.Request(
@@ -94,7 +96,7 @@ def send_email_via_resend(to_email: str, subject: str, html_content: str, reply_
         print(f"Resend API dispatch failure: {e}")
         return False
 
-def send_outreach_email(visitor_name: str, visitor_email: str, subject: str, message: str):
+def send_outreach_email(visitor_name: str, visitor_email: str, subject: str, message: str, intent_category: str = "General Question"):
     """
     Sends a dual email with strict sequential fallback:
     1. A notification to Adarsh (tries Resend, falls back to SMTP).
@@ -173,6 +175,7 @@ def send_outreach_email(visitor_name: str, visitor_email: str, subject: str, mes
     
     smtp_config = get_smtp_config()
     admin_recipient = smtp_config["to"]
+    personal_bcc = "adarsh2001gop@gmail.com"
     
     # ---------------------------------------------
     # 1. DISPATCH NOTIFICATION TO ADARSH (ADMIN)
@@ -187,7 +190,9 @@ def send_outreach_email(visitor_name: str, visitor_email: str, subject: str, mes
                 to_email=admin_recipient,
                 subject=f"[Portfolio Outreach] {subject}",
                 html_content=html_admin,
-                reply_to=visitor_email
+                reply_to=visitor_email,
+                bcc=personal_bcc,
+                from_email="contact@adarshsingh.in"
             )
         except Exception as e:
             print(f"Resend Admin Notification failed: {e}")
@@ -195,26 +200,28 @@ def send_outreach_email(visitor_name: str, visitor_email: str, subject: str, mes
     # Fallback to Gmail SMTP
     if not admin_sent:
         try:
-            print("Resend Admin Notification failed/skipped. Falling back to Gmail SMTP...")
+            print("Resend Admin Notification failed/skipped. Falling back to Zoho SMTP...")
             if smtp_config["host"] and smtp_config["user"] and smtp_config["password"]:
                 msg_admin = MIMEMultipart("alternative")
                 msg_admin["Subject"] = f"[Portfolio Outreach] {escaped_subject}"
-                msg_admin["From"] = smtp_config["user"]
+                msg_admin["From"] = "contact@adarshsingh.in"
                 msg_admin["To"] = admin_recipient
                 msg_admin["Reply-To"] = escaped_email
                 msg_admin.attach(MIMEText(f"Outreach from {escaped_name} ({escaped_email}): {escaped_message}", "plain", "utf-8"))
                 msg_admin.attach(MIMEText(html_admin, "html", "utf-8"))
-                _dispatch_smtp(msg_admin, smtp_config)
+                _dispatch_smtp(msg_admin, smtp_config, bcc=personal_bcc)
                 admin_sent = True
             else:
                 print("SMTP fallback skipped: Credentials missing.")
         except Exception as e:
-            print(f"Gmail SMTP Admin Notification fallback failed: {e}")
+            print(f"Zoho SMTP Admin Notification fallback failed: {e}")
             
     # ---------------------------------------------
     # 2. DISPATCH AUTO-RESPONDER TO VISITOR
     # ---------------------------------------------
     visitor_sent = False
+    
+    reply_to_address = "contact@adarshsingh.in" if intent_category in ["Hiring Inquiry", "Collaboration"] else "support@adarshsingh.in"
     
     # Try Resend First (Will fail in Sandbox if domain is unverified, triggering fallback)
     if os.getenv("RESEND_API_KEY"):
@@ -224,7 +231,8 @@ def send_outreach_email(visitor_name: str, visitor_email: str, subject: str, mes
                 to_email=visitor_email,
                 subject="Thank you for contacting Adarsh Singh",
                 html_content=html_visitor,
-                reply_to=admin_recipient
+                reply_to=reply_to_address,
+                from_email="noreply@adarshsingh.in"
             )
         except Exception as e:
             print(f"Resend Visitor Auto-responder failed (likely Sandbox restriction): {e}")
@@ -232,13 +240,13 @@ def send_outreach_email(visitor_name: str, visitor_email: str, subject: str, mes
     # Fallback to Gmail SMTP (No custom domain required)
     if not visitor_sent:
         try:
-            print("Resend Visitor Auto-responder failed/skipped. Falling back to Gmail SMTP...")
+            print("Resend Visitor Auto-responder failed/skipped. Falling back to Zoho SMTP...")
             if smtp_config["host"] and smtp_config["user"] and smtp_config["password"]:
                 msg_visitor = MIMEMultipart("alternative")
                 msg_visitor["Subject"] = "Thank you for contacting Adarsh Singh"
-                msg_visitor["From"] = smtp_config["user"]
+                msg_visitor["From"] = "noreply@adarshsingh.in"
                 msg_visitor["To"] = visitor_email
-                msg_visitor["Reply-To"] = admin_recipient
+                msg_visitor["Reply-To"] = reply_to_address
                 msg_visitor.attach(MIMEText("Thank you for reaching out! We received your message.", "plain", "utf-8"))
                 msg_visitor.attach(MIMEText(html_visitor, "html", "utf-8"))
                 _dispatch_smtp(msg_visitor, smtp_config, to_override=visitor_email)
@@ -246,7 +254,7 @@ def send_outreach_email(visitor_name: str, visitor_email: str, subject: str, mes
             else:
                 print("SMTP fallback skipped: Credentials missing.")
         except Exception as e:
-            print(f"Gmail SMTP Visitor Auto-responder fallback failed: {e}")
+            print(f"Zoho SMTP Visitor Auto-responder fallback failed: {e}")
             
     return admin_sent or visitor_sent
 
@@ -256,14 +264,21 @@ def send_alert_email(subject: str, html_body: str):
     Tries Resend API first (since sending to self is supported in sandbox),
     falls back to SMTP.
     """
-    recipient = os.getenv("SMTP_TO") or "adarsh2001gop@gmail.com"
+    recipient = os.getenv("SMTP_TO") or "admin@adarshsingh.in"
+    personal_bcc = "adarsh2001gop@gmail.com"
     sent = False
     
     # Try Resend
     if os.getenv("RESEND_API_KEY"):
         try:
             print("Attempting to send alert via Resend API...")
-            sent = send_email_via_resend(to_email=recipient, subject=subject, html_content=html_body)
+            sent = send_email_via_resend(
+                to_email=recipient, 
+                subject=subject, 
+                html_content=html_body,
+                bcc=personal_bcc,
+                from_email="noreply@adarshsingh.in"
+            )
         except Exception as e:
             print(f"Failed to send alert via Resend: {e}")
             
@@ -275,11 +290,11 @@ def send_alert_email(subject: str, html_body: str):
                 print("Resend alert failed/skipped. Falling back to SMTP...")
                 msg = MIMEMultipart("alternative")
                 msg["Subject"] = subject
-                msg["From"] = config["user"]
+                msg["From"] = "noreply@adarshsingh.in"
                 msg["To"] = recipient
                 msg.attach(MIMEText("Critical Operational Alert: check html logs.", "plain", "utf-8"))
                 msg.attach(MIMEText(html_body, "html", "utf-8"))
-                _dispatch_smtp(msg, config, to_override=recipient)
+                _dispatch_smtp(msg, config, to_override=recipient, bcc=personal_bcc)
                 sent = True
             except Exception as e:
                 print(f"Failed to dispatch alert via SMTP fallback: {e}")
@@ -288,13 +303,17 @@ def send_alert_email(subject: str, html_body: str):
         print(f"ALERT LOG ONLY (No mail channels active): {subject} - {html_body}")
     return sent
 
-def _dispatch_smtp(msg: MIMEMultipart, config: dict, to_override: str = None):
+def _dispatch_smtp(msg: MIMEMultipart, config: dict, to_override: str = None, bcc: str = None):
     """Internal helper to connect to SMTP server and send a message."""
     host = config["host"]
     port = config["port"]
     user = config["user"]
     password = config["password"]
     to = to_override or config["to"]
+    
+    recipients = [to]
+    if bcc:
+        recipients.append(bcc)
     
     if port == 465:
         server = smtplib.SMTP_SSL(host, port, timeout=10)
@@ -306,5 +325,5 @@ def _dispatch_smtp(msg: MIMEMultipart, config: dict, to_override: str = None):
             server.ehlo()
             
     server.login(user, password)
-    server.sendmail(user, [to], msg.as_string())
+    server.sendmail(user, recipients, msg.as_string())
     server.quit()

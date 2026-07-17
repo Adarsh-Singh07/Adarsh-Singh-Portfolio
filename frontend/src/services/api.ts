@@ -521,9 +521,9 @@ export class PortfolioService {
       return {
         SMTP_HOST: 'smtp.gmail.com',
         SMTP_PORT: 587,
-        SMTP_USER: 'adarsh2001gop@gmail.com',
+        SMTP_USER: 'admin@adarshsingh.in',
         SMTP_PASSWORD: '********',
-        SMTP_TO: 'adarsh2001gop@gmail.com',
+        SMTP_TO: 'admin@adarshsingh.in',
         RESEND_API_KEY: '********',
         RESEND_FROM: 'onboarding@resend.dev'
       };

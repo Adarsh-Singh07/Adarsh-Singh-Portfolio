@@ -300,7 +300,7 @@ export default function Chatbot({ isDark, currentMode = 'general' }: { isDark: b
         ...prev, 
         { 
           role: 'model', 
-          content: "Addy, my AI Twin, is temporarily experiencing connection issues with Google's Gemini services (due to high demand). If you have an urgent inquiry, please feel free to email me directly at adarsh2001gop@gmail.com or submit a message through the Contact Page. A diagnostics report has been auto-sent to my email to resolve this issue." 
+          content: "Addy, my AI Twin, is temporarily experiencing connection issues with Google's Gemini services (due to high demand). If you have an urgent inquiry, please feel free to email me directly at hello@adarshsingh.in or submit a message through the Contact Page. A diagnostics report has been auto-sent to my email to resolve this issue." 
         }
       ]);
     } finally {

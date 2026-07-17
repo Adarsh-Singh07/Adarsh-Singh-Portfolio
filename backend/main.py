@@ -619,7 +619,8 @@ async def submit_contact(payload: ContactPayload, background_tasks: BackgroundTa
         payload.name,
         payload.email,
         payload.subject,
-        payload.message
+        payload.message,
+        intent_category
     )
         
     return {
