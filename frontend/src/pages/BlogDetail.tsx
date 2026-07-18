@@ -12,6 +12,7 @@ import ReadingProgressBar from '../components/blog/ReadingProgressBar';
 import TableOfContents from '../components/blog/TableOfContents';
 import ShareArticle from '../components/blog/ShareArticle';
 import RelatedArticles from '../components/blog/RelatedArticles';
+import TagList from '../components/blog/TagList';
 
 interface BlogDetailProps {
   blogs: BlogNote[];
@@ -21,7 +22,7 @@ interface BlogDetailProps {
 }
 
 // Predefined high-quality articles mapping to requested SEO slugs
-const staticArticles: Record<string, { title: string; excerpt: string; readTime: string; category: string; date: string; content: string; logoUrl: string; brandColor: string }> = {
+const staticArticles: Record<string, { title: string; excerpt: string; readTime: string; category: string; date: string; content: string; logoUrl: string; brandColor: string; tags?: string[] }> = {
   "databricks-lakehouse": {
     title: "The Magic of Databricks: Building a Data Lakehouse",
     excerpt: "Imagine having the vast, bottomless storage of a data lake combined with the organized, easy-to-search structure of a data warehouse. That's the Databricks Lakehouse.",
@@ -30,6 +31,7 @@ const staticArticles: Record<string, { title: string; excerpt: string; readTime:
     date: "2026-07-15",
     logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/databricks/databricks-original.svg",
     brandColor: "#FF3621",
+    tags: ["Databricks", "Data Lakehouse", "Spark", "Data Engineering"],
     content: `Imagine you're running a massive library. \n\nTraditionally, you had two choices:\n1. **The Data Lake**: A giant warehouse where people just dump books in random piles. It holds everything, but finding a specific book is a nightmare.\n2. **The Data Warehouse**: A perfectly organized bookshelf. It's easy to search, but it's incredibly expensive to maintain, and it can only hold specific types of books.\n\nWhat if you could have the unlimited storage of the warehouse pile, but the perfect organization of the bookshelf? \n\nThat's the **Databricks Lakehouse**.\n\n## How it works\nDatabricks uses a technology called Delta Lake. Think of Delta Lake as an incredibly smart librarian who stands at the door of your warehouse. \n\nEvery time you throw a massive pile of messy data (like JSON logs or CSV files) into the lake, the librarian instantly catalogs it, cleans it up, and adds "transactions." If someone tries to read the data while it's being updated, the librarian ensures they don't see a broken half-written file.\n\n## The Magic of Spark\nUnder the hood, Databricks is powered by Apache Spark. Imagine hiring 1,000 workers to read 1,000 different pages of a book at the exact same time. Spark breaks down massive data jobs into tiny pieces and processes them in parallel across a cluster of machines.\n\n> [!TIP]\n> Next time you need to process terabytes of data, don't build a fragile pipeline. Just let the Lakehouse handle it.`
   },
   "langgraph-agents": {
@@ -40,6 +42,7 @@ const staticArticles: Record<string, { title: string; excerpt: string; readTime:
     date: "2026-07-10",
     logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg",
     brandColor: "#3776AB",
+    tags: ["LangGraph", "LLM", "AI Agents", "Python"],
     content: `Most AI systems work like a drive-thru window. You ask a question, the AI gives you an answer, and the interaction is over. \n\nBut what if you need the AI to do something complex, like write a software program, test it, and fix its own bugs? A simple drive-thru won't work. You need the AI to think in **loops**.\n\n## Enter LangGraph\nLangGraph is a framework that allows Large Language Models (LLMs) to operate in cycles. \n\nInstead of a straight line, imagine a flowchart. \n1. The **Generator** writes the code.\n2. The **Reviewer** looks at the code and runs tests.\n3. If the tests fail, the Reviewer sends it *back* to the Generator with a list of errors.\n\nThis loop continues until the code works perfectly.\n\n## Why does this matter?\nBy giving AI the ability to reflect and retry, we see a massive jump in quality. It's the difference between asking someone to write an essay in one draft without looking at it, versus letting them revise it five times. LangGraph gives your AI the power of revision.`
   },
   "rag-system": {
@@ -50,6 +53,7 @@ const staticArticles: Record<string, { title: string; excerpt: string; readTime:
     date: "2026-07-05",
     logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tensorflow/tensorflow-original.svg",
     brandColor: "#FF6F00",
+    tags: ["RAG", "Generative AI", "Vector Database", "Embeddings"],
     content: `Imagine asking an incredibly smart professor a question about a highly specific, top-secret document they have never read. No matter how smart they are, they will either guess or hallucinate an answer. \n\nThis is the problem with ChatGPT and company data.\n\n## The RAG Solution\nRetrieval-Augmented Generation (RAG) fixes this by acting as the professor's research assistant. \n\nBefore the professor (the AI) answers your question, the research assistant (the Vector Database) sprints to the filing cabinet, finds the exactly relevant paragraphs from your company's documents, and hands them to the professor.\n\n"Here, use this context to answer the question," the assistant says.\n\n## The Secret Sauce: Chunking\nYou can't just hand the AI a 500-page PDF. It will get overwhelmed. Instead, we "chunk" the document into small paragraphs. When you ask a question, the system uses mathematics (Vector Embeddings) to find the 5 most relevant paragraphs out of millions, in milliseconds.\n\nRAG doesn't just make AI smarter; it gives it a perfect, factual memory of your proprietary data.`
   },
   "interviewos": {
@@ -112,6 +116,7 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
     date: staticBlog.date,
     url: '#',
     content: staticBlog.content,
+    tags: staticBlog.tags,
     logoUrl: staticBlog.logoUrl,
     brandColor: staticBlog.brandColor,
     priority: { general: 1, 'data-engineer': 1 }
@@ -324,6 +329,9 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
               </div>
             </div>
           </header>
+
+          {/* Tags */}
+          <TagList tags={activeBlog.tags} isDark={isDark} />
 
           {/* Markdown Content */}
           <MarkdownRenderer content={activeBlog.content} title={activeBlog.title} isDark={isDark} />

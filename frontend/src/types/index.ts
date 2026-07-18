@@ -87,6 +87,7 @@ export interface BlogNote {
   date: string;
   url: string;
   content?: string; // Rich article markdown or text content
+  tags?: string[];
   logoUrl?: string;
   brandColor?: string;
   priority: {
