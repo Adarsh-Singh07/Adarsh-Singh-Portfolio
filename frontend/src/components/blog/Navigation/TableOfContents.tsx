@@ -116,11 +116,11 @@ export default function TableOfContents({ isDark }: TableOfContentsProps) {
                       e.preventDefault();
                       document.getElementById(heading.id)?.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className={`relative pl-5 py-1 text-sm transition-all duration-300 block line-clamp-2 ${
+                    className={`relative pl-5 py-1.5 text-sm transition-all duration-300 block ${
                       heading.level === 3 ? 'ml-3 text-[13px]' : ''
                     } ${
                       isActive 
-                        ? 'text-[#007AFF] font-medium scale-105 origin-left' 
+                        ? 'text-[#007AFF] font-medium scale-[1.02] origin-left' 
                         : isDark ? 'text-slate-400 hover:text-slate-200' : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
@@ -130,7 +130,7 @@ export default function TableOfContents({ isDark }: TableOfContentsProps) {
                         className="absolute left-[-1px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-[#007AFF] rounded-full shadow-[0_0_8px_rgba(0,122,255,0.6)]" 
                       />
                     )}
-                    {heading.text}
+                    <span className="line-clamp-2 block leading-snug">{heading.text}</span>
                   </a>
                 );
               })}
