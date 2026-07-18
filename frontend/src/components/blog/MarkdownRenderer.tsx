@@ -17,6 +17,7 @@ import mermaid from 'mermaid';
 
 interface MarkdownRendererProps {
   content: string;
+  title?: string;
   isDark: boolean;
 }
 
@@ -45,15 +46,15 @@ const CodeBlock = ({ node, inline, className, children, ...props }: any) => {
   }
 
   return (
-    <div className="relative group rounded-xl overflow-hidden my-8 border border-slate-200 dark:border-white/10 bg-[#0d1117]">
-      <div className="flex items-center justify-between px-4 py-2 bg-[#161b22] border-b border-white/10">
+    <div className="relative group rounded-xl overflow-hidden my-8 border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0d1117] shadow-sm dark:shadow-none">
+      <div className="flex items-center justify-between px-4 py-2 bg-slate-100 dark:bg-[#161b22] border-b border-slate-200 dark:border-white/10">
         <div className="flex gap-1.5">
           <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
           <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
           <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
         </div>
         {language && (
-          <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">{language}</span>
+          <span className="text-xs font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider">{language}</span>
         )}
       </div>
       <div className="relative">
@@ -153,13 +154,13 @@ const CustomBlockQuote = ({ children, ...props }: any) => {
   }
 
   return (
-    <blockquote className="border-l-4 border-slate-300 dark:border-slate-700 pl-6 my-8 italic text-slate-700 dark:text-slate-300" {...props}>
+    <blockquote className="border-l-[6px] border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-6 my-8 rounded-r-xl italic text-slate-700 dark:text-slate-300 shadow-sm dark:shadow-none" {...props}>
       {children}
     </blockquote>
   );
 };
 
-export default function MarkdownRenderer({ content, isDark }: MarkdownRendererProps) {
+export default function MarkdownRenderer({ content, title, isDark }: MarkdownRendererProps) {
   return (
     <div className={`prose prose-lg max-w-none w-full markdown-content ${isDark ? 'prose-invert' : ''}`}>
       <ReactMarkdown
@@ -175,20 +176,49 @@ export default function MarkdownRenderer({ content, isDark }: MarkdownRendererPr
         components={{
           code: CodeBlock,
           blockquote: CustomBlockQuote,
+          h1: ({ node, children, ...props }) => {
+            // Deduplicate H1 if it exactly matches the blog title
+            if (title && React.Children.toArray(children).join('').trim() === title.trim()) {
+              return null;
+            }
+            return <h1 {...props}>{children}</h1>;
+          },
+          p: ({ node, children, ...props }) => {
+            // Intercept purely tag-based paragraphs to render as chips
+            const textContent = React.Children.toArray(children).join('').trim();
+            const tagPattern = /^(\[[^\]]+\]\s*)+$/;
+            
+            if (tagPattern.test(textContent)) {
+              const tags = textContent.match(/\[([^\]]+)\]/g)?.map(t => t.replace(/\[|\]/g, '')) || [];
+              if (tags.length > 0) {
+                return (
+                  <div className="flex flex-wrap gap-2 my-8">
+                    {tags.map((tag, i) => (
+                      <span key={i} className="px-3 py-1.5 rounded-lg text-sm font-semibold tracking-wide border bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 shadow-sm dark:shadow-none">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                );
+              }
+            }
+            return <p {...props}>{children}</p>;
+          },
           img: ({ node, ...props }) => (
             <figure className="my-10">
               <Zoom zoomMargin={40}>
-                <img {...props} className="rounded-xl w-full h-auto shadow-sm border border-slate-200 dark:border-white/10" loading="lazy" />
+                <img {...props} className="rounded-xl w-full h-auto shadow-md border border-slate-200 dark:border-white/10" loading="lazy" />
               </Zoom>
               {props.alt && <figcaption className="text-center text-sm text-slate-500 mt-3">{props.alt}</figcaption>}
             </figure>
           ),
           table: ({ node, ...props }) => (
-            <div className="overflow-x-auto my-8 border border-slate-200 dark:border-white/10 rounded-xl custom-scrollbar">
+            <div className="overflow-x-auto my-8 border border-slate-200 dark:border-white/10 rounded-xl custom-scrollbar shadow-sm dark:shadow-none bg-white dark:bg-transparent">
               <table className="w-full text-sm text-left m-0" {...props} />
             </div>
           ),
-          th: ({ node, ...props }) => <th className="bg-slate-50 dark:bg-white/5 px-4 py-3 font-semibold border-b border-slate-200 dark:border-white/10 text-slate-900 dark:text-white" {...props} />,
+          tr: ({ node, ...props }) => <tr className="even:bg-slate-50 dark:even:bg-white/[0.02] hover:bg-slate-50/80 dark:hover:bg-white/[0.04] transition-colors" {...props} />,
+          th: ({ node, ...props }) => <th className="bg-slate-100 dark:bg-white/[0.05] px-4 py-3 font-semibold border-b border-slate-200 dark:border-white/10 text-slate-900 dark:text-white" {...props} />,
           td: ({ node, ...props }) => <td className="px-4 py-3 border-b border-slate-100 dark:border-white/5 last:border-0" {...props} />,
           a: ({ node, ...props }) => <a className="text-[#007AFF] no-underline hover:underline underline-offset-4 decoration-2" target={props.href?.startsWith('http') ? '_blank' : undefined} rel={props.href?.startsWith('http') ? 'noopener noreferrer' : undefined} {...props} />
         }}

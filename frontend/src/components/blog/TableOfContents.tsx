@@ -37,7 +37,7 @@ export default function TableOfContents({ isDark }: TableOfContentsProps) {
           }
         });
       },
-      { rootMargin: '0px 0px -80% 0px' }
+      { rootMargin: '-10% 0px -70% 0px' }
     );
 
     const elements = document.querySelectorAll('.prose h2, .prose h3');
@@ -50,25 +50,30 @@ export default function TableOfContents({ isDark }: TableOfContentsProps) {
 
   return (
     <div className="hidden xl:block w-64 shrink-0">
-      <div className="sticky top-32 max-h-[calc(100vh-8rem)] overflow-y-auto">
-        <h4 className={`text-xs font-bold uppercase tracking-wider mb-4 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+      <div className="sticky top-32 max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar pr-4">
+        <h4 className={`text-xs font-bold uppercase tracking-wider mb-5 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
           On this page
         </h4>
-        <nav className="flex flex-col gap-2.5 relative before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-slate-200 dark:before:bg-slate-800">
+        <nav className="flex flex-col gap-3 relative before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-slate-200 dark:before:bg-slate-800">
           {headings.map((heading) => (
             <a
               key={heading.id}
               href={`#${heading.id}`}
-              className={`text-sm transition-colors duration-200 relative pl-4 ${
-                heading.level === 3 ? 'ml-3' : ''
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById(heading.id)?.scrollIntoView({ behavior: 'smooth' });
+                setActiveId(heading.id);
+              }}
+              className={`text-sm transition-all duration-300 relative pl-4 block line-clamp-2 ${
+                heading.level === 3 ? 'ml-3 text-[13px]' : ''
               } ${
                 activeId === heading.id
-                  ? isDark ? 'text-white font-medium' : 'text-slate-900 font-medium'
+                  ? isDark ? 'text-[#007AFF] font-medium' : 'text-[#007AFF] font-medium'
                   : isDark ? 'text-slate-400 hover:text-slate-200' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
               {activeId === heading.id && (
-                <span className="absolute left-[-1px] top-1/2 -translate-y-1/2 w-0.5 h-4 bg-[#007AFF] rounded-full" />
+                <span className="absolute left-[-1px] top-0 bottom-0 w-0.5 bg-[#007AFF] rounded-full shadow-[0_0_8px_rgba(0,122,255,0.4)]" />
               )}
               {heading.text}
             </a>

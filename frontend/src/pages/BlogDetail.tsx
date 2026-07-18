@@ -256,7 +256,7 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
 
       <div className="pt-32 pb-24 px-6 md:px-12 max-w-[1200px] mx-auto w-full flex flex-col xl:flex-row gap-16 relative">
         {/* Main Content Area */}
-        <div className="flex-1 max-w-[760px] mx-auto xl:mx-0 w-full">
+        <div className="flex-1 max-w-[820px] mx-auto xl:mx-0 w-full">
           {/* Navigation Row */}
           <div className="mb-12 flex justify-between items-center">
             <Link 
@@ -281,7 +281,7 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
           </div>
 
           {/* Article Header */}
-          <header className="mb-12">
+          <header className="mb-16 flex flex-col items-start text-left">
             <div className="flex items-center gap-3 mb-6">
               {activeBlog.logoUrl && (
                 <div 
@@ -299,20 +299,21 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
               </span>
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.1] mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.1] mb-6 max-w-3xl">
               {activeBlog.title}
             </h1>
             
-            <p className={`text-xl font-light leading-relaxed mb-8 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p className={`text-xl font-light leading-relaxed mb-8 max-w-2xl ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
               {activeBlog.excerpt}
             </p>
 
             <div className="flex items-center gap-4 text-sm font-medium">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden border border-slate-300 dark:border-white/20">
-                  <img src="/avatar.jpg" alt="Adarsh Singh" className="w-full h-full object-cover" onError={(e) => e.currentTarget.style.display = 'none'} />
+                <div className="relative w-10 h-10 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden border border-slate-300 dark:border-white/20 flex items-center justify-center">
+                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400">AS</span>
+                  <img src="/avatar.jpg" alt="Adarsh Singh" className="absolute inset-0 w-full h-full object-cover z-10" onError={(e) => e.currentTarget.style.display = 'none'} />
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col text-left">
                   <span className={isDark ? 'text-white' : 'text-slate-900'}>Adarsh Singh</span>
                   <div className={`flex items-center gap-2 text-xs ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>
                     <time dateTime={activeBlog.date}>{activeBlog.date}</time>
@@ -325,7 +326,7 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
           </header>
 
           {/* Markdown Content */}
-          <MarkdownRenderer content={activeBlog.content} isDark={isDark} />
+          <MarkdownRenderer content={activeBlog.content} title={activeBlog.title} isDark={isDark} />
 
           {/* Share & Related Articles */}
           <ShareArticle url={`https://adarshsingh.in/blog/${activeBlog.id}`} title={activeBlog.title} isDark={isDark} />
