@@ -168,7 +168,7 @@ export default function MarkdownRenderer({ content, isDark }: MarkdownRendererPr
           rehypeRaw,
           rehypeSanitize,
           rehypeSlug,
-          [rehypeAutolinkHeadings, { behavior: 'wrap', properties: { className: ['anchor-link'] } }],
+          [rehypeAutolinkHeadings, { behavior: 'prepend', properties: { className: ['anchor-link'] } }],
           rehypeKatex,
           [rehypeHighlight, { ignoreMissing: true }]
         ]}

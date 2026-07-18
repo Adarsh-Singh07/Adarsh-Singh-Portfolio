@@ -138,11 +138,15 @@
   }
 
   .markdown-content h2 {
-    @apply text-3xl font-bold mt-12 mb-6 tracking-tight scroll-mt-24;
+    @apply text-3xl font-bold mt-12 mb-6 tracking-tight scroll-mt-24 relative;
   }
 
   .markdown-content h3 {
-    @apply text-2xl font-semibold mt-8 mb-4 tracking-tight scroll-mt-24;
+    @apply text-2xl font-semibold mt-8 mb-4 tracking-tight scroll-mt-24 relative;
+  }
+
+  .markdown-content h4 {
+    @apply text-xl font-semibold mt-6 mb-4 tracking-tight scroll-mt-24 relative;
   }
   
   .markdown-content ul {
@@ -159,11 +163,12 @@
 
   /* Custom anchor links */
   .anchor-link {
-    @apply opacity-0 transition-opacity absolute -ml-6 pr-2 text-slate-400 no-underline hover:text-[#007AFF];
+    @apply opacity-0 transition-opacity absolute -left-6 pr-2 text-slate-400 no-underline hover:text-[#007AFF];
   }
   
   .markdown-content h2:hover .anchor-link,
-  .markdown-content h3:hover .anchor-link {
+  .markdown-content h3:hover .anchor-link,
+  .markdown-content h4:hover .anchor-link {
     @apply opacity-100;
   }
   .anchor-link::before {
