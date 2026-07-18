@@ -185,21 +185,26 @@ export default function MarkdownRenderer({ content, title, isDark }: MarkdownRen
           },
           p: ({ node, children, ...props }) => {
             // Intercept purely tag-based paragraphs to render as chips
-            const textContent = React.Children.toArray(children).join('').trim();
-            const tagPattern = /^(\[[^\]]+\]\s*)+$/;
+            const childrenArray = React.Children.toArray(children);
+            const isAllStrings = childrenArray.every(child => typeof child === 'string');
             
-            if (tagPattern.test(textContent)) {
-              const tags = textContent.match(/\[([^\]]+)\]/g)?.map(t => t.replace(/\[|\]/g, '')) || [];
-              if (tags.length > 0) {
-                return (
-                  <div className="flex flex-wrap gap-2 my-8">
-                    {tags.map((tag, i) => (
-                      <span key={i} className="px-3 py-1.5 rounded-lg text-sm font-semibold tracking-wide border bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 shadow-sm dark:shadow-none">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                );
+            if (isAllStrings) {
+              const textContent = childrenArray.join('').trim();
+              const tagPattern = /^(\[[^\]]+\]\s*)+$/;
+              
+              if (tagPattern.test(textContent)) {
+                const tags = textContent.match(/\[([^\]]+)\]/g)?.map(t => t.replace(/\[|\]/g, '')) || [];
+                if (tags.length > 0) {
+                  return (
+                    <div className="flex flex-wrap gap-2 my-8">
+                      {tags.map((tag, i) => (
+                        <span key={i} className="px-3 py-1.5 rounded-lg text-sm font-semibold tracking-wide border bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 shadow-sm dark:shadow-none">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  );
+                }
               }
             }
             return <p {...props}>{children}</p>;
