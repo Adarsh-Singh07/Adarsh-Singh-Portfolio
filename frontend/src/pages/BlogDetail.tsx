@@ -165,16 +165,46 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
 
   React.useEffect(() => {
     if (activeBlog?.content) {
-      // Delay to ensure markdown is rendered and headers are present
-      const timeoutId = setTimeout(() => {
-        const hElements = Array.from(document.querySelectorAll('.markdown-content h2, .markdown-content h3'));
-        const tocHeadings = hElements.map(h => ({
-          id: h.id,
-          text: h.getAttribute('data-toc-text') || h.textContent || '',
-          level: h.tagName.toLowerCase() === 'h2' ? 2 : 3
-        }));
-        readingStore.initialize(tocHeadings, activeBlog.content || '');
-      }, 300);
+      // Parse headings directly from markdown to guarantee stability and bypass DOM rendering issues
+      const extractHeadings = (markdown: string) => {
+        const extracted: any[] = [];
+        const lines = markdown.split('\n');
+        let inCodeBlock = false;
+        const slugCounts = new Map<string, number>();
+
+        for (const line of lines) {
+          if (line.trim().startsWith('```')) {
+            inCodeBlock = !inCodeBlock;
+            continue;
+          }
+          if (!inCodeBlock) {
+            const match = line.match(/^(#{2,3})\s+(.+)$/);
+            if (match) {
+              const level = match[1].length;
+              let text = match[2].trim();
+              text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+              text = text.replace(/[*_~`]/g, '');
+              text = text.replace(/<[^>]+>/g, '');
+              
+              let id = text.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-');
+              
+              if (slugCounts.has(id)) {
+                const count = slugCounts.get(id)! + 1;
+                slugCounts.set(id, count);
+                id = `${id}-${count}`;
+              } else {
+                slugCounts.set(id, 0);
+              }
+              
+              if (text) extracted.push({ id, text, level });
+            }
+          }
+        }
+        return extracted;
+      };
+
+      const tocHeadings = extractHeadings(activeBlog.content || '');
+      readingStore.initialize(tocHeadings, activeBlog.content || '');
       
       const onScroll = () => readingStore.handleScroll();
       window.addEventListener('scroll', onScroll, { passive: true });
@@ -190,7 +220,6 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
       window.addEventListener('keydown', onKeyDown);
       
       return () => {
-        clearTimeout(timeoutId);
         window.removeEventListener('scroll', onScroll);
         window.removeEventListener('keydown', onKeyDown);
         readingStore.cleanup();
