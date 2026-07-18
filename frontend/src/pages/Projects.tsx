@@ -267,7 +267,7 @@ export default function Projects({ projects, currentMode, isDark, onRefreshData 
             className={`col-span-1 lg:col-span-12 p-8 md:p-10 rounded-[40px] relative overflow-hidden transition-all duration-500 hover:shadow-2xl border cursor-pointer ${
               isDark 
                 ? 'bg-[#151515]/60 hover:bg-[#151515] border-white/5 hover:border-[#007AFF]/20' 
-                : 'bg-white hover:bg-slate-50/80 border-neutral-200/60 hover:border-[#007AFF]/15'
+                : 'bg-white hover:bg-[#FDFBF7]/80 border-neutral-200/60 hover:border-[#007AFF]/15'
             } flex flex-col justify-between group`}
           >
             <div className="absolute -right-32 -bottom-32 w-96 h-96 rounded-full filter blur-[120px] opacity-15 pointer-events-none bg-[#007AFF]/30 transition-opacity group-hover:opacity-25" />
@@ -390,7 +390,7 @@ export default function Projects({ projects, currentMode, isDark, onRefreshData 
                   } ${
                     isDark 
                       ? 'bg-[#151515]/60 hover:bg-[#151515] border-white/5 hover:border-[#007AFF]/15' 
-                      : 'bg-white hover:bg-slate-50/80 border-neutral-200/60 hover:border-[#007AFF]/10'
+                      : 'bg-white hover:bg-[#FDFBF7]/80 border-neutral-200/60 hover:border-[#007AFF]/10'
                   } flex flex-col justify-between group`}
                 >
                   <div>

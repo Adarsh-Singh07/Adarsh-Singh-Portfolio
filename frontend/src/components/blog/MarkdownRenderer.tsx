@@ -11,7 +11,7 @@ import rehypeSanitize from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
 import Zoom from 'react-medium-image-zoom';
 import 'react-medium-image-zoom/dist/styles.css';
-import { Copy, Check, Info, AlertTriangle, XCircle, Lightbulb } from 'lucide-react';
+import { Copy, Check, Info, AlertTriangle, XCircle, Lightbulb, Link as LinkIcon } from 'lucide-react';
 import { useState } from 'react';
 import mermaid from 'mermaid';
 
@@ -86,7 +86,7 @@ const MermaidBlock = ({ chart }: { chart: string }) => {
     }).catch(console.error);
   }, [chart]);
 
-  return svg ? <div className="my-8 flex justify-center bg-slate-50 dark:bg-white/5 p-4 rounded-xl border border-slate-200 dark:border-white/10" dangerouslySetInnerHTML={{ __html: svg }} /> : <div className="animate-pulse h-32 bg-slate-100 dark:bg-white/5 rounded-xl my-8" />;
+  return svg ? <div className="my-8 flex justify-center bg-[#FDFBF7] dark:bg-white/5 p-4 rounded-xl border border-slate-200 dark:border-white/10" dangerouslySetInnerHTML={{ __html: svg }} /> : <div className="animate-pulse h-32 bg-slate-100 dark:bg-white/5 rounded-xl my-8" />;
 };
 
 // Parse GitHub Alerts from Blockquotes
@@ -154,9 +154,40 @@ const CustomBlockQuote = ({ children, ...props }: any) => {
   }
 
   return (
-    <blockquote className="border-l-[6px] border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-6 my-8 rounded-r-xl italic text-slate-700 dark:text-slate-300 shadow-sm dark:shadow-none" {...props}>
+    <blockquote className="border-l-[6px] border-slate-300 dark:border-slate-700 bg-[#FDFBF7] dark:bg-slate-900/50 p-6 my-8 rounded-r-xl italic text-slate-700 dark:text-slate-300 shadow-sm dark:shadow-none" {...props}>
       {children}
     </blockquote>
+  );
+};
+
+const CustomHeading = ({ as: Component, id, children, ...props }: any) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    if (!id) return;
+    const url = new URL(window.location.href);
+    url.hash = id;
+    navigator.clipboard.writeText(url.toString());
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <Component id={id} className="group flex items-center mt-12 mb-4 scroll-mt-24 font-bold" {...props}>
+      <span>{children}</span>
+      {id && (
+        <button 
+          onClick={handleCopy}
+          className={`opacity-0 group-hover:opacity-100 ml-3 p-1.5 rounded-md transition-all focus:opacity-100 outline-none ${
+            copied ? 'text-emerald-500 bg-emerald-500/10' : 'text-slate-400 hover:text-[#007AFF] hover:bg-[#007AFF]/10'
+          }`}
+          aria-label="Copy link to heading"
+          title="Copy link"
+        >
+          {copied ? <Check className="w-4 h-4" /> : <LinkIcon className="w-4 h-4" />}
+        </button>
+      )}
+    </Component>
   );
 };
 
@@ -183,23 +214,34 @@ export default function MarkdownRenderer({ content, title, isDark }: MarkdownRen
             }
             return <h1 {...props}>{children}</h1>;
           },
+          h2: ({ node, id, children, ...props }) => <CustomHeading as="h2" id={id} {...props}>{children}</CustomHeading>,
+          h3: ({ node, id, children, ...props }) => <CustomHeading as="h3" id={id} {...props}>{children}</CustomHeading>,
+          h4: ({ node, id, children, ...props }) => <CustomHeading as="h4" id={id} {...props}>{children}</CustomHeading>,
           p: ({ node, children, ...props }) => {
             return <p {...props}>{children}</p>;
           },
-          img: ({ node, ...props }) => (
-            <figure className="my-10">
-              <Zoom zoomMargin={40}>
-                <img {...props} className="rounded-xl w-full h-auto shadow-md border border-slate-200 dark:border-white/10" loading="lazy" />
-              </Zoom>
-              {props.alt && <figcaption className="text-center text-sm text-slate-500 mt-3">{props.alt}</figcaption>}
-            </figure>
-          ),
+          img: ({ node, ...props }) => {
+            const [isLoaded, setIsLoaded] = useState(false);
+            return (
+              <figure className="my-10">
+                <Zoom zoomMargin={40}>
+                  <img 
+                    {...props} 
+                    className={`rounded-xl w-full h-auto shadow-md border border-slate-200 dark:border-white/10 transition-opacity duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'}`} 
+                    loading="lazy" 
+                    onLoad={() => setIsLoaded(true)}
+                  />
+                </Zoom>
+                {props.alt && <figcaption className="text-center text-sm text-slate-500 mt-3">{props.alt}</figcaption>}
+              </figure>
+            );
+          },
           table: ({ node, ...props }) => (
             <div className="overflow-x-auto my-8 border border-slate-200 dark:border-white/10 rounded-xl custom-scrollbar shadow-sm dark:shadow-none bg-white dark:bg-transparent">
               <table className="w-full text-sm text-left m-0" {...props} />
             </div>
           ),
-          tr: ({ node, ...props }) => <tr className="even:bg-slate-50 dark:even:bg-white/[0.02] hover:bg-slate-50/80 dark:hover:bg-white/[0.04] transition-colors" {...props} />,
+          tr: ({ node, ...props }) => <tr className="even:bg-[#FDFBF7] dark:even:bg-white/[0.02] hover:bg-[#FDFBF7]/80 dark:hover:bg-white/[0.04] transition-colors" {...props} />,
           th: ({ node, ...props }) => <th className="bg-slate-100 dark:bg-white/[0.05] px-4 py-3 font-semibold border-b border-slate-200 dark:border-white/10 text-slate-900 dark:text-white" {...props} />,
           td: ({ node, ...props }) => <td className="px-4 py-3 border-b border-slate-100 dark:border-white/5 last:border-0" {...props} />,
           a: ({ node, ...props }) => <a className="text-[#007AFF] no-underline hover:underline underline-offset-4 decoration-2" target={props.href?.startsWith('http') ? '_blank' : undefined} rel={props.href?.startsWith('http') ? 'noopener noreferrer' : undefined} {...props} />

@@ -235,7 +235,7 @@ export default function Contact({ isDark, coordinates, currentMode, onRefreshDat
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-[#050505]/95 z-30 flex flex-col items-center justify-center p-8 text-center"
+                className="absolute inset-0 bg-[#121212]/95 z-30 flex flex-col items-center justify-center p-8 text-center"
               >
                 <div className="w-full max-w-md bg-black border border-white/10 rounded-2xl p-6 text-left font-mono text-xs">
                   <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4 text-[#007AFF]">
@@ -393,7 +393,7 @@ export default function Contact({ isDark, coordinates, currentMode, onRefreshDat
                   Direct Mail Endpoint
                 </span>
                 <div className={`flex items-center justify-between p-3.5 rounded-xl border font-mono text-xs ${
-                  isDark ? 'bg-white/5 border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+                  isDark ? 'bg-white/5 border-white/[0.08]' : 'bg-[#FDFBF7] border-slate-200'
                 }`}>
                   <span className={isDark ? 'text-white/80' : 'text-neutral-800'}>{coords.email}</span>
                   <button
@@ -423,7 +423,7 @@ export default function Contact({ isDark, coordinates, currentMode, onRefreshDat
                   className={`flex items-center justify-between p-3.5 rounded-xl border font-mono text-xs transition-colors ${
                     isDark 
                       ? 'bg-white/5 border-white/[0.08] hover:bg-white/10 hover:border-white/20 text-white/80 hover:text-white' 
-                      : 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-350 text-neutral-800'
+                      : 'bg-[#FDFBF7] border-slate-200 hover:bg-slate-100 hover:border-slate-350 text-neutral-800'
                   }`}
                 >
                   <div className="flex items-center gap-2">
@@ -447,7 +447,7 @@ export default function Contact({ isDark, coordinates, currentMode, onRefreshDat
                   className={`flex items-center justify-between p-3.5 rounded-xl border font-mono text-xs transition-colors ${
                     isDark 
                       ? 'bg-white/5 border-white/[0.08] hover:bg-white/10 hover:border-white/20 text-white/80 hover:text-white' 
-                      : 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-350 text-neutral-800'
+                      : 'bg-[#FDFBF7] border-slate-200 hover:bg-slate-100 hover:border-slate-350 text-neutral-800'
                   }`}
                 >
                   <div className="flex items-center gap-2">
@@ -464,7 +464,7 @@ export default function Contact({ isDark, coordinates, currentMode, onRefreshDat
                   Operational Location
                 </span>
                 <div className={`flex items-center gap-2 p-3.5 rounded-xl border font-mono text-xs ${
-                  isDark ? 'bg-white/5 border-white/[0.08] text-white/80' : 'bg-slate-50 border-slate-200 text-neutral-800'
+                  isDark ? 'bg-white/5 border-white/[0.08] text-white/80' : 'bg-[#FDFBF7] border-slate-200 text-neutral-800'
                 }`}>
                   <MapPin className="w-4 h-4 text-[#007AFF]" />
                   <span>{coords.location}</span>
@@ -477,7 +477,7 @@ export default function Contact({ isDark, coordinates, currentMode, onRefreshDat
                   Response Hours
                 </span>
                 <div className={`flex items-center gap-2 p-3.5 rounded-xl border font-mono text-xs ${
-                  isDark ? 'bg-white/5 border-white/[0.08] text-white/80' : 'bg-slate-50 border-slate-200 text-neutral-800'
+                  isDark ? 'bg-white/5 border-white/[0.08] text-white/80' : 'bg-[#FDFBF7] border-slate-200 text-neutral-800'
                 }`}>
                   <Clock className="w-4 h-4 text-[#007AFF]" />
                   <span>{coords.hours}</span>

@@ -24,9 +24,9 @@ export default function JourneySection({ journey, blogs, currentMode, philosophy
   return (
     <section 
       id="journey" 
-      className={`relative py-24 transition-colors duration-1000 ${
+      className={`relative py-24 transition-colors duration-200 ${
         isDark 
-          ? 'bg-[#050505] text-white' 
+          ? 'bg-[#121212] text-white' 
           : 'bg-white text-neutral-900'
       }`}
     >
@@ -73,7 +73,7 @@ export default function JourneySection({ journey, blogs, currentMode, philosophy
                         : 'bg-white border-[#007AFF]/30 shadow-[0_10px_25px_-5px_rgba(0,122,255,0.06)]'
                       : isDark
                         ? 'bg-[#121212]/90 border-white/5 hover:border-white/10'
-                        : 'bg-slate-50/80 border-slate-200/80 hover:border-slate-300'
+                        : 'bg-[#FDFBF7]/80 border-slate-200/80 hover:border-slate-300'
                   }`}
                 >
                   <div>
@@ -116,7 +116,7 @@ export default function JourneySection({ journey, blogs, currentMode, philosophy
 
             {/* Extra Future Vision card block */}
             <div className={`w-[260px] md:w-[320px] p-6 rounded-2xl border flex flex-col justify-between ${
-              isDark ? 'bg-neutral-950 border-neutral-900/60' : 'bg-slate-50 border-slate-200/80'
+              isDark ? 'bg-neutral-950 border-neutral-900/60' : 'bg-[#FDFBF7] border-slate-200/80'
             }`}>
               <div>
                 <div className="flex items-center justify-between gap-2 mb-4">

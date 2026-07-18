@@ -38,13 +38,13 @@ export default function Hero({ config, isDark }: HeroProps) {
       id="about" 
       className={`relative min-h-[100vh] flex items-center justify-center pt-28 pb-16 overflow-hidden ${
         isDark 
-          ? 'bg-[#050505] text-white' 
-          : 'bg-slate-50 text-neutral-900'
+          ? 'bg-[#121212] text-white' 
+          : 'bg-[#FDFBF7] text-neutral-900'
       }`}
     >
       {/* Absolute Cinematic Grid Pattern Background */}
       <div 
-        className={`absolute inset-0 z-0 opacity-[0.02] md:opacity-[0.035] transition-colors duration-1000 ${
+        className={`absolute inset-0 z-0 opacity-[0.02] md:opacity-[0.035] transition-colors duration-200 ${
           isDark ? 'bg-[linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)]' : 'bg-[linear-gradient(rgba(0,0,0,0.15)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.15)_1px,transparent_1px)]'
         }`}
         style={{ backgroundSize: '45px 45px' }}

@@ -388,8 +388,8 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
 
   if (!isUnlocked) {
     return (
-      <div className={`min-h-screen flex items-center justify-center py-24 px-6 transition-colors duration-1000 ${
-        isDark ? 'bg-[#050505] text-white' : 'bg-slate-50 text-neutral-900'
+      <div className={`min-h-screen flex items-center justify-center py-24 px-6 transition-colors duration-200 ${
+        isDark ? 'bg-[#121212] text-white' : 'bg-[#FDFBF7] text-neutral-900'
       }`}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -451,8 +451,8 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
   }
 
   return (
-    <div className={`min-h-screen py-24 px-6 md:px-12 transition-colors duration-1000 ${
-      isDark ? 'bg-[#050505] text-white' : 'bg-slate-50 text-neutral-900'
+    <div className={`min-h-screen py-24 px-6 md:px-12 transition-colors duration-200 ${
+      isDark ? 'bg-[#121212] text-white' : 'bg-[#FDFBF7] text-neutral-900'
     }`}>
       <div className="max-w-7xl mx-auto w-full">
         
@@ -567,7 +567,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                           <div 
                             key={q.id}
                             className={`p-5 rounded-2xl border flex flex-col gap-4 ${
-                              isDark ? 'bg-neutral-900/50 border-white/5' : 'bg-slate-50 border-slate-200'
+                              isDark ? 'bg-neutral-900/50 border-white/5' : 'bg-[#FDFBF7] border-slate-200'
                             }`}
                           >
                             <div>
@@ -623,7 +623,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                             <div 
                               key={idx}
                               className={`p-5 rounded-2xl border flex flex-col gap-3 ${
-                                isDark ? 'bg-neutral-900/50 border-white/5' : 'bg-slate-50 border-slate-200'
+                                isDark ? 'bg-neutral-900/50 border-white/5' : 'bg-[#FDFBF7] border-slate-200'
                               }`}
                             >
                               <div className="flex items-center justify-between">
@@ -788,7 +788,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                         <div 
                           key={r.id}
                           className={`px-4 py-3 rounded-xl border flex items-center justify-between text-xs font-semibold tracking-wider ${
-                            isDark ? 'bg-neutral-900/50 border-white/5' : 'bg-slate-50 border-slate-200'
+                            isDark ? 'bg-neutral-900/50 border-white/5' : 'bg-[#FDFBF7] border-slate-200'
                           }`}
                         >
                           <div className="flex items-center gap-3">

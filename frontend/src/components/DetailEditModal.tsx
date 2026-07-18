@@ -349,7 +349,7 @@ export default function DetailEditModal({
                       ? 'bg-sky-500/10 border-sky-500/30 text-sky-400'
                       : isDark
                         ? 'bg-neutral-900 border-white/10 hover:border-white/20 text-slate-300 hover:text-white'
-                        : 'bg-slate-50 border-neutral-200 hover:border-neutral-300 text-slate-600'
+                        : 'bg-[#FDFBF7] border-neutral-200 hover:border-neutral-300 text-slate-600'
                   }`}
                 >
                   {isEditing ? <Eye className="w-3.5 h-3.5" /> : <Edit className="w-3.5 h-3.5" />}
@@ -361,7 +361,7 @@ export default function DetailEditModal({
                 className={`p-2 rounded-full border transition-all duration-300 ${
                   isDark 
                     ? 'border-white/10 bg-neutral-900 hover:border-white/20 hover:text-white text-slate-400' 
-                    : 'border-neutral-200 bg-slate-50 hover:border-neutral-300 hover:text-neutral-950 text-slate-600'
+                    : 'border-neutral-200 bg-[#FDFBF7] hover:border-neutral-300 hover:text-neutral-950 text-slate-600'
                 }`}
               >
                 <X className="w-4 h-4" />
@@ -1107,7 +1107,7 @@ export default function DetailEditModal({
                               className={`px-3 py-1.5 rounded-xl text-xs border ${
                                 isDark 
                                   ? 'bg-white/5 border-white/10 text-slate-300' 
-                                  : 'bg-slate-50 border-neutral-200 text-neutral-800'
+                                  : 'bg-[#FDFBF7] border-neutral-200 text-neutral-800'
                               }`}
                             >
                               {tech}
@@ -1125,7 +1125,7 @@ export default function DetailEditModal({
                             <div 
                               key={met.label}
                               className={`p-4 rounded-2xl border ${
-                                isDark ? 'bg-neutral-900/40 border-white/5' : 'bg-slate-50 border-neutral-200/50'
+                                isDark ? 'bg-neutral-900/40 border-white/5' : 'bg-[#FDFBF7] border-neutral-200/50'
                               }`}
                             >
                               <span className="block text-2xl font-bold tracking-tight text-[#007AFF]">{met.value}</span>
@@ -1198,7 +1198,7 @@ export default function DetailEditModal({
                     )}
 
                     <div className={`p-4 rounded-2xl border w-full max-w-sm mb-6 flex items-center justify-between text-xs font-mono ${
-                      isDark ? 'bg-neutral-900/50 border-white/5 text-slate-300' : 'bg-slate-50 border-neutral-200 text-neutral-800'
+                      isDark ? 'bg-neutral-900/50 border-white/5 text-slate-300' : 'bg-[#FDFBF7] border-neutral-200 text-neutral-800'
                     }`}>
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-[#007AFF]" />
@@ -1237,7 +1237,7 @@ export default function DetailEditModal({
 
                     {/* Excerpt panel */}
                     <div className={`p-5 rounded-2xl border italic text-sm ${
-                      isDark ? 'bg-neutral-900/40 border-white/5 text-slate-300' : 'bg-slate-50 border-neutral-200 text-neutral-800'
+                      isDark ? 'bg-neutral-900/40 border-white/5 text-slate-300' : 'bg-[#FDFBF7] border-neutral-200 text-neutral-800'
                     }`}>
                       <span className="font-mono text-[9px] block uppercase text-[#007AFF] font-bold not-italic tracking-wider mb-2">Executive Summary</span>
                       "{item.excerpt}"
@@ -1299,7 +1299,7 @@ export default function DetailEditModal({
 
                     {item.extra && item.extra.length > 0 && (
                       <div className={`w-full max-w-md p-5 rounded-2xl border flex flex-col gap-2.5 mt-8 text-left ${
-                        isDark ? 'bg-neutral-900/40 border-white/5' : 'bg-slate-50 border-neutral-200'
+                        isDark ? 'bg-neutral-900/40 border-white/5' : 'bg-[#FDFBF7] border-neutral-200'
                       }`}>
                         <span className="text-[9px] font-mono uppercase text-[#007AFF] tracking-wider font-bold mb-1">Key Context Parameters</span>
                         {item.extra.map((ext: string, idx: number) => (
@@ -1449,7 +1449,7 @@ export default function DetailEditModal({
                         <div 
                           key={idx}
                           className={`p-4 rounded-2xl border flex items-center justify-between ${
-                            isDark ? 'bg-neutral-900/35 border-white/5' : 'bg-slate-50 border-slate-200'
+                            isDark ? 'bg-neutral-900/35 border-white/5' : 'bg-[#FDFBF7] border-slate-200'
                           }`}
                         >
                           <span className="font-semibold text-sm">{skill.name}</span>
@@ -1458,7 +1458,7 @@ export default function DetailEditModal({
                               ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
                               : skill.level === 'Proficient'
                                 ? 'bg-[#007AFF]/10 border-[#007AFF]/20 text-[#007AFF]'
-                                : 'bg-slate-500/10 border-slate-500/20 text-slate-400'
+                                : 'bg-[#FDFBF7]0/10 border-slate-500/20 text-slate-400'
                           }`}>
                             {skill.level}
                           </span>

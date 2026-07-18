@@ -101,7 +101,7 @@ export default function RoleToggle({ currentMode, onModeChange, isDark, rolesLis
                           : 'bg-[#007AFF]/5 text-[#007AFF] border border-[#007AFF]/10'
                         : isDark
                           ? 'hover:bg-white/5 text-slate-400 hover:text-white border border-transparent'
-                          : 'hover:bg-slate-50 text-slate-600 hover:text-neutral-900 border border-transparent'
+                          : 'hover:bg-[#FDFBF7] text-slate-600 hover:text-neutral-900 border border-transparent'
                     }`}
                   >
                     <IconComponent className="w-3.5 h-3.5 relative z-10" />

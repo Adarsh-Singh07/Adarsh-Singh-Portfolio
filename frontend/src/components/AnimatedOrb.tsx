@@ -280,7 +280,7 @@ export default function AnimatedOrb({ isDark }: AnimatedOrbProps) {
         className={`absolute bottom-[25%] right-[15%] w-1.5 h-1.5 rounded-full transition-all duration-500 ${
           isHovered 
             ? 'bg-[#FF007F] shadow-[0_0_15px_#FF007F]' 
-            : isDark ? 'bg-sky-400/35' : 'bg-slate-500/35'
+            : isDark ? 'bg-sky-400/35' : 'bg-[#FDFBF7]0/35'
         }`}
       />
     </motion.div>

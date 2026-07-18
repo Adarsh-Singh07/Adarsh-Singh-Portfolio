@@ -224,8 +224,8 @@ export default function Certifications({ certifications, currentMode, isDark, on
   };
 
   return (
-    <div className={`min-h-screen py-24 px-6 md:px-12 transition-colors duration-1000 ${
-      isDark ? 'bg-[#050505] text-white' : 'bg-slate-50 text-neutral-900'
+    <div className={`min-h-screen py-24 px-6 md:px-12 transition-colors duration-200 ${
+      isDark ? 'bg-[#121212] text-white' : 'bg-[#FDFBF7] text-neutral-900'
     }`}>
       <SEO 
         title="Professional Certifications & Accreditations | Adarsh Singh"

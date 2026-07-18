@@ -345,7 +345,7 @@ export default function Skills({ categories, strengths, currentMode, isDark, onR
                           className={`px-3 py-1.5 rounded-xl text-xs font-semibold tracking-wide border cursor-default select-none ${
                             isDark 
                               ? 'bg-white/[0.04] border-white/[0.06] text-white/80 hover:bg-white/[0.08] hover:border-white/15 hover:text-white' 
-                              : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-slate-300 hover:text-neutral-900'
+                              : 'bg-[#FDFBF7] border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-slate-300 hover:text-neutral-900'
                           }`}
                         >
                           {skill.name}

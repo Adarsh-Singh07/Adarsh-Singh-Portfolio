@@ -20,6 +20,7 @@ import {
   DollarSign
 } from 'lucide-react';
 import PortfolioService from '../services/api';
+import { useReadingState } from '../store/readingStore';
 
 // Futuristic custom bot icon with glowing concentric animate rings
 const CustomBotIcon = ({ className = "w-6 h-6" }: { className?: string }) => (
@@ -333,10 +334,14 @@ export default function Chatbot({ isDark, currentMode = 'general' }: { isDark: b
     setSelectedTrace(null);
   };
 
+  const { isFocusMode } = useReadingState();
+
   return (
     <>
       {/* Floating Action Button */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+      <div className={`fixed bottom-6 right-6 z-50 flex flex-col items-end transition-all duration-500 ease-out ${
+        isFocusMode ? 'scale-0 opacity-0 pointer-events-none' : ''
+      }`}>
         <AnimatePresence>
           {!isOpen && hasNewMessage && (
             <motion.div
@@ -384,6 +389,8 @@ export default function Chatbot({ isDark, currentMode = 'general' }: { isDark: b
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
             className={`fixed bottom-24 right-6 w-[360px] md:w-[400px] h-[550px] z-50 rounded-2xl flex flex-col shadow-2xl border overflow-hidden backdrop-blur-xl transition-all duration-300 ${
+              isFocusMode ? 'scale-0 opacity-0 pointer-events-none' : ''
+            } ${
               isDark 
                 ? 'bg-[#0a0a0c]/90 border-slate-800/80 text-slate-100 shadow-cyan-950/20 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]' 
                 : 'bg-white/95 border-slate-200/80 text-slate-900 shadow-slate-300/40 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.4)]'
@@ -391,7 +398,7 @@ export default function Chatbot({ isDark, currentMode = 'general' }: { isDark: b
           >
             {/* Header */}
             <div className={`p-4 flex items-center justify-between border-b ${
-              isDark ? 'border-slate-800/80 bg-slate-950/40' : 'border-slate-200 bg-slate-50/50'
+              isDark ? 'border-slate-800/80 bg-slate-950/40' : 'border-slate-200 bg-[#FDFBF7]/50'
             }`}>
               <div className="flex items-center gap-3">
                 <div className="relative">
@@ -456,7 +463,7 @@ export default function Chatbot({ isDark, currentMode = 'general' }: { isDark: b
                           className={`w-full text-left p-2.5 rounded-xl border text-xs transition-all flex items-center justify-between group cursor-pointer ${
                             isDark 
                               ? 'bg-slate-900/50 hover:bg-slate-900 border-slate-800 text-slate-350 hover:text-white' 
-                              : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-650 hover:text-slate-900'
+                              : 'bg-[#FDFBF7] hover:bg-slate-100 border-slate-200 text-slate-650 hover:text-slate-900'
                           }`}
                         >
                           <span>{q}</span>
@@ -569,7 +576,7 @@ export default function Chatbot({ isDark, currentMode = 'general' }: { isDark: b
 
             {/* Input Bar */}
             <div className={`p-3 border-t ${
-              isDark ? 'border-slate-800/80 bg-slate-950/40' : 'border-slate-200 bg-slate-50/50'
+              isDark ? 'border-slate-800/80 bg-slate-950/40' : 'border-slate-200 bg-[#FDFBF7]/50'
             }`}>
               <form
                 onSubmit={(e) => {
@@ -670,7 +677,7 @@ export default function Chatbot({ isDark, currentMode = 'general' }: { isDark: b
                     {/* Model banner */}
                     {selectedTrace.model_used && (
                       <div className={`p-3 rounded-xl border flex items-center justify-between gap-3 ${
-                        isDark ? 'bg-slate-900/60 border-slate-800/80 text-cyan-400' : 'bg-slate-50 border-slate-200 text-sky-700'
+                        isDark ? 'bg-slate-900/60 border-slate-800/80 text-cyan-400' : 'bg-[#FDFBF7] border-slate-200 text-sky-700'
                       }`}>
                         <div className="flex items-center gap-2">
                           <Cpu className="w-4 h-4" />
@@ -683,21 +690,21 @@ export default function Chatbot({ isDark, currentMode = 'general' }: { isDark: b
                     {/* Performance metrics grid */}
                     <div className="grid grid-cols-3 gap-2">
                       <div className={`p-2.5 rounded-xl border flex flex-col items-center justify-center text-center ${
-                        isDark ? 'bg-slate-900/50 border-slate-800/80' : 'bg-slate-50 border-slate-200'
+                        isDark ? 'bg-slate-900/50 border-slate-800/80' : 'bg-[#FDFBF7] border-slate-200'
                       }`}>
                         <Clock className="w-3.5 h-3.5 text-amber-400 mb-1" />
                         <span className="opacity-60 text-[9px] uppercase tracking-wider">Latency</span>
                         <span className="font-semibold text-xs mt-0.5">{selectedTrace.latency_ms}ms</span>
                       </div>
                       <div className={`p-2.5 rounded-xl border flex flex-col items-center justify-center text-center ${
-                        isDark ? 'bg-slate-900/50 border-slate-800/80' : 'bg-slate-50 border-slate-200'
+                        isDark ? 'bg-slate-900/50 border-slate-800/80' : 'bg-[#FDFBF7] border-slate-200'
                       }`}>
                         <Cpu className="w-3.5 h-3.5 text-indigo-400 mb-1" />
                         <span className="opacity-60 text-[9px] uppercase tracking-wider">Tokens</span>
                         <span className="font-semibold text-xs mt-0.5">{selectedTrace.tokens_input + selectedTrace.tokens_output}</span>
                       </div>
                       <div className={`p-2.5 rounded-xl border flex flex-col items-center justify-center text-center ${
-                        isDark ? 'bg-slate-900/50 border-slate-800/80' : 'bg-slate-50 border-slate-200'
+                        isDark ? 'bg-slate-900/50 border-slate-800/80' : 'bg-[#FDFBF7] border-slate-200'
                       }`}>
                         <DollarSign className="w-3.5 h-3.5 text-emerald-400 mb-1" />
                         <span className="opacity-60 text-[9px] uppercase tracking-wider">Cost (Est)</span>
@@ -721,7 +728,7 @@ export default function Chatbot({ isDark, currentMode = 'general' }: { isDark: b
                               <div
                                 key={idx}
                                 className={`p-3 rounded-xl border flex flex-col gap-1.5 ${
-                                  isDark ? 'bg-slate-900/35 border-slate-800/50 hover:bg-slate-900/50' : 'bg-slate-50/50 border-slate-200 hover:bg-slate-50'
+                                  isDark ? 'bg-slate-900/35 border-slate-800/50 hover:bg-slate-900/50' : 'bg-[#FDFBF7]/50 border-slate-200 hover:bg-[#FDFBF7]'
                                 }`}
                               >
                                 <div className="flex items-center justify-between gap-1">

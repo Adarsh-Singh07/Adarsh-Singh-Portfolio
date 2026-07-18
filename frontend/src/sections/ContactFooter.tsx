@@ -85,9 +85,9 @@ export default function ContactFooter({ isDark }: ContactFooterProps) {
   return (
     <section 
       id="contact" 
-      className={`relative pt-24 pb-8 transition-colors duration-1000 border-t ${
+      className={`relative pt-24 pb-8 transition-colors duration-200 border-t ${
         isDark 
-          ? 'bg-[#050505] text-white border-neutral-900' 
+          ? 'bg-[#121212] text-white border-neutral-900' 
           : 'bg-white text-neutral-900 border-slate-100'
       }`}
     >
@@ -125,7 +125,7 @@ export default function ContactFooter({ isDark }: ContactFooterProps) {
                   className={`p-5 rounded-[24px] border flex items-center gap-4 transition-all duration-300 w-full text-left h-full ${
                     isDark 
                       ? 'bg-[#151515]/60 border-white/5 text-white hover:bg-[#151515] hover:border-[#007AFF]/35' 
-                      : 'bg-slate-50 border-neutral-200/60 text-neutral-900 hover:bg-white hover:shadow-md'
+                      : 'bg-[#FDFBF7] border-neutral-200/60 text-neutral-900 hover:bg-white hover:shadow-md'
                   }`}
                 >
                   <div className={`p-3 rounded-2xl ${
@@ -172,7 +172,7 @@ export default function ContactFooter({ isDark }: ContactFooterProps) {
 
             {/* Resume button request box */}
             <div className={`p-6 rounded-[24px] border ${
-              isDark ? 'bg-[#151515]/60 border-white/5' : 'bg-slate-50 border-neutral-200/60'
+              isDark ? 'bg-[#151515]/60 border-white/5' : 'bg-[#FDFBF7] border-neutral-200/60'
             }`}>
               <h4 className="text-sm font-semibold font-sans tracking-tight mb-2">Architectural Blueprint Ready</h4>
               <p className={`text-xs font-light leading-relaxed mb-4 ${isDark ? 'text-white/50' : 'text-neutral-950/60'}`}>

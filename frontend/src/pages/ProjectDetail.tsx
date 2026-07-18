@@ -25,8 +25,8 @@ export default function ProjectDetail({ projects, currentMode = 'general', isDar
 
   if (!project) {
     return (
-      <div className={`min-h-screen py-32 px-6 flex flex-col items-center justify-center text-center transition-colors duration-1000 ${
-        isDark ? 'bg-[#050505] text-white' : 'bg-slate-50 text-neutral-900'
+      <div className={`min-h-screen py-32 px-6 flex flex-col items-center justify-center text-center transition-colors duration-200 ${
+        isDark ? 'bg-[#121212] text-white' : 'bg-[#FDFBF7] text-neutral-900'
       }`}>
         <span className="text-sm font-mono text-red-500 mb-2">Error 404</span>
         <h1 className="text-3xl font-bold font-sans mb-4">Case Study Not Found</h1>
@@ -108,8 +108,8 @@ export default function ProjectDetail({ projects, currentMode = 'general', isDar
   };
 
   return (
-    <div className={`min-h-screen py-24 px-6 md:px-12 transition-colors duration-1000 ${
-      isDark ? 'bg-[#050505] text-white' : 'bg-slate-50 text-neutral-900'
+    <div className={`min-h-screen py-24 px-6 md:px-12 transition-colors duration-200 ${
+      isDark ? 'bg-[#121212] text-white' : 'bg-[#FDFBF7] text-neutral-900'
     }`}>
       <SEO 
         title={`${project.title} | Case Study | Adarsh Singh`}
@@ -170,7 +170,7 @@ export default function ProjectDetail({ projects, currentMode = 'general', isDar
               target="_blank" 
               rel="noopener noreferrer" 
               className={`px-5 py-3 rounded-full flex items-center gap-2 text-xs font-semibold transition-all duration-300 cursor-pointer ${
-                isDark ? 'bg-white/5 hover:bg-white/10 text-white border border-white/10' : 'bg-white hover:bg-slate-50 text-neutral-900 border border-slate-200'
+                isDark ? 'bg-white/5 hover:bg-white/10 text-white border border-white/10' : 'bg-white hover:bg-[#FDFBF7] text-neutral-900 border border-slate-200'
               }`}
             >
               <Github className="w-4 h-4" />

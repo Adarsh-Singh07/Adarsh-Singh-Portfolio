@@ -90,6 +90,9 @@ export interface BlogNote {
   tags?: string[];
   logoUrl?: string;
   brandColor?: string;
+  difficulty?: 'Beginner' | 'Intermediate' | 'Advanced';
+  lastUpdated?: string;
+  version?: string;
   priority: {
     general: number;
     'data-engineer': number;

@@ -88,8 +88,8 @@ export default function Dashboard({ isDark }: DashboardProps) {
     : [];
 
   return (
-    <div className={`min-h-screen py-24 px-6 md:px-12 transition-colors duration-1000 ${
-      isDark ? 'bg-[#050505] text-white' : 'bg-slate-50 text-neutral-900'
+    <div className={`min-h-screen py-24 px-6 md:px-12 transition-colors duration-200 ${
+      isDark ? 'bg-[#121212] text-white' : 'bg-[#FDFBF7] text-neutral-900'
     }`}>
       <div className="max-w-7xl mx-auto w-full">
         
@@ -274,7 +274,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
                             ? 'bg-[#007AFF]/10 border-[#007AFF]/30 text-white'
                             : isDark
                               ? 'bg-neutral-900/30 border-white/5 hover:border-white/10 text-slate-400 hover:text-slate-200'
-                              : 'bg-slate-50 border-neutral-200 hover:border-neutral-300 text-slate-700'
+                              : 'bg-[#FDFBF7] border-neutral-200 hover:border-neutral-300 text-slate-700'
                         }`}
                       >
                         <div className="flex items-center justify-between mb-2">
@@ -296,7 +296,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
 
                 {/* Session Message Log View */}
                 <div className={`md:col-span-2 p-5 rounded-2xl border min-h-[300px] max-h-[400px] overflow-y-auto scrollbar-thin flex flex-col gap-4 ${
-                  isDark ? 'bg-neutral-900/10 border-white/5' : 'bg-slate-50 border-neutral-200'
+                  isDark ? 'bg-neutral-900/10 border-white/5' : 'bg-[#FDFBF7] border-neutral-200'
                 }`}>
                   {selectedSessionId ? (
                     activeSessionMessages.length > 0 ? (

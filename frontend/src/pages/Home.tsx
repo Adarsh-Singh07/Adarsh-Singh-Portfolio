@@ -221,8 +221,8 @@ export default function Home({ config, homeCards = [], currentMode, isDark, onRe
       <Hero config={config} isDark={isDark} />
 
       {/* Premium Teaser Navigation Section */}
-      <section className={`py-16 md:py-24 border-t relative overflow-hidden transition-colors duration-1000 ${
-        isDark ? 'bg-[#050505] border-white/5' : 'bg-slate-50 border-black/5'
+      <section className={`py-16 md:py-24 border-t relative overflow-hidden transition-colors duration-200 ${
+        isDark ? 'bg-[#121212] border-white/5' : 'bg-[#FDFBF7] border-black/5'
       }`}>
         {/* Soft atmospheric gradient */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] rounded-full filter blur-[150px] opacity-10 bg-[#007AFF]/20 pointer-events-none" />
@@ -322,8 +322,8 @@ export default function Home({ config, homeCards = [], currentMode, isDark, onRe
       </section>
 
       {/* FAQ Accordion Section for SEO & LLM Scraping */}
-      <section className={`py-16 md:py-24 border-t relative overflow-hidden transition-colors duration-1000 ${
-        isDark ? 'bg-[#050505] border-white/5' : 'bg-slate-50 border-black/5'
+      <section className={`py-16 md:py-24 border-t relative overflow-hidden transition-colors duration-200 ${
+        isDark ? 'bg-[#121212] border-white/5' : 'bg-[#FDFBF7] border-black/5'
       }`}>
         <div className="max-w-4xl mx-auto px-6 md:px-12 relative z-10 w-full text-left">
           <div className="mb-12">

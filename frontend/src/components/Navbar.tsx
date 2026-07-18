@@ -10,6 +10,7 @@ import { ProfileMode, RoleDefinition } from '../types';
 import ThemeToggle from './ThemeToggle';
 import RoleToggle from './RoleToggle';
 import { Menu, X, FileText, ArrowUpRight, ChevronDown } from 'lucide-react';
+import { useReadingState } from '../store/readingStore';
 
 interface NavbarProps {
   isDark: boolean;
@@ -50,11 +51,15 @@ export default function Navbar({ isDark, toggleTheme, currentMode, onModeChange,
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const { isFocusMode } = useReadingState();
+
   return (
     <>
       <nav
         id="global-navbar"
         className={`fixed left-1/2 -translate-x-1/2 w-[94%] md:w-[90%] max-w-7xl z-50 transition-all duration-500 ease-out rounded-full flex items-center justify-between px-6 md:px-10 top-4 py-3.5 ${
+          isFocusMode ? '-translate-y-[150%] opacity-0 pointer-events-none' : ''
+        } ${
           isDark
             ? 'bg-black/60 backdrop-blur-xl border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.6)] hover:border-white/20'
             : 'bg-white/85 backdrop-blur-xl border border-black/5 shadow-[0_10px_35px_rgba(0,0,0,0.04)] hover:border-black/10'
@@ -171,7 +176,7 @@ export default function Navbar({ isDark, toggleTheme, currentMode, onModeChange,
                                   : 'bg-[#007AFF]/5 text-[#007AFF] border border-[#007AFF]/10'
                                 : isDark
                                   ? 'hover:bg-white/5 text-slate-400 hover:text-white border border-transparent'
-                                  : 'hover:bg-slate-50 text-slate-600 hover:text-neutral-900 border border-transparent'
+                                  : 'hover:bg-[#FDFBF7] text-slate-600 hover:text-neutral-900 border border-transparent'
                             }`}
                           >
                             <span className="font-display tracking-widest uppercase">{item.label}</span>
@@ -203,7 +208,7 @@ export default function Navbar({ isDark, toggleTheme, currentMode, onModeChange,
                                   : 'bg-[#007AFF]/5 text-[#007AFF] border border-[#007AFF]/10'
                                 : isDark
                                   ? 'hover:bg-white/5 text-slate-400 hover:text-white border border-transparent'
-                                  : 'hover:bg-slate-50 text-slate-600 hover:text-neutral-900 border border-transparent'
+                                  : 'hover:bg-[#FDFBF7] text-slate-600 hover:text-neutral-900 border border-transparent'
                             }`}
                           >
                             <span className="font-display tracking-widest uppercase">{role.label}</span>

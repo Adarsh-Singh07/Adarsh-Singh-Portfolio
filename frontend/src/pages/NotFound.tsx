@@ -9,7 +9,7 @@ interface NotFoundProps {
 
 export default function NotFound({ isDark }: NotFoundProps) {
   return (
-    <div className={`min-h-[80vh] flex items-center justify-center px-6 py-24 transition-colors duration-1000 ${
+    <div className={`min-h-[80vh] flex items-center justify-center px-6 py-24 transition-colors duration-200 ${
       isDark ? 'bg-transparent text-white' : 'bg-transparent text-neutral-900'
     }`}>
       {/* React 19 Native Head Metadata Hoisting */}
@@ -53,7 +53,7 @@ export default function NotFound({ isDark }: NotFoundProps) {
             className={`flex items-center justify-center gap-2 p-3 rounded-2xl border text-xs font-semibold tracking-wider uppercase transition-all duration-300 ${
               isDark 
                 ? 'bg-neutral-900/40 border-white/5 hover:border-white/15 hover:bg-neutral-900 text-slate-200' 
-                : 'bg-white border-neutral-200 hover:border-neutral-350 hover:bg-slate-50 text-neutral-800'
+                : 'bg-white border-neutral-200 hover:border-neutral-350 hover:bg-[#FDFBF7] text-neutral-800'
             }`}
           >
             <Home className="w-4 h-4 text-[#007AFF]" />
@@ -64,7 +64,7 @@ export default function NotFound({ isDark }: NotFoundProps) {
             className={`flex items-center justify-center gap-2 p-3 rounded-2xl border text-xs font-semibold tracking-wider uppercase transition-all duration-300 ${
               isDark 
                 ? 'bg-neutral-900/40 border-white/5 hover:border-white/15 hover:bg-neutral-900 text-slate-200' 
-                : 'bg-white border-neutral-200 hover:border-neutral-350 hover:bg-slate-50 text-neutral-800'
+                : 'bg-white border-neutral-200 hover:border-neutral-350 hover:bg-[#FDFBF7] text-neutral-800'
             }`}
           >
             <FolderGit2 className="w-4 h-4 text-[#007AFF]" />
@@ -75,7 +75,7 @@ export default function NotFound({ isDark }: NotFoundProps) {
             className={`flex items-center justify-center gap-2 p-3 rounded-2xl border text-xs font-semibold tracking-wider uppercase transition-all duration-300 ${
               isDark 
                 ? 'bg-neutral-900/40 border-white/5 hover:border-white/15 hover:bg-neutral-900 text-slate-200' 
-                : 'bg-white border-neutral-200 hover:border-neutral-350 hover:bg-slate-50 text-neutral-800'
+                : 'bg-white border-neutral-200 hover:border-neutral-350 hover:bg-[#FDFBF7] text-neutral-800'
             }`}
           >
             <Mail className="w-4 h-4 text-[#007AFF]" />

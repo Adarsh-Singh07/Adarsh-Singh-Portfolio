@@ -39,9 +39,9 @@ export default function PortfolioBento({ projects, certifications, currentMode, 
   return (
     <section 
       id="projects" 
-      className={`relative py-24 border-t transition-colors duration-1000 ${
+      className={`relative py-24 border-t transition-colors duration-200 ${
         isDark 
-          ? 'bg-[#050505] text-white border-neutral-900' 
+          ? 'bg-[#121212] text-white border-neutral-900' 
           : 'bg-white text-neutral-900 border-slate-100'
       }`}
     >
@@ -74,7 +74,7 @@ export default function PortfolioBento({ projects, certifications, currentMode, 
             className={`col-span-1 lg:col-span-8 p-6 md:p-8 rounded-[40px] relative overflow-hidden transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl border ${
               isDark 
                 ? 'bg-[#151515]/60 hover:bg-[#151515] border-white/5' 
-                : 'bg-white hover:bg-slate-50 border-neutral-200/60 hover:border-neutral-300'
+                : 'bg-white hover:bg-[#FDFBF7] border-neutral-200/60 hover:border-neutral-300'
             }`}
           >
             {/* Soft decorative background asset */}
@@ -159,7 +159,7 @@ export default function PortfolioBento({ projects, certifications, currentMode, 
             className={`col-span-1 lg:col-span-4 p-6 rounded-[32px] relative overflow-hidden transition-all duration-500 transform hover:-translate-y-1 hover:shadow-2xl border ${
               isDark 
                 ? 'bg-[#151515]/60 hover:bg-[#151515] border-white/5' 
-                : 'bg-white hover:bg-slate-50 border-neutral-200/60 hover:border-neutral-300'
+                : 'bg-white hover:bg-[#FDFBF7] border-neutral-200/60 hover:border-neutral-300'
             }`}
           >
             <div className="flex flex-col h-full justify-between">
@@ -190,7 +190,7 @@ export default function PortfolioBento({ projects, certifications, currentMode, 
                       className={`p-2.5 rounded-xl border flex items-center gap-3 transition-colors duration-300 ${
                         isDark 
                           ? 'bg-white/5 border-white/5 text-slate-300 hover:bg-white/10' 
-                          : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                          : 'bg-[#FDFBF7] border-slate-200 text-slate-700 hover:bg-slate-100'
                       }`}
                     >
                       <div className={`w-1.5 h-1.5 rounded-full ${
@@ -218,7 +218,7 @@ export default function PortfolioBento({ projects, certifications, currentMode, 
             className={`col-span-1 lg:col-span-4 p-6 rounded-[32px] relative overflow-hidden transition-all duration-500 transform hover:-translate-y-1 hover:shadow-2xl border ${
               isDark 
                 ? 'bg-[#151515]/60 hover:bg-[#151515] border-white/5' 
-                : 'bg-white hover:bg-slate-50 border-neutral-200/60 hover:border-neutral-300'
+                : 'bg-white hover:bg-[#FDFBF7] border-neutral-200/60 hover:border-neutral-300'
             }`}
           >
             <div className="flex flex-col h-full justify-between">
@@ -257,7 +257,7 @@ export default function PortfolioBento({ projects, certifications, currentMode, 
             className={`col-span-1 lg:col-span-8 p-6 rounded-[32px] relative overflow-hidden transition-all duration-500 transform hover:-translate-y-1 hover:shadow-2xl border ${
               isDark 
                 ? 'bg-[#151515]/60 hover:bg-[#151515] border-white/5' 
-                : 'bg-white hover:bg-slate-50 border-neutral-200/60 hover:border-neutral-300'
+                : 'bg-white hover:bg-[#FDFBF7] border-neutral-200/60 hover:border-neutral-300'
             }`}
           >
             <div className="flex flex-col h-full justify-between">
@@ -282,7 +282,7 @@ export default function PortfolioBento({ projects, certifications, currentMode, 
                       className={`p-3 rounded-xl border flex flex-col justify-between transition-all duration-300 ${
                         isDark 
                           ? 'bg-white/5 border-white/5 hover:border-white/10' 
-                          : 'bg-slate-50 border-slate-200 hover:shadow-sm'
+                          : 'bg-[#FDFBF7] border-slate-200 hover:shadow-sm'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2">
@@ -324,7 +324,7 @@ export default function PortfolioBento({ projects, certifications, currentMode, 
                 className={`group p-6 md:p-7 rounded-[32px] border flex flex-col justify-between transition-all duration-500 transform hover:-translate-y-1 ${
                   isDark 
                     ? 'bg-[#151515]/60 hover:bg-[#151515] border-white/5 hover:border-[#007AFF]/30 hover:shadow-[0_20px_40px_rgba(0,122,255,0.15)]' 
-                    : 'bg-white hover:bg-slate-50 border-neutral-200/60 hover:border-[#007AFF]/20 hover:shadow-lg'
+                    : 'bg-white hover:bg-[#FDFBF7] border-neutral-200/60 hover:border-[#007AFF]/20 hover:shadow-lg'
                 }`}
               >
                 <div>

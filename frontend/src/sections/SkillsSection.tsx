@@ -28,10 +28,10 @@ export default function SkillsSection({ categories, certifications, currentMode,
   return (
     <section 
       id="skills" 
-      className={`relative py-24 transition-colors duration-1000 ${
+      className={`relative py-24 transition-colors duration-200 ${
         isDark 
-          ? 'bg-[#050505] text-white' 
-          : 'bg-slate-50 text-neutral-900'
+          ? 'bg-[#121212] text-white' 
+          : 'bg-[#FDFBF7] text-neutral-900'
       }`}
     >
       <div className="absolute inset-0 z-0 opacity-10 pointer-events-none" />
