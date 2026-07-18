@@ -160,8 +160,17 @@ const CustomBlockQuote = ({ children, ...props }: any) => {
   );
 };
 
+const extractTextFromReactNode = (node: any): string => {
+  if (typeof node === 'string') return node;
+  if (typeof node === 'number') return String(node);
+  if (Array.isArray(node)) return node.map(extractTextFromReactNode).join('');
+  if (React.isValidElement(node)) return extractTextFromReactNode((node.props as any).children);
+  return '';
+};
+
 const CustomHeading = ({ as: Component, id, children, ...props }: any) => {
   const [copied, setCopied] = useState(false);
+  const textContent = extractTextFromReactNode(children);
 
   const handleCopy = () => {
     if (!id) return;
@@ -173,7 +182,7 @@ const CustomHeading = ({ as: Component, id, children, ...props }: any) => {
   };
 
   return (
-    <Component id={id} className="group flex items-center mt-12 mb-4 scroll-mt-24 font-bold" {...props}>
+    <Component id={id} data-toc-text={textContent} className="group flex items-center mt-12 mb-4 scroll-mt-24 font-bold" {...props}>
       <span>{children}</span>
       {id && (
         <button 
@@ -200,7 +209,6 @@ export default function MarkdownRenderer({ content, title, isDark }: MarkdownRen
           rehypeRaw,
           rehypeSanitize,
           rehypeSlug,
-          [rehypeAutolinkHeadings, { behavior: 'prepend', properties: { className: ['anchor-link'] } }],
           rehypeKatex,
           [rehypeHighlight, { ignoreMissing: true }]
         ]}
