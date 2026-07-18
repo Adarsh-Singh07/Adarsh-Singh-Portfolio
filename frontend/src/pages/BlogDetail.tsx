@@ -316,7 +316,7 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
               <div className="flex items-center gap-3">
                 <div className="relative w-10 h-10 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden border border-slate-300 dark:border-white/20 flex items-center justify-center">
                   <span className="text-xs font-bold text-slate-500 dark:text-slate-400">AS</span>
-                  <img src="/avatar.jpg" alt="Adarsh Singh" className="absolute inset-0 w-full h-full object-cover z-10" onError={(e) => e.currentTarget.style.display = 'none'} />
+                  <img src="/api/v1/portfolio/assets/avatar.jpg" alt="Adarsh Singh" className="absolute inset-0 w-full h-full object-cover z-10" onError={(e) => e.currentTarget.style.display = 'none'} />
                 </div>
                 <div className="flex flex-col text-left">
                   <span className={isDark ? 'text-white' : 'text-slate-900'}>Adarsh Singh</span>

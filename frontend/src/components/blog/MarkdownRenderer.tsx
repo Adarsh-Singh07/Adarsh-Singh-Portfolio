@@ -46,8 +46,8 @@ const CodeBlock = ({ node, inline, className, children, ...props }: any) => {
   }
 
   return (
-    <div className="relative group rounded-xl overflow-hidden my-8 border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0d1117] shadow-sm dark:shadow-none">
-      <div className="flex items-center justify-between px-4 py-2 bg-slate-100 dark:bg-[#161b22] border-b border-slate-200 dark:border-white/10">
+    <div className="relative group rounded-xl overflow-hidden my-8 border border-white/10 bg-[#0d1117] shadow-lg">
+      <div className="flex items-center justify-between px-4 py-2 bg-[#161b22] border-b border-white/10">
         <div className="flex gap-1.5">
           <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
           <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
