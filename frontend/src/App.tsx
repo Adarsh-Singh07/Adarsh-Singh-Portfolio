@@ -132,6 +132,15 @@ export default function App() {
     }
   }, []);
 
+  // Sync dark mode state with document class for Tailwind v4 class-based dark variant
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDark]);
+
   // Fetch / load data whenever the active profile mode toggles
   useEffect(() => {
     let active = true;
