@@ -416,7 +416,7 @@ Here is my official CV & Portfolio Knowledge Base context:
                 "source": c["source_file"],
                 "similarity": float(c["similarity"])
             }
-            for c in retrieved_chunks
+            for c in knowledge_chunks
         ]
         
         db.save_chat_message(
