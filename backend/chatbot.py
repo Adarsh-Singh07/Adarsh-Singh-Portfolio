@@ -123,107 +123,171 @@ Here is my official CV & Portfolio Knowledge Base context:
 {context_str}
 """
 
-    try:
-        client = genai.Client(api_key=api_key)
+async def call_groq_llm(groq_key: str, model_name: str, history: list, user_message: str, system_instruction: str):
+    import urllib.request
+    import json
+    messages = [{"role": "system", "content": system_instruction}]
+    for msg in history:
+        role = "user" if msg.role == "user" else "assistant"
+        messages.append({"role": role, "content": msg.content})
+    messages.append({"role": "user", "content": user_message})
+
+    payload = json.dumps({
+        "model": model_name,
+        "messages": messages,
+        "temperature": 0.7,
+        "max_tokens": 1024
+    }).encode("utf-8")
+
+    req = urllib.request.Request(
+        "https://api.groq.com/openai/v1/chat/completions",
+        data=payload,
+        headers={
+            "Authorization": f"Bearer {groq_key}",
+            "Content-Type": "application/json",
+            "User-Agent": "FastAPI-Groq-Client"
+        }
+    )
+
+    def _req():
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+
+    return await asyncio.to_thread(_req)
+
+@router.post("/chat")
+async def chat(request: ChatRequest, client_request: Request, background_tasks: BackgroundTasks):
+    """
+    RAG-powered conversational endpoint. Answers questions using Groq/Gemini
+    grounded on dynamically retrieved CV and profile chunks, logs
+    unresolved queries, captures contact leads, and records metrics in SQLite.
+    """
+    start_time = time.time()
+    
+    # 1. Rate Limiting Check
+    client_ip = client_request.client.host if client_request.client else "unknown"
+    if not check_chat_rate_limit(client_ip):
+        raise HTTPException(
+            status_code=429, 
+            detail="Rate limit exceeded. Please wait a minute before sending more messages."
+        )
         
-        # Prepare contents list
-        contents = []
-        for msg in request.history:
-            # Map roles to Gemini's expected: 'user' or 'model'
-            role = "user" if msg.role == "user" else "model"
+    # 2. Manage Session ID
+    session_id = request.session_id or str(uuid.uuid4())
+    
+    # 3. Save User Message to SQLite
+    db.save_chat_message(session_id, "user", request.message)
+    
+    # 4. RAG Retrieval
+    knowledge_chunks = rag.search_chunks(request.message, top_k=4)
+    context_str = rag.format_context(knowledge_chunks)
+    
+    api_key = os.environ.get("GEMINI_API_KEY")
+    groq_api_key = os.environ.get("GROQ_API_KEY")
+    
+    # 5. System Prompt Construction
+    system_instruction = f"""
+You are Addy, the AI Twin of Adarsh Singh, representing him in a conversation with a visitor (like a recruiter, hiring manager, or project stakeholder) on his personal portfolio website.
+
+Your Guidelines:
+1. Introduce yourself as "Addy, Adarsh's AI Twin". Speak in the first person ("I", "my", "me") as Adarsh Singh's digital replica. Maintain a professional, positive, innovative, and highly persuasive tone that represents a top-tier engineer.
+2. Answer questions accurately and truthfully based on the provided knowledge base.
+   - If asked about weaknesses, answer in a persuasive, constructive engineering-focused style (e.g. "My main weakness is that when I get stuck on a challenging technical block, my absolute drive is to push through and complete it, sometimes spending extra hours optimizing and perfecting the implementation").
+   - If asked about strengths, present yourself as a premium Data & AI Engineer who has a deep passion for beautiful UI/UX details, performance optimization, and clean system architecture.
+3. If a question is about me (my experience, projects, skills, or background) and you cannot find the answer in the provided knowledge base, you MUST start your response with the tag `[UNANSWERED]` followed by a polite explanation that you don't have that detail in your current portfolio knowledge base, but share relevant adjacent info or tell them they can reach out to me directly.
+4. If the visitor wants to contact me (e.g. they say "send this mail to Adarsh", "tell Adarsh to call me", "ask Adarsh to contact me", "email Adarsh", etc.), you must collect their Name, Email Address, and Description/Message.
+   - If they have not yet provided these details, politely ask them to provide them.
+   - Once you have collected all three details (Name, Email, and Message), you MUST append this exact tag to the end of your response: `[SAVE_LEAD: name=<Name>|email=<Email>|message=<Message>]` (replacing the placeholders with the actual details they provided).
+5. When describing my projects, skills, certifications, or work experience, you can suggest navigating to specific pages on my website. Use standard markdown links exactly like this:
+   - To check projects: [Projects Section](/projects)
+   - To see skills/certifications: [Skills Section](/skills)
+   - To read about my career journey/timeline: [Journey Timeline](/timeline)
+   - To send me a message: [Contact Page](/contact)
+   - To read my blogs: [Blog Section](/blog)
+   For external profiles, use these links:
+   - GitHub: https://github.com/Adarsh-Singh07
+   - LinkedIn: https://www.linkedin.com/in/adarshsingh45/
+6. Keep your responses concise, readable, and structured. Use bullet points or short paragraphs. Avoid long blocks of text.
+
+Here is my official CV & Portfolio Knowledge Base context:
+{context_str}
+"""
+
+    try:
+        response_text = None
+        model_used_name = "unknown"
+        tokens_input = 0
+        tokens_output = 0
+
+        # Try Groq API first (Ultra-Fast <400ms Response)
+        if groq_api_key:
+            groq_models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
+            for g_model in groq_models:
+                try:
+                    print(f"Calling Groq ultra-fast API with model {g_model}...")
+                    g_res = await call_groq_llm(groq_api_key, g_model, request.history, request.message, system_instruction)
+                    response_text = g_res["choices"][0]["message"]["content"]
+                    model_used_name = f"groq/{g_model}"
+                    usage = g_res.get("usage", {})
+                    tokens_input = usage.get("prompt_tokens", 0)
+                    tokens_output = usage.get("completion_tokens", 0)
+                    print(f"Groq API succeeded using {g_model}!")
+                    break
+                except Exception as g_err:
+                    print(f"Groq model {g_model} failed: {g_err}")
+
+        # Fallback to Gemini if Groq was not used or failed
+        if not response_text:
+            client = genai.Client(api_key=api_key)
+            
+            # Prepare contents list
+            contents = []
+            for msg in request.history:
+                role = "user" if msg.role == "user" else "model"
+                contents.append(
+                    types.Content(
+                        role=role,
+                        parts=[types.Part.from_text(text=msg.content)]
+                    )
+                )
+                
             contents.append(
                 types.Content(
-                    role=role,
-                    parts=[types.Part.from_text(text=msg.content)]
+                    role="user",
+                    parts=[types.Part.from_text(text=request.message)]
                 )
             )
             
-        # Append current user message
-        contents.append(
-            types.Content(
-                role="user",
-                parts=[types.Part.from_text(text=request.message)]
-            )
-        )
-        
-        # Call Gemini asynchronously with robust retry loop and model/key fallbacks
-        backup_key = os.environ.get("BACKUP_GEMINI_API_KEY")
-        response = None
-        last_error = None
-        model_used_name = "unknown"
-        models_to_try = [
-            'gemini-2.5-flash',
-            'gemini-2.5-flash-lite',
-            'gemini-2.0-flash',
-            'gemini-2.0-flash-lite',
-            'gemini-1.5-flash',
-            'gemini-flash-latest',
-            'gemini-flash-lite-latest',
-            'gemini-3.5-flash'
-        ]
-        
-        if request.model_override and request.model_override in models_to_try:
-            print(f"User specified model override: {request.model_override}. Prioritizing it.")
-            models_to_try.remove(request.model_override)
-            models_to_try.insert(0, request.model_override)
-        
-        now = time.time()
-        
-        # 1. Try Primary API Key
-        primary_key_hash = get_key_hash(api_key)
-        for model_name in models_to_try:
-            # Skip if blacklisted
-            blacklist_until = EXHAUSTED_MODELS.get((primary_key_hash, model_name), 0)
-            if now < blacklist_until:
-                print(f"Skipping primary model {model_name} (blacklisted due to quota exhaustion)")
-                continue
-                
-            for attempt in range(2):
-                try:
-                    print(f"Calling primary client with model {model_name} (Attempt {attempt+1})...")
-                    client = genai.Client(api_key=api_key)
-                    response = await client.aio.models.generate_content(
-                        model=model_name,
-                        contents=contents,
-                        config=types.GenerateContentConfig(
-                            system_instruction=system_instruction,
-                            temperature=0.7,
-                        )
-                    )
-                    model_used_name = model_name
-                    break
-                except Exception as err:
-                    last_error = err
-                    print(f"Primary client model {model_name} attempt {attempt+1} failed: {err}")
-                    err_str = str(err).lower()
-                    if "429" in err_str or "quota exceeded" in err_str or "resource_exhausted" in err_str:
-                        # Blacklist for 4 hours
-                        EXHAUSTED_MODELS[(primary_key_hash, model_name)] = time.time() + 14400
-                        print(f"Blacklisted primary model {model_name} for 4 hours.")
-                        break  # Break retry loop, skip to next model
-                    elif "503" in err_str or "overloaded" in err_str:
-                        await asyncio.sleep(1)
-                    else:
-                        break
-            if response:
-                break
-                
-        # 2. Try Backup API Key if Primary failed
-        if not response and backup_key:
-            print("Primary API key failed all models. Switching to Backup API key...")
-            backup_key_hash = get_key_hash(backup_key)
+            backup_key = os.environ.get("BACKUP_GEMINI_API_KEY")
+            response = None
+            last_error = None
+            models_to_try = [
+                'gemini-2.5-flash',
+                'gemini-2.5-flash-lite',
+                'gemini-2.0-flash',
+                'gemini-2.0-flash-lite',
+                'gemini-1.5-flash',
+                'gemini-flash-latest',
+                'gemini-flash-lite-latest',
+                'gemini-3.5-flash'
+            ]
+            
+            if request.model_override and request.model_override in models_to_try:
+                models_to_try.remove(request.model_override)
+                models_to_try.insert(0, request.model_override)
+            
+            now = time.time()
+            
+            primary_key_hash = get_key_hash(api_key)
             for model_name in models_to_try:
-                # Skip if blacklisted
-                blacklist_until = EXHAUSTED_MODELS.get((backup_key_hash, model_name), 0)
+                blacklist_until = EXHAUSTED_MODELS.get((primary_key_hash, model_name), 0)
                 if now < blacklist_until:
-                    print(f"Skipping backup model {model_name} (blacklisted due to quota exhaustion)")
                     continue
                     
                 for attempt in range(2):
                     try:
-                        print(f"Calling backup client with model {model_name} (Attempt {attempt+1})...")
-                        backup_client = genai.Client(api_key=backup_key)
-                        response = await backup_client.aio.models.generate_content(
+                        client = genai.Client(api_key=api_key)
+                        response = await client.aio.models.generate_content(
                             model=model_name,
                             contents=contents,
                             config=types.GenerateContentConfig(
@@ -235,12 +299,9 @@ Here is my official CV & Portfolio Knowledge Base context:
                         break
                     except Exception as err:
                         last_error = err
-                        print(f"Backup client model {model_name} attempt {attempt+1} failed: {err}")
                         err_str = str(err).lower()
                         if "429" in err_str or "quota exceeded" in err_str or "resource_exhausted" in err_str:
-                            # Blacklist for 4 hours
-                            EXHAUSTED_MODELS[(backup_key_hash, model_name)] = time.time() + 14400
-                            print(f"Blacklisted backup model {model_name} for 4 hours.")
+                            EXHAUSTED_MODELS[(primary_key_hash, model_name)] = time.time() + 14400
                             break
                         elif "503" in err_str or "overloaded" in err_str:
                             await asyncio.sleep(1)
@@ -249,17 +310,47 @@ Here is my official CV & Portfolio Knowledge Base context:
                 if response:
                     break
                     
-        if not response:
-            raise last_error or Exception("All configured Gemini models and keys returned exceptions.")
-        
-        # Calculate Latency & Token Metrics
-        latency_ms = int((time.time() - start_time) * 1000)
-        
-        tokens_input = 0
-        tokens_output = 0
-        if response.usage_metadata:
-            tokens_input = response.usage_metadata.prompt_token_count
-            tokens_output = response.usage_metadata.candidates_token_count
+            if not response and backup_key:
+                backup_key_hash = get_key_hash(backup_key)
+                for model_name in models_to_try:
+                    blacklist_until = EXHAUSTED_MODELS.get((backup_key_hash, model_name), 0)
+                    if now < blacklist_until:
+                        continue
+                        
+                    for attempt in range(2):
+                        try:
+                            backup_client = genai.Client(api_key=backup_key)
+                            response = await backup_client.aio.models.generate_content(
+                                model=model_name,
+                                contents=contents,
+                                config=types.GenerateContentConfig(
+                                    system_instruction=system_instruction,
+                                    temperature=0.7,
+                                )
+                            )
+                            model_used_name = model_name
+                            break
+                        except Exception as err:
+                            last_error = err
+                            err_str = str(err).lower()
+                            if "429" in err_str or "quota exceeded" in err_str or "resource_exhausted" in err_str:
+                                EXHAUSTED_MODELS[(backup_key_hash, model_name)] = time.time() + 14400
+                                break
+                            elif "503" in err_str or "overloaded" in err_str:
+                                await asyncio.sleep(1)
+                            else:
+                                break
+                    if response:
+                        break
+                        
+            if not response and not response_text:
+                raise last_error or Exception("All configured Groq and Gemini models and keys returned exceptions.")
+            
+            if response:
+                response_text = response.text
+                if response.usage_metadata:
+                    tokens_input = response.usage_metadata.prompt_token_count
+                    tokens_output = response.usage_metadata.candidates_token_count
             
         # Cost math for gemini-2.5-flash: $0.075 / 1M input, $0.30 / 1M output
         cost_est = (tokens_input * 0.075 / 1_000_000) + (tokens_output * 0.30 / 1_000_000)
