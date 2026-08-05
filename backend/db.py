@@ -97,6 +97,19 @@ def init_db():
         resolved INTEGER DEFAULT 0
     )
     """)
+
+    # 7. File Backups Table (Audit & Version History for profile.json, cv.txt, cv.pdf)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS file_backups (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        filename TEXT NOT NULL,
+        content_text TEXT,
+        content_blob BLOB,
+        file_hash TEXT NOT NULL,
+        source TEXT DEFAULT 'system',
+        created_at TEXT NOT NULL
+    )
+    """)
     
     conn.commit()
     conn.close()
@@ -224,5 +237,83 @@ def resolve_unanswered_question(question_id: int):
         conn.commit()
     except Exception as e:
         print(f"Error resolving unanswered question: {e}")
+    finally:
+        conn.close()
+
+import hashlib
+
+def save_file_backup(filename: str, content: str | bytes, source: str = "system"):
+    """
+    Saves a versioned backup snapshot of profile.json, cv.txt, or cv.pdf to SQLite.
+    Skips insertion if the latest backup for filename has the exact same SHA-256 hash.
+    """
+    conn = get_db_connection()
+    try:
+        if isinstance(content, str):
+            content_bytes = content.encode('utf-8')
+            is_text = True
+        else:
+            content_bytes = content
+            is_text = False
+            
+        file_hash = hashlib.sha256(content_bytes).hexdigest()
+        
+        # Check latest backup for this filename
+        latest = conn.execute(
+            "SELECT file_hash FROM file_backups WHERE filename = ? ORDER BY id DESC LIMIT 1",
+            (filename,)
+        ).fetchone()
+        
+        if latest and latest["file_hash"] == file_hash:
+            return  # No changes detected, skip duplicate insertion
+            
+        now_str = datetime.utcnow().isoformat() + "Z"
+        if is_text:
+            conn.execute(
+                "INSERT INTO file_backups (filename, content_text, file_hash, source, created_at) VALUES (?, ?, ?, ?, ?)",
+                (filename, content, file_hash, source, now_str)
+            )
+        else:
+            conn.execute(
+                "INSERT INTO file_backups (filename, content_blob, file_hash, source, created_at) VALUES (?, ?, ?, ?, ?)",
+                (filename, content, file_hash, source, now_str)
+            )
+        conn.commit()
+        print(f"[Backup System] Logged new version of {filename} (hash: {file_hash[:8]}, source: {source})")
+    except Exception as e:
+        print(f"Error saving file backup for {filename}: {e}")
+    finally:
+        conn.close()
+
+def get_file_backups(filename: str = None, limit: int = 50):
+    """Retrieves list of file backup versions from SQLite."""
+    conn = get_db_connection()
+    try:
+        if filename:
+            rows = conn.execute(
+                "SELECT id, filename, file_hash, source, created_at, LENGTH(COALESCE(content_text, '')) as text_len, LENGTH(COALESCE(content_blob, '')) as blob_len FROM file_backups WHERE filename = ? ORDER BY id DESC LIMIT ?",
+                (filename, limit)
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT id, filename, file_hash, source, created_at, LENGTH(COALESCE(content_text, '')) as text_len, LENGTH(COALESCE(content_blob, '')) as blob_len FROM file_backups ORDER BY id DESC LIMIT ?",
+                (limit,)
+            ).fetchall()
+        return [dict(r) for r in rows]
+    except Exception as e:
+        print(f"Error getting file backups: {e}")
+        return []
+    finally:
+        conn.close()
+
+def get_backup_by_id(backup_id: int):
+    """Retrieves a single backup record by ID."""
+    conn = get_db_connection()
+    try:
+        row = conn.execute("SELECT * FROM file_backups WHERE id = ?", (backup_id,)).fetchone()
+        return dict(row) if row else None
+    except Exception as e:
+        print(f"Error getting backup by id: {e}")
+        return None
     finally:
         conn.close()

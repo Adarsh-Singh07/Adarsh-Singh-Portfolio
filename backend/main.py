@@ -306,6 +306,7 @@ async def upload_cv(payload: UploadPayload, request: Request):
         cv_path = os.path.join(DATA_DIR, "cv.pdf")
         with open(cv_path, "wb") as f:
             f.write(binary_data)
+        db.save_file_backup("cv.pdf", binary_data, source="admin_cv_upload")
         return {"success": True, "message": "CV PDF uploaded successfully."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to process CV: {str(e)}")
@@ -327,21 +328,25 @@ async def get_cv():
     return RedirectResponse(url="https://adarshsingh.in/Adarsh_Singh_CV.pdf")
 
 def load_profiles():
-    """Loads consolidated profile roles from local JSON database."""
+    """Loads consolidated profile roles from local JSON database and logs version backup in SQLite."""
     if not os.path.exists(PROFILE_JSON):
         return {}
     try:
         with open(PROFILE_JSON, "r", encoding="utf-8") as f:
-            return json.load(f)
+            content_str = f.read()
+            db.save_file_backup("profile.json", content_str, source="startup_sync")
+            return json.loads(content_str)
     except Exception as e:
         print(f"Error loading profiles database: {e}")
         return {}
 
 def save_profiles(profiles):
-    """Saves consolidated profile roles to local JSON database."""
+    """Saves consolidated profile roles to local JSON database and logs version backup in SQLite."""
     os.makedirs(DATA_DIR, exist_ok=True)
+    content_str = json.dumps(profiles, indent=2, ensure_ascii=False)
     with open(PROFILE_JSON, "w", encoding="utf-8") as f:
-        json.dump(profiles, f, indent=2, ensure_ascii=False)
+        f.write(content_str)
+    db.save_file_backup("profile.json", content_str, source="admin_api_save")
 
 class ContactPayload(BaseModel):
     name: str
@@ -971,6 +976,47 @@ async def delete_role_endpoint(role_id: str, request: Request):
     except Exception as e:
         print(f"Failed to delete dynamic role '{role_id}': {e}")
         raise HTTPException(status_code=500, detail=f"Failed to delete role: {str(e)}")
+
+@app.get("/api/v1/portfolio/admin/backups")
+async def get_backups_endpoint(request: Request, filename: str = None):
+    """Lists all versioned database backup snapshots for profile.json, cv.txt, or cv.pdf."""
+    token = get_token_from_request(request)
+    if not verify_session_token(token):
+        raise HTTPException(status_code=401, detail="Unauthorized session.")
+    return {"success": True, "backups": db.get_file_backups(filename=filename)}
+
+@app.post("/api/v1/portfolio/admin/backups/restore/{backup_id}")
+async def restore_backup_endpoint(backup_id: int, request: Request):
+    """Restores a selected past version of profile.json, cv.txt, or cv.pdf directly from SQLite DB."""
+    token = get_token_from_request(request)
+    if not verify_session_token(token):
+        raise HTTPException(status_code=401, detail="Unauthorized session.")
+        
+    rec = db.get_backup_by_id(backup_id)
+    if not rec:
+        raise HTTPException(status_code=404, detail="Backup record not found.")
+        
+    filename = rec["filename"]
+    if filename == "profile.json":
+        target_path = PROFILE_JSON
+        content = rec["content_text"]
+        with open(target_path, "w", encoding="utf-8") as f:
+            f.write(content)
+    elif filename == "cv.txt":
+        target_path = os.path.join(DATA_DIR, "cv.txt")
+        content = rec["content_text"]
+        with open(target_path, "w", encoding="utf-8") as f:
+            f.write(content)
+    elif filename == "cv.pdf":
+        target_path = os.path.join(DATA_DIR, "cv.pdf")
+        content = rec["content_blob"]
+        with open(target_path, "wb") as f:
+            f.write(content)
+    else:
+        raise HTTPException(status_code=400, detail="Unsupported backup filename.")
+        
+    db.save_file_backup(filename, content, source=f"restored_from_backup_{backup_id}")
+    return {"success": True, "message": f"Successfully restored '{filename}' from backup ID {backup_id}."}
 
 if __name__ == "__main__":
     import uvicorn
