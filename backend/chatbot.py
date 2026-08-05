@@ -105,12 +105,18 @@ async def chat(request: ChatRequest, client_request: Request, background_tasks: 
     # 2. Manage Session ID
     session_id = request.session_id or str(uuid.uuid4())
     
-    # 3. RAG Retrieval
-    knowledge_chunks = rag.search_chunks(request.message, top_k=4)
-    context_str = rag.format_context(knowledge_chunks)
-    
     api_key = os.environ.get("GEMINI_API_KEY")
     groq_api_key = os.environ.get("GROQ_API_KEY")
+
+    # 3. RAG Retrieval
+    knowledge_chunks = rag.retrieve_context(api_key, request.message, top_k=4) if api_key else []
+    if knowledge_chunks:
+        context_str = "\n\n".join([
+            f"Source: {c['chunk_title']} (Relevance Score: {c['similarity']:.2f})\n{c['content']}"
+            for c in knowledge_chunks
+        ])
+    else:
+        context_str = "No specific profile context retrieved."
     
     # 5. System Prompt Construction
     system_instruction = f"""
