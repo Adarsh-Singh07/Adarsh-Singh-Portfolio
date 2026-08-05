@@ -1,16 +1,24 @@
 ADARSH SINGH
-Bengaluru, India | +91-7492003695 | hello@adarshsingh.in | LinkedIn
+Bengaluru, India | +91-7492003695 | hello@adarshsingh.in | LinkedIn: https://www.linkedin.com/in/adarshsingh45/ | GitHub: https://github.com/Adarsh-Singh07
 
 Software Engineer with experience in Python, Generative AI, RAG, LLMs, and Azure cloud platforms — passionate about building scalable AI systems and large language model applications.
 
 TECHNICAL SKILLS
-Languages: Python, C++, SQL
-AI / ML & GenAI: Generative AI, Large Language Models (LLMs), Transformers, Agentic AI, RAG, PyTorch, TensorFlow, Sci-Kit Learn, NLP, OpenCV, Machine Learning
-Cloud & Platforms: Microsoft Azure (Databricks, Data Factory), GCP (BigQuery, Vertex AI), Docker, REST APIs
+Languages: Python, C++, SQL, TypeScript, JavaScript
+AI / ML & GenAI: Generative AI, Large Language Models (LLMs), Transformers, Agentic AI, LangGraph, LangChain, RAG, PyTorch, TensorFlow, Sci-Kit Learn, NLP, OpenCV, Machine Learning
+Cloud & Platforms: Microsoft Azure (Databricks, Data Factory), GCP (BigQuery, Vertex AI), Oracle Cloud VPS, Docker, REST APIs, Vercel, Cloudflare
 Data Engineering: ETL Pipelines, Data Transformation, Azure Databricks, Distributed Data Processing
 Dev Practices: Agile, CI/CD, Git, Microservices, Distributed Systems
 Visualization: Power BI, Matplotlib, Seaborn, Looker, Tableau
 Soft Skills: Problem-Solving, Stakeholder Communication, Team Collaboration, Fast Learner, Adaptability
+
+FREELANCE & CONSULTING SERVICES
+• Adarsh offers full-stack web development and end-to-end cloud deployment (Vercel, AWS, Oracle VPS, GCP, Cloudflare).
+• Specializes in Autonomous AI Agents and Multi-Agent Orchestration using LangGraph, LangChain, and OpenAI/Groq/Gemini APIs.
+• Custom Chatbot integrations with RAG (Retrieval-Augmented Generation) for websites, documentation, and enterprise search.
+• E-commerce & Shopify custom integrations, store setups, and automated workflow triggers.
+• Data Engineering pipelines, Lakehouse ETL architectures, and custom analytics dashboards.
+• Contact for Freelance & Consulting: Reach out directly on the website Contact Page (/contact) or email hello@adarshsingh.in / adarsh2001gop@gmail.com.
 
 PROFESSIONAL EXPERIENCE
 Analyst – AI & Data Engineering | Capgemini (Aug 2025 – Present)
@@ -24,31 +32,22 @@ Software Engineering Intern – Python & RAG | Capgemini (Apr 2025 – Jun 2025)
 • Built and tested REST API endpoints, contributing to end-to-end feature delivery in an Agile sprint-based environment.
 • Collaborated with cross-functional teams on deploying AI-powered features, gaining exposure to CI/CD workflows and distributed service architecture.
 
-PROJECTS
-On-Demand Service Platform with Agentic AI & RAG (Aug 2025 – Jan 2026)
-• Architected a distributed microservices system using REST APIs, Docker, and WebSocket supporting concurrent users at scale.
-• Integrated Agentic AI and Retrieval-Augmented Generation (RAG) to fetch live data and dynamically adjust pricing — projected 18% revenue uplift.
-• Implemented an LLM-powered chatbot for automated customer support, reducing manual query response time by 60%.
-• Enabled real-time event-driven updates via WebSocket, demonstrating production-grade distributed system design.
-Tech Stack: Python, Microservices, REST APIs, Docker, Agentic AI, RAG, LLMs, WebSocket
-
-Intelligent Email Campaign Automation with OpenAI (Jan 2025 – Mar 2025)
-• Developed a Python-based automated email campaign tool integrating OpenAI API for LLM-driven personalisation at scale.
-• Built a GUI dashboard for campaign scheduling, template management, and delivery analytics; used Google Sheets API as live backend.
-Tech Stack: Python, OpenAI API, Google Sheets API, Matplotlib, Tkinter, SMTP
-
-Indian Sign Language Real-Time ML Translation System (Mar 2025 – Jul 2025)
-• Built a real-time ML inference pipeline for Indian Sign Language (ISL) to text and speech using TensorFlow and OpenCV.
-• Optimised model inference for low-latency real-time processing on resource-constrained devices.
-Tech Stack: Python, TensorFlow, OpenCV, NLP, Google TTS
+PROJECTS & LIVE DEMO LINKS
+• EMIVO (AI Software Engineering Multi-Agent Platform): Live Demo at https://emivo.vercel.app/ | GitHub: https://github.com/Adarsh-Singh07/EMIVO
+• On-Demand Service Platform with Agentic AI & RAG: GitHub: https://github.com/Adarsh-Singh07/on-demand-agentic-service
+• Intelligent Email Campaign Automation with OpenAI: GitHub: https://github.com/Adarsh-Singh07/email-automation-openai
+• Indian Sign Language Real-Time ML Translation System: GitHub: https://github.com/Adarsh-Singh07/isl-realtime-translation
+• Financial Data Lakehouse ETL Pipeline: GitHub: https://github.com/Adarsh-Singh07/financial-lakehouse-etl
+• Portfolio Website & AI Twin Engine: Live at https://adarshsingh.in | GitHub: https://github.com/Adarsh-Singh07/Adarsh-Singh-Portfolio
 
 CERTIFICATIONS
-• AI-102: Designing & Implementing Azure AI Solutions – Microsoft (Expires Mar 2029)
-• AWS Certified AI Practitioner – Amazon Web Services (Expires Mar 2029)
-• Generative AI Leader Certification – Google Cloud (Expires Dec 2028)
-• Professional Cloud Developer Certification – Google Cloud (Expires Jan 2028)
-• AZ-900: Microsoft Azure Fundamentals – Microsoft (Jan 2026)
-• AI-900: Microsoft Azure AI Fundamentals – Microsoft (Sep 2025)
+• AWS Certified AI Practitioner – Amazon Web Services (Credly verified)
+• Associate Data Practitioner Certification – Google Cloud (Credly verified)
+• Professional Cloud Developer Certification – Google Cloud (Credly verified)
+• Generative AI Leader Certification – Google Cloud (Credly verified)
+• AI-102: Designing & Implementing Azure AI Solutions – Microsoft
+• AZ-900: Microsoft Azure Fundamentals – Microsoft
+• AI-900: Microsoft Azure AI Fundamentals – Microsoft
 
 ACHIEVEMENTS
 • Advanced to Top 500 (Idea Submission) in Tata Imagination Challenge 2024, clearing Aptitude, Gamified, and General Awareness rounds.
@@ -61,9 +60,3 @@ Master of Computer Applications – Computer Science | CGPA: 8.35 (Aug 2023 – 
 
 Deen Dayal Upadhyay Gorakhpur University (Gorakhpur, UP, India)
 Bachelor of Science – Mathematics & Computer Science | 61.28% (Apr 2018 – Sep 2021)
-
-A.H. Intermediate College (Deoria, India)
-Intermediate (PCM) | 70% (Apr 2017 – May 2018)
-
-Co-operative High School (Bihar, India)
-Matriculation | 74% (Apr 2015 – May 2016)
