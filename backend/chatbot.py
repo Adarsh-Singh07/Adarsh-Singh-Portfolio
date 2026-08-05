@@ -285,7 +285,8 @@ Here is my official CV & Portfolio Knowledge Base context:
                     tokens_input = response.usage_metadata.prompt_token_count
                     tokens_output = response.usage_metadata.candidates_token_count
             
-        # Cost math for gemini-2.5-flash: $0.075 / 1M input, $0.30 / 1M output
+        # Calculate Latency & Token Metrics
+        latency_ms = int((time.time() - start_time) * 1000)
         cost_est = (tokens_input * 0.075 / 1_000_000) + (tokens_output * 0.30 / 1_000_000)
         
         # 1. Parse unanswered questions
