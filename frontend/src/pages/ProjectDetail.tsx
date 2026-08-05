@@ -248,36 +248,36 @@ export default function ProjectDetail({ projects, currentMode = 'general', isDar
             <>
               <div className="space-y-4">
                 <h3 className="font-semibold text-base text-cyan-400 flex items-center gap-2">
-                  <span>1. Product Mission &amp; Problem Statement</span>
+                  <span>1. Enterprise Architecture &amp; System Vision</span>
                 </h3>
                 <p className={`text-xs md:text-sm font-light leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                  Traditional AI coding tools rely on single-turn text prompts that struggle with large codebases, lack persistent memory, and produce unverified code that breaks during compilation. <strong>EMIVO</strong> solves this by establishing a multi-agent ecosystem where specialized AI roles—Planner, Developer, Code Reviewer, and QA Tester—collaborate asynchronously to design, build, test, and self-heal production-ready software.
+                  <strong>EMIVO</strong> is an AI-native, enterprise-grade eCommerce SaaS platform engineered to streamline digital retail for startups, SMEs, and enterprise merchants. Built on a modular microservices pattern with FastAPI, PostgreSQL, and Supabase, EMIVO decouples storefront delivery from back-office management, combining instant checkout speeds with real-time inventory synchronization across multi-tenant deployments.
                 </p>
               </div>
 
               <div className="space-y-4">
                 <h3 className="font-semibold text-base text-cyan-400 flex items-center gap-2">
-                  <span>2. Multi-Agent Graph Architecture</span>
+                  <span>2. Intelligent Automation &amp; AI-Driven Features</span>
                 </h3>
                 <p className={`text-xs md:text-sm font-light leading-relaxed mb-3 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                  Built on top of <strong>LangGraph</strong> and stateful Graph Prompting, EMIVO models software engineering as a directed, stateful execution graph:
+                  The platform embeds 10+ intelligent AI capabilities across store management and customer engagement:
                 </p>
                 <ul className={`list-disc pl-5 text-xs md:text-sm font-light leading-relaxed space-y-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                  <li><strong>Architect Agent:</strong> Deconstructs product requirements into modular system component specifications.</li>
-                  <li><strong>Developer Agent:</strong> Generates clean, production-grade Python/TypeScript code and API layers.</li>
-                  <li><strong>Reviewer Agent:</strong> Scans code for security vulnerabilities, style compliance, and efficiency bottlenecks.</li>
-                  <li><strong>QA &amp; Test Agent:</strong> Executes syntax checks, simulates runtime execution, and verifies API contracts.</li>
+                  <li><strong>Conversational Shopping Assistants:</strong> RAG-driven shopping co-pilots utilizing <strong>Qdrant</strong> vector embeddings for real-time natural language product discovery.</li>
+                  <li><strong>Automated Content &amp; Catalog Generation:</strong> Multi-LLM pipelines (OpenAI, Gemini, Groq) that generate high-converting product descriptions, tags, and marketing assets.</li>
+                  <li><strong>Smart Vector Search:</strong> Hybrid BM25 and vector semantic search powered by Qdrant to understand customer search intent, synonyms, and complex filters.</li>
+                  <li><strong>Automated Order &amp; Inventory Management:</strong> Event-driven WebSocket streams monitoring stock thresholds, supplier orders, and payment webhooks via Stripe.</li>
                 </ul>
               </div>
 
               <div className="space-y-4">
                 <h3 className="font-semibold text-base text-cyan-400 flex items-center gap-2">
-                  <span>3. Key Technical Innovations</span>
+                  <span>3. Cloud-Native Infrastructure &amp; Production Security</span>
                 </h3>
                 <ul className={`list-disc pl-5 text-xs md:text-sm font-light leading-relaxed space-y-2.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                  <li><strong>Self-Healing Iterative Loops:</strong> When an error or lint violation is detected by the Reviewer, feedback automatically loops back to the Developer agent for self-correction without human intervention.</li>
-                  <li><strong>Context Token Optimization:</strong> Dynamic token packing algorithms preserve full codebase context while keeping LLM retrieval fast and cost-effective.</li>
-                  <li><strong>Live Streaming Workflows:</strong> Real-time WebSockets stream multi-agent progress, code generation, and terminal logs live to the user dashboard.</li>
+                  <li><strong>Containerized Microservices:</strong> Deployed with <strong>Docker Compose</strong> and reverse-proxied via <strong>Nginx</strong> for horizontal scalability and zero-downtime rolling updates.</li>
+                  <li><strong>High-Performance In-Memory Cache:</strong> Integrated <strong>Redis</strong> caching layer to guarantee sub-2-second AI response times under concurrent traffic.</li>
+                  <li><strong>Security &amp; Multi-Tenancy:</strong> Enterprise-grade security featuring JWT token authentication, Cloudflare DDoS shielding, and isolated tenant data partitions.</li>
                 </ul>
               </div>
             </>

@@ -259,15 +259,15 @@ export default function Home({ config, homeCards = [], currentMode, isDark, onRe
                     </div>
 
                     <h3 className="text-2xl md:text-3xl font-sans font-bold tracking-tight mb-3 group-hover:text-cyan-400 transition-colors duration-300">
-                      EMIVO — Autonomous AI Software Engineering Platform
+                      EMIVO — AI-Native Enterprise eCommerce SaaS Platform
                     </h3>
 
                     <p className={`text-sm font-light leading-relaxed mb-5 ${isDark ? 'text-slate-300' : 'text-slate-650'}`}>
-                      An AI-native multi-agent development environment powered by LangGraph, Graph Prompting, and specialized AI agents that collaborate to plan, generate, test, and evolve production-ready software autonomously.
+                      An enterprise-grade eCommerce platform combining AI product management, conversational shopping assistants, vector search, and cloud-native microservices for modern online retail.
                     </p>
 
                     <div className="flex flex-wrap gap-2 text-[10px] font-mono">
-                      {['LangGraph', 'Graph Prompting', 'Multi-Agent AI', 'FastAPI', 'Next.js', 'Vercel'].map(tech => (
+                      {['FastAPI', 'Python', 'PostgreSQL', 'Redis', 'Qdrant', 'Docker', 'AI Agents', 'Stripe'].map(tech => (
                         <span key={tech} className={`px-2.5 py-1 rounded-lg border ${
                           isDark ? 'bg-white/5 border-white/10 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
                         }`}>
