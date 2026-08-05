@@ -33,7 +33,8 @@ Software Engineering Intern – Python & RAG | Capgemini (Apr 2025 – Jun 2025)
 • Collaborated with cross-functional teams on deploying AI-powered features, gaining exposure to CI/CD workflows and distributed service architecture.
 
 PROJECTS & LIVE DEMO LINKS
-• EMIVO (AI Software Engineering Multi-Agent Platform): Live Demo at https://emivo.vercel.app/ | GitHub: https://github.com/Adarsh-Singh07/EMIVO
+• EMIVO (AI-Native Enterprise eCommerce SaaS Platform): Live Demo at https://emivo.vercel.app | GitHub: https://github.com/Adarsh-Singh07/EMIVO
+• InterviewOS (AI Mock Interviewer Platform): Case Study at https://adarshsingh.in/blog/interviewos | GitHub: https://github.com/Adarsh-Singh07
 • On-Demand Service Platform with Agentic AI & RAG: GitHub: https://github.com/Adarsh-Singh07/on-demand-agentic-service
 • Intelligent Email Campaign Automation with OpenAI: GitHub: https://github.com/Adarsh-Singh07/email-automation-openai
 • Indian Sign Language Real-Time ML Translation System: GitHub: https://github.com/Adarsh-Singh07/isl-realtime-translation

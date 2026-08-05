@@ -193,11 +193,46 @@
         "githubUrl": "https://github.com/Adarsh-Singh07/EMIVO",
         "demoUrl": "https://emivo.vercel.app",
         "status": "In Progress",
-        "featured": false,
+        "featured": true,
         "priority": {
           "general": 1,
           "data-engineer": 99,
           "ai-engineer": 1
+        }
+      },
+      {
+        "id": "interviewos",
+        "title": "InterviewOS",
+        "description": "InterviewOS is an AI-powered mock interview platform that evaluates software engineers in real-time. Built with streaming WebSockets, low-latency audio transcription, and a multi-judge AI evaluation panel (code efficiency, communication style, integrity), InterviewOS delivers objective, instant feedback for technical interviews.",
+        "technologies": [
+          "Python",
+          "FastAPI",
+          "WebSockets",
+          "OpenAI API",
+          "LLMs",
+          "React",
+          "TypeScript",
+          "Tailwind CSS",
+          "Docker"
+        ],
+        "metrics": [
+          {
+            "label": "Evaluation Panel",
+            "value": "3 AI Judges"
+          },
+          {
+            "label": "Audio Stream",
+            "value": "Real-Time WebSockets"
+          }
+        ],
+        "githubUrl": "https://github.com/Adarsh-Singh07",
+        "demoUrl": null,
+        "status": "Completed",
+        "featured": false,
+        "priority": {
+          "general": 2,
+          "data-engineer": 99,
+          "ai-engineer": 2
         }
       }
     ],
@@ -844,6 +879,59 @@
     },
     "projects": [
       {
+        "id": "project-1785868472979",
+        "title": "EMIVO",
+        "description": "EMIVO is an AI-native, enterprise-grade eCommerce SaaS platform built to help businesses launch and manage modern online stores with intelligent automation. The platform combines a high-performance shopping experience with AI-powered product management, conversational shopping assistants, automated content generation, smart search, and business analytics. Designed using a scalable microservice architecture, EMIVO supports multi-tenant deployments, secure authentication, real-time inventory management, order processing, and cloud-native infrastructure, making it suitable for startups, SMEs, and enterprise retailers.\n\nEMIVO is currently under active development. The public demo showcases the evolving frontend & architecture while AI orchestration pipelines are continuously upgraded.",
+        "technologies": [
+          "FastAPI",
+          "Python",
+          "PostgreSQL",
+          "Redis",
+          "Qdrant",
+          "Docker Compose",
+          "Nginx",
+          "JWT Authentication",
+          "WebSockets",
+          "AI Agents",
+          "OpenAI API",
+          "Gemini API",
+          "Groq API",
+          "Stripe",
+          "Cloudflare",
+          "Supabase",
+          "React",
+          "TypeScript",
+          "Tailwind CSS"
+        ],
+        "metrics": [
+          {
+            "label": "AI Features",
+            "value": "10+"
+          },
+          {
+            "label": "AI Response Time",
+            "value": "<2 sec"
+          },
+          {
+            "label": "Deployment",
+            "value": "Docker + Nginx"
+          },
+          {
+            "label": "Scalability",
+            "value": "Horizontal Scaling Ready"
+          }
+        ],
+        "githubUrl": "https://github.com/Adarsh-Singh07/EMIVO",
+        "demoUrl": "https://emivo.vercel.app",
+        "status": "In Progress",
+        "featured": true,
+        "priority": {
+          "general": 1,
+          "data-engineer": 99,
+          "ai-engineer": 1
+        }
+      },
+      {
         "id": "on-demand-service-platform-agentic-ai-rag",
         "title": "On-Demand Service Platform with Agentic AI & RAG",
         "description": "Architected a distributed microservices system leveraging REST APIs, Docker, and WebSockets to support concurrent users at scale. Integrated Agentic AI and Retrieval-Augmented Generation (RAG) for dynamic pricing based on live data, projecting an 18% revenue uplift. Developed an LLM-powered chatbot for automated customer support, reducing manual query response time by 60%, and implemented real-time event-driven updates.",
@@ -935,6 +1023,41 @@
           "general": 2,
           "data-engineer": 1,
           "ai-engineer": 99
+        }
+      },
+      {
+        "id": "interviewos",
+        "title": "InterviewOS",
+        "description": "InterviewOS is an AI-powered mock interview platform that evaluates software engineers in real-time. Built with streaming WebSockets, low-latency audio transcription, and a multi-judge AI evaluation panel (code efficiency, communication style, integrity), InterviewOS delivers objective, instant feedback for technical interviews.",
+        "technologies": [
+          "Python",
+          "FastAPI",
+          "WebSockets",
+          "OpenAI API",
+          "LLMs",
+          "React",
+          "TypeScript",
+          "Tailwind CSS",
+          "Docker"
+        ],
+        "metrics": [
+          {
+            "label": "Evaluation Panel",
+            "value": "3 AI Judges"
+          },
+          {
+            "label": "Audio Stream",
+            "value": "Real-Time WebSockets"
+          }
+        ],
+        "githubUrl": "https://github.com/Adarsh-Singh07",
+        "demoUrl": null,
+        "status": "Completed",
+        "featured": false,
+        "priority": {
+          "general": 2,
+          "data-engineer": 99,
+          "ai-engineer": 2
         }
       }
     ],
@@ -1479,6 +1602,59 @@
     },
     "projects": [
       {
+        "id": "project-1785868472979",
+        "title": "EMIVO",
+        "description": "EMIVO is an AI-native, enterprise-grade eCommerce SaaS platform built to help businesses launch and manage modern online stores with intelligent automation. The platform combines a high-performance shopping experience with AI-powered product management, conversational shopping assistants, automated content generation, smart search, and business analytics. Designed using a scalable microservice architecture, EMIVO supports multi-tenant deployments, secure authentication, real-time inventory management, order processing, and cloud-native infrastructure, making it suitable for startups, SMEs, and enterprise retailers.\n\nEMIVO is currently under active development. The public demo showcases the evolving frontend & architecture while AI orchestration pipelines are continuously upgraded.",
+        "technologies": [
+          "FastAPI",
+          "Python",
+          "PostgreSQL",
+          "Redis",
+          "Qdrant",
+          "Docker Compose",
+          "Nginx",
+          "JWT Authentication",
+          "WebSockets",
+          "AI Agents",
+          "OpenAI API",
+          "Gemini API",
+          "Groq API",
+          "Stripe",
+          "Cloudflare",
+          "Supabase",
+          "React",
+          "TypeScript",
+          "Tailwind CSS"
+        ],
+        "metrics": [
+          {
+            "label": "AI Features",
+            "value": "10+"
+          },
+          {
+            "label": "AI Response Time",
+            "value": "<2 sec"
+          },
+          {
+            "label": "Deployment",
+            "value": "Docker + Nginx"
+          },
+          {
+            "label": "Scalability",
+            "value": "Horizontal Scaling Ready"
+          }
+        ],
+        "githubUrl": "https://github.com/Adarsh-Singh07/EMIVO",
+        "demoUrl": "https://emivo.vercel.app",
+        "status": "In Progress",
+        "featured": true,
+        "priority": {
+          "general": 1,
+          "data-engineer": 99,
+          "ai-engineer": 1
+        }
+      },
+      {
         "id": "on-demand-service-platform-agentic-ai-rag",
         "title": "On-Demand Service Platform with Agentic AI & RAG",
         "description": "Architected a distributed microservices system leveraging REST APIs, Docker, and WebSockets to support concurrent users at scale. Integrated Agentic AI and Retrieval-Augmented Generation (RAG) for dynamic pricing based on live data, projecting an 18% revenue uplift. Developed an LLM-powered chatbot for automated customer support, reducing manual query response time by 60%, and implemented real-time event-driven updates.",
@@ -1555,6 +1731,41 @@
           "general": 4,
           "data-engineer": 99,
           "ai-engineer": 3
+        }
+      },
+      {
+        "id": "interviewos",
+        "title": "InterviewOS",
+        "description": "InterviewOS is an AI-powered mock interview platform that evaluates software engineers in real-time. Built with streaming WebSockets, low-latency audio transcription, and a multi-judge AI evaluation panel (code efficiency, communication style, integrity), InterviewOS delivers objective, instant feedback for technical interviews.",
+        "technologies": [
+          "Python",
+          "FastAPI",
+          "WebSockets",
+          "OpenAI API",
+          "LLMs",
+          "React",
+          "TypeScript",
+          "Tailwind CSS",
+          "Docker"
+        ],
+        "metrics": [
+          {
+            "label": "Evaluation Panel",
+            "value": "3 AI Judges"
+          },
+          {
+            "label": "Audio Stream",
+            "value": "Real-Time WebSockets"
+          }
+        ],
+        "githubUrl": "https://github.com/Adarsh-Singh07",
+        "demoUrl": null,
+        "status": "Completed",
+        "featured": false,
+        "priority": {
+          "general": 2,
+          "data-engineer": 99,
+          "ai-engineer": 2
         }
       }
     ],
