@@ -116,10 +116,8 @@ export default function Hero({ config, isDark }: HeroProps) {
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
 
-              <a
-                href="/api/v1/portfolio/assets/cv.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                to="/resume"
                 className={`py-4 px-9 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-1.5 focus:outline-none transition-transform duration-300 hover:scale-105 cursor-pointer border ${
                   isDark 
                     ? 'border-white/20 text-white hover:bg-white/5' 
@@ -127,7 +125,7 @@ export default function Hero({ config, isDark }: HeroProps) {
                 }`}
               >
                 <span>Resume</span>
-              </a>
+              </Link>
             </motion.div>
 
             {/* Elegant Trust Row Certification Labels */}

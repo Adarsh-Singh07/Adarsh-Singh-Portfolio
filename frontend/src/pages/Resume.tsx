@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { FileText, Briefcase, GraduationCap, Mail, Linkedin, Github, MapPin, Award, Layers } from 'lucide-react';
+import { FileText, Briefcase, GraduationCap, Mail, Linkedin, Github, MapPin, Award, Layers, ExternalLink, Download } from 'lucide-react';
 import { ProfileData } from '../types';
 import SEO from '../components/SEO';
 
@@ -85,15 +85,31 @@ export default function Resume({ profileData, isDark }: ResumeProps) {
             </p>
           </div>
 
-          <a 
-            href="/Adarsh_Singh_CV.pdf" 
-            download 
-            className="px-5 py-3 bg-[#007AFF] hover:bg-[#007AFF]/90 text-white rounded-full flex items-center gap-2.5 text-xs font-semibold shadow-glow cursor-pointer transition-colors"
-            aria-label="Download Resume PDF file"
-          >
-            <FileText className="w-4 h-4" />
-            <span>Download PDF CV</span>
-          </a>
+          <div className="flex flex-wrap items-center gap-3">
+            <a 
+              href="/cv.pdf" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`px-4 py-2.5 rounded-full flex items-center gap-2 text-xs font-semibold border transition-all cursor-pointer ${
+                isDark 
+                  ? 'border-white/20 text-white hover:bg-white/10' 
+                  : 'border-slate-300 text-neutral-900 hover:bg-slate-100'
+              }`}
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span>View Original PDF</span>
+            </a>
+
+            <a 
+              href="/cv.pdf" 
+              download="Adarsh_Singh_CV.pdf" 
+              className="px-5 py-2.5 bg-[#007AFF] hover:bg-[#007AFF]/90 text-white rounded-full flex items-center gap-2 text-xs font-semibold shadow-glow cursor-pointer transition-colors"
+              aria-label="Download Resume PDF file"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Download PDF CV</span>
+            </a>
+          </div>
         </div>
 
         {/* Contact Info Chips */}

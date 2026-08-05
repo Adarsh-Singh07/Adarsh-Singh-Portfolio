@@ -108,10 +108,8 @@ export default function Navbar({ isDark, toggleTheme, currentMode, onModeChange,
             <ThemeToggle isDark={isDark} toggleTheme={toggleTheme} />
 
             {/* view resume dynamic link */}
-            <a
-              href="/api/v1/portfolio/assets/cv.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              to="/resume"
               className={`px-4 py-2 rounded-full text-xs font-medium tracking-wide flex items-center gap-1.5 focus:outline-none transition-all duration-300 cursor-pointer ${
                 isDark 
                   ? 'bg-white text-black hover:bg-neutral-200 border border-transparent hover:shadow-[0_0_15px_rgba(255,255,255,0.25)]' 
@@ -120,7 +118,7 @@ export default function Navbar({ isDark, toggleTheme, currentMode, onModeChange,
             >
               <FileText className="w-3.5 h-3.5" />
               <span>Resume</span>
-            </a>
+            </Link>
 
             {/* Desktop Navigation Links (Collapsed under a single Menu dropdown on the right) */}
             <div 
@@ -312,10 +310,8 @@ export default function Navbar({ isDark, toggleTheme, currentMode, onModeChange,
             </div>
 
             {/* Mobile Call-To-Action Link */}
-            <a
-              href="/api/v1/portfolio/assets/cv.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              to="/resume"
               onClick={() => setMobileMenuOpen(false)}
               className={`w-full py-3 rounded-xl text-xs font-semibold tracking-widest uppercase flex items-center justify-center gap-2 focus:outline-none transition-all duration-300 ${
                 isDark 
@@ -326,7 +322,7 @@ export default function Navbar({ isDark, toggleTheme, currentMode, onModeChange,
               <FileText className="w-4 h-4" />
               <span>View Resume</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
-            </a>
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>

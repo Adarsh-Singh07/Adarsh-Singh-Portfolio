@@ -320,11 +320,11 @@ async def get_avatar():
 
 @app.get("/api/v1/portfolio/assets/cv.pdf")
 async def get_cv():
-    """Serves the custom cv.pdf from GCS mount, falls back to default Adarsh_Singh_CV.pdf."""
+    """Serves the custom cv.pdf file directly, falls back to static frontend URL."""
     cv_path = os.path.join(DATA_DIR, "cv.pdf")
     if os.path.exists(cv_path):
-        return FileResponse(cv_path)
-    return RedirectResponse(url="/Adarsh_Singh_CV.pdf")
+        return FileResponse(cv_path, media_type="application/pdf", filename="Adarsh_Singh_CV.pdf")
+    return RedirectResponse(url="https://adarshsingh.in/Adarsh_Singh_CV.pdf")
 
 def load_profiles():
     """Loads consolidated profile roles from local JSON database."""
