@@ -104,6 +104,7 @@ async def chat(request: ChatRequest, client_request: Request, background_tasks: 
         
     # 2. Manage Session ID
     session_id = request.session_id or str(uuid.uuid4())
+    db.save_chat_session(session_id, request.mode)
     
     api_key = os.environ.get("GEMINI_API_KEY")
     groq_api_key = os.environ.get("GROQ_API_KEY")
