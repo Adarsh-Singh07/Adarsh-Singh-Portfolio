@@ -84,7 +84,7 @@ export default function Dashboard({ isDark }: DashboardProps) {
 
   // Find messages for selected session
   const activeSessionMessages = selectedSessionId 
-    ? logs.sessions.find((s: any) => s.session_id === selectedSessionId)?.messages || []
+    ? logs.sessions.find((s: any) => (s.session_id || s.id) === selectedSessionId)?.messages || []
     : [];
 
   return (
@@ -265,28 +265,31 @@ export default function Dashboard({ isDark }: DashboardProps) {
                 <div className="md:col-span-1 flex flex-col gap-2 max-h-[400px] overflow-y-auto scrollbar-thin pr-2">
                   <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold mb-1">Logged Sessions</span>
                   {logs.sessions && logs.sessions.length > 0 ? (
-                    logs.sessions.map((s: any) => (
-                      <button
-                        key={s.session_id}
-                        onClick={() => setSelectedSessionId(s.session_id)}
-                        className={`p-3 rounded-xl border text-left flex flex-col gap-1 transition-all cursor-pointer ${
-                          selectedSessionId === s.session_id
-                            ? 'bg-[#007AFF]/10 border-[#007AFF]/30 text-white'
-                            : isDark
-                              ? 'bg-neutral-900/30 border-white/5 hover:border-white/10 text-slate-400 hover:text-slate-200'
-                              : 'bg-[#FDFBF7] border-neutral-200 hover:border-neutral-300 text-slate-700'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-mono font-semibold">Session: {(s.session_id || '').substring(0, 8)}...</span>
-                          <span className="text-[10px] font-mono text-slate-500">{(s.messages || []).length} turns</span>
-                        </div>
-                        <div className="flex items-center justify-between text-[9px] font-mono text-slate-500 mt-1">
-                          <span className="capitalize">Mode: {s.role_mode}</span>
-                          <span>{s.created_at?.split(' ')[1] || ''}</span>
-                        </div>
-                      </button>
-                    ))
+                    logs.sessions.map((s: any) => {
+                      const sid = s.session_id || s.id || '';
+                      return (
+                        <button
+                          key={sid}
+                          onClick={() => setSelectedSessionId(sid)}
+                          className={`p-3 rounded-xl border text-left flex flex-col gap-1 transition-all cursor-pointer ${
+                            selectedSessionId === sid
+                              ? 'bg-[#007AFF]/10 border-[#007AFF]/30 text-white'
+                              : isDark
+                                ? 'bg-neutral-900/30 border-white/5 hover:border-white/10 text-slate-400 hover:text-slate-200'
+                                : 'bg-[#FDFBF7] border-neutral-200 hover:border-neutral-300 text-slate-700'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-mono font-semibold">Session: {sid.substring(0, 8)}...</span>
+                            <span className="text-[10px] font-mono text-slate-500">{(s.messages || []).length} turns</span>
+                          </div>
+                          <div className="flex items-center justify-between text-[9px] font-mono text-slate-500 mt-1">
+                            <span className="capitalize">Mode: {s.role_mode}</span>
+                            <span>{s.created_at?.split('T')[1]?.substring(0, 5) || s.created_at?.split(' ')[1] || ''}</span>
+                          </div>
+                        </button>
+                      );
+                    })
                   ) : (
                     <div className="text-center py-8">
                       <span className="text-[10px] font-mono text-slate-500">No sessions recorded yet.</span>

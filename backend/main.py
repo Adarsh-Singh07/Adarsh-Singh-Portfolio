@@ -775,6 +775,7 @@ async def get_analytics_logs(request: Request, passcode: str = Query(default=Non
                 
             sessions_list.append({
                 "id": s["id"],
+                "session_id": s["id"],
                 "created_at": s["created_at"],
                 "role_mode": s["role_mode"],
                 "messages": messages_list
