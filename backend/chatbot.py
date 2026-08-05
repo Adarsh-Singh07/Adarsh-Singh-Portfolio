@@ -175,10 +175,7 @@ async def chat(request: ChatRequest, client_request: Request, background_tasks: 
     # 2. Manage Session ID
     session_id = request.session_id or str(uuid.uuid4())
     
-    # 3. Save User Message to SQLite
-    db.save_chat_message(session_id, "user", request.message)
-    
-    # 4. RAG Retrieval
+    # 3. RAG Retrieval
     knowledge_chunks = rag.search_chunks(request.message, top_k=4)
     context_str = rag.format_context(knowledge_chunks)
     
