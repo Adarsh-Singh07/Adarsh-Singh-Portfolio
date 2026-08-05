@@ -22,6 +22,9 @@ __pycache__/
 backend/data/portfolio.db
 backend/data/contact_messages.json
 backend/data/files_hash.json
+backend/data/admin_credentials.json
+backend/data/avatar.jpg
+backend/data/backups/
 
 # Local Environment secrets
 .env
