@@ -244,28 +244,69 @@ export default function ProjectDetail({ projects, currentMode = 'general', isDar
             Under the Hood: System Overview
           </h2>
           
-          <div className="space-y-6">
-            <h3 className="font-semibold text-base text-[#007AFF]">1. Engineering Objective &amp; Problem Statement</h3>
-            <p className={`text-xs md:text-sm font-light leading-relaxed ${isDark ? 'text-slate-350' : 'text-slate-655'}`}>
-              The implementation addresses critical issues in distributed environments, such as high database transaction latency, data consistency errors during high concurrent spikes, and integration barriers when building AI agent systems. By using event-driven architectures, low-latency API layers, and intelligent orchestration models, this framework ensures production stability at scale.
-            </p>
-          </div>
+          {project.title === "EMIVO" || project.id === "project-1785868472979" ? (
+            <>
+              <div className="space-y-4">
+                <h3 className="font-semibold text-base text-cyan-400 flex items-center gap-2">
+                  <span>1. Product Mission &amp; Problem Statement</span>
+                </h3>
+                <p className={`text-xs md:text-sm font-light leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                  Traditional AI coding tools rely on single-turn text prompts that struggle with large codebases, lack persistent memory, and produce unverified code that breaks during compilation. <strong>EMIVO</strong> solves this by establishing a multi-agent ecosystem where specialized AI roles—Planner, Developer, Code Reviewer, and QA Tester—collaborate asynchronously to design, build, test, and self-heal production-ready software.
+                </p>
+              </div>
 
-          <div className="space-y-6">
-            <h3 className="font-semibold text-base text-[#007AFF]">2. Architecture Design</h3>
-            <p className={`text-xs md:text-sm font-light leading-relaxed ${isDark ? 'text-slate-350' : 'text-slate-655'}`}>
-              The backend leverages a lightweight, asynchronous containerized architecture deployed on high-availability cloud platforms. WebSockets support bidirectional communication, and data streaming loops are processed in parallel configurations. RAG modules query high-dimensional vector databases, and indexing maps ensure near-instant metadata extraction.
-            </p>
-          </div>
+              <div className="space-y-4">
+                <h3 className="font-semibold text-base text-cyan-400 flex items-center gap-2">
+                  <span>2. Multi-Agent Graph Architecture</span>
+                </h3>
+                <p className={`text-xs md:text-sm font-light leading-relaxed mb-3 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                  Built on top of <strong>LangGraph</strong> and stateful Graph Prompting, EMIVO models software engineering as a directed, stateful execution graph:
+                </p>
+                <ul className={`list-disc pl-5 text-xs md:text-sm font-light leading-relaxed space-y-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                  <li><strong>Architect Agent:</strong> Deconstructs product requirements into modular system component specifications.</li>
+                  <li><strong>Developer Agent:</strong> Generates clean, production-grade Python/TypeScript code and API layers.</li>
+                  <li><strong>Reviewer Agent:</strong> Scans code for security vulnerabilities, style compliance, and efficiency bottlenecks.</li>
+                  <li><strong>QA &amp; Test Agent:</strong> Executes syntax checks, simulates runtime execution, and verifies API contracts.</li>
+                </ul>
+              </div>
 
-          <div className="space-y-6">
-            <h3 className="font-semibold text-base text-[#007AFF]">3. Key Challenges &amp; Resolution</h3>
-            <ul className={`list-disc pl-5 text-xs md:text-sm font-light leading-relaxed space-y-2.5 ${isDark ? 'text-slate-350' : 'text-slate-655'}`}>
-              <li><strong>Cold Start Latency:</strong> Optimized container scaling rules and memory boundaries to achieve faster boot responses.</li>
-              <li><strong>Database Lockups:</strong> Structured indices and query parameters to avoid full-table scans.</li>
-              <li><strong>Context Window Management:</strong> Built dynamic context token packing algorithms to limit processing costs in LLM retrieval tasks.</li>
-            </ul>
-          </div>
+              <div className="space-y-4">
+                <h3 className="font-semibold text-base text-cyan-400 flex items-center gap-2">
+                  <span>3. Key Technical Innovations</span>
+                </h3>
+                <ul className={`list-disc pl-5 text-xs md:text-sm font-light leading-relaxed space-y-2.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                  <li><strong>Self-Healing Iterative Loops:</strong> When an error or lint violation is detected by the Reviewer, feedback automatically loops back to the Developer agent for self-correction without human intervention.</li>
+                  <li><strong>Context Token Optimization:</strong> Dynamic token packing algorithms preserve full codebase context while keeping LLM retrieval fast and cost-effective.</li>
+                  <li><strong>Live Streaming Workflows:</strong> Real-time WebSockets stream multi-agent progress, code generation, and terminal logs live to the user dashboard.</li>
+                </ul>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="space-y-6">
+                <h3 className="font-semibold text-base text-[#007AFF]">1. Engineering Objective &amp; Problem Statement</h3>
+                <p className={`text-xs md:text-sm font-light leading-relaxed ${isDark ? 'text-slate-350' : 'text-slate-655'}`}>
+                  The implementation addresses critical issues in distributed environments, such as high database transaction latency, data consistency errors during high concurrent spikes, and integration barriers when building AI agent systems. By using event-driven architectures, low-latency API layers, and intelligent orchestration models, this framework ensures production stability at scale.
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                <h3 className="font-semibold text-base text-[#007AFF]">2. Architecture Design</h3>
+                <p className={`text-xs md:text-sm font-light leading-relaxed ${isDark ? 'text-slate-350' : 'text-slate-655'}`}>
+                  The backend leverages a lightweight, asynchronous containerized architecture deployed on high-availability cloud platforms. WebSockets support bidirectional communication, and data streaming loops are processed in parallel configurations. RAG modules query high-dimensional vector databases, and indexing maps ensure near-instant metadata extraction.
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                <h3 className="font-semibold text-base text-[#007AFF]">3. Key Challenges &amp; Resolution</h3>
+                <ul className={`list-disc pl-5 text-xs md:text-sm font-light leading-relaxed space-y-2.5 ${isDark ? 'text-slate-350' : 'text-slate-655'}`}>
+                  <li><strong>Cold Start Latency:</strong> Optimized container scaling rules and memory boundaries to achieve faster boot responses.</li>
+                  <li><strong>Database Lockups:</strong> Structured indices and query parameters to avoid full-table scans.</li>
+                  <li><strong>Context Window Management:</strong> Built dynamic context token packing algorithms to limit processing costs in LLM retrieval tasks.</li>
+                </ul>
+              </div>
+            </>
+          )}
         </section>
       </div>
 
