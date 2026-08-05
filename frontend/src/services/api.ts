@@ -7,7 +7,7 @@ import { generalProfile, dataEngineerProfile } from '../data/profileModes';
  */
 export class PortfolioService {
   private static useMock = false;
-  private static apiBaseUrl = '/api/v1/portfolio';
+  private static apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.adarshsingh.in/api/v1/portfolio';
 
   /**
    * Retrieves profile data based on state or active mode.
