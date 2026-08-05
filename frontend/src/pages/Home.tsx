@@ -231,7 +231,7 @@ export default function Home({ config, homeCards = [], currentMode, isDark, onRe
           
           {/* Flagship Featured Showcase: EMIVO */}
           <div className="mb-14">
-            <Link to="/projects/project-1785868472979">
+            <Link to="/projects/emivo">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

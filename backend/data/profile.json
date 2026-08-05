@@ -60,9 +60,9 @@
         "status": "Beta",
         "featured": true,
         "priority": {
-          "general": 2,
+          "general": 5,
           "data-engineer": 4,
-          "ai-engineer": 2
+          "ai-engineer": 4
         }
       },
       {
@@ -78,14 +78,14 @@
           "SMTP"
         ],
         "metrics": [],
-        "githubUrl": "https://github.com/Adarsh-Singh07/email-campaign-automation",
+        "githubUrl": "",
         "demoUrl": null,
-        "status": "Deployed",
+        "status": "Beta",
         "featured": false,
         "priority": {
-          "general": 3,
+          "general": 4,
           "data-engineer": 3,
-          "ai-engineer": 2
+          "ai-engineer": 4
         }
       },
       {
@@ -99,13 +99,18 @@
           "NLP",
           "Google TTS"
         ],
-        "metrics": [],
+        "metrics": [
+          {
+            "value": "~90 %",
+            "label": "Accuracy"
+          }
+        ],
         "githubUrl": "https://github.com/Adarsh-Singh07/isl-translation-system",
-        "demoUrl": null,
+        "demoUrl": "https://isl.adarshsingh.in",
         "status": "Deployed",
         "featured": false,
         "priority": {
-          "general": 4,
+          "general": 3,
           "data-engineer": 99,
           "ai-engineer": 3
         }
@@ -125,30 +130,22 @@
         ],
         "metrics": [
           {
-            "label": "Ingestion Rate",
-            "value": "1.2M req/m"
-          },
-          {
             "label": "Query Latency",
             "value": "<2.5s"
-          },
-          {
-            "label": "Data Volume",
-            "value": "12TB+"
           }
         ],
-        "githubUrl": "https://github.com/Adarsh-Singh07/financial-lakehouse-etl",
+        "githubUrl": "",
         "demoUrl": null,
-        "status": "Deployed",
+        "status": "Beta",
         "featured": false,
         "priority": {
-          "general": 2,
-          "data-engineer": 1,
+          "general": 4,
+          "data-engineer": 2,
           "ai-engineer": 99
         }
       },
       {
-        "id": "project-1785868472979",
+        "id": "emivo",
         "title": "EMIVO",
         "description": "EMIVO is an AI-native, enterprise-grade eCommerce SaaS platform built to help businesses launch and manage modern online stores with intelligent automation. The platform combines a high-performance shopping experience with AI-powered product management, conversational shopping assistants, automated content generation, smart search, and business analytics. Designed using a scalable microservice architecture, EMIVO supports multi-tenant deployments, secure authentication, real-time inventory management, order processing, and cloud-native infrastructure, making it suitable for startups, SMEs, and enterprise retailers.\n\nEMIVO is currently under active development. The public demo showcases the evolving frontend & architecture while AI orchestration pipelines are continuously upgraded.",
         "technologies": [
@@ -205,28 +202,38 @@
         "title": "InterviewOS",
         "description": "InterviewOS is an AI-powered mock interview platform that evaluates software engineers in real-time. Built with streaming WebSockets, low-latency audio transcription, and a multi-judge AI evaluation panel (code efficiency, communication style, integrity), InterviewOS delivers objective, instant feedback for technical interviews.",
         "technologies": [
-          "Python",
           "FastAPI",
-          "WebSockets",
-          "OpenAI API",
-          "LLMs",
+          "Python",
           "React",
           "TypeScript",
+          "PostgreSQL",
+          "WebSockets",
+          "Docker",
+          "Redis",
+          "OpenAI API",
+          "Groq API",
+          "Whisper",
+          "Qdrant",
+          "JWT Authentication",
           "Tailwind CSS",
-          "Docker"
+          "Nginx"
         ],
         "metrics": [
           {
-            "label": "Evaluation Panel",
-            "value": "3 AI Judges"
+            "label": "AI Models Supported",
+            "value": "OpenAI, Groq, Gemini"
           },
           {
-            "label": "Audio Stream",
-            "value": "Real-Time WebSockets"
+            "value": "< 500 ms",
+            "label": "Speech-to-Text Latency"
+          },
+          {
+            "value": "< 1 sec",
+            "label": "AI Response Latency"
           }
         ],
         "githubUrl": "https://github.com/Adarsh-Singh07",
-        "demoUrl": null,
+        "demoUrl": "https://interviewos.adarshsingh.in",
         "status": "Completed",
         "featured": false,
         "priority": {
@@ -879,7 +886,7 @@
     },
     "projects": [
       {
-        "id": "project-1785868472979",
+        "id": "emivo",
         "title": "EMIVO",
         "description": "EMIVO is an AI-native, enterprise-grade eCommerce SaaS platform built to help businesses launch and manage modern online stores with intelligent automation. The platform combines a high-performance shopping experience with AI-powered product management, conversational shopping assistants, automated content generation, smart search, and business analytics. Designed using a scalable microservice architecture, EMIVO supports multi-tenant deployments, secure authentication, real-time inventory management, order processing, and cloud-native infrastructure, making it suitable for startups, SMEs, and enterprise retailers.\n\nEMIVO is currently under active development. The public demo showcases the evolving frontend & architecture while AI orchestration pipelines are continuously upgraded.",
         "technologies": [
@@ -1602,7 +1609,7 @@
     },
     "projects": [
       {
-        "id": "project-1785868472979",
+        "id": "emivo",
         "title": "EMIVO",
         "description": "EMIVO is an AI-native, enterprise-grade eCommerce SaaS platform built to help businesses launch and manage modern online stores with intelligent automation. The platform combines a high-performance shopping experience with AI-powered product management, conversational shopping assistants, automated content generation, smart search, and business analytics. Designed using a scalable microservice architecture, EMIVO supports multi-tenant deployments, secure authentication, real-time inventory management, order processing, and cloud-native infrastructure, making it suitable for startups, SMEs, and enterprise retailers.\n\nEMIVO is currently under active development. The public demo showcases the evolving frontend & architecture while AI orchestration pipelines are continuously upgraded.",
         "technologies": [

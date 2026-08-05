@@ -244,7 +244,7 @@ export default function ProjectDetail({ projects, currentMode = 'general', isDar
             Under the Hood: System Overview
           </h2>
           
-          {project.title === "EMIVO" || project.id === "project-1785868472979" ? (
+          {project.title === "EMIVO" || project.id === "emivo" ? (
             <>
               <div className="space-y-4">
                 <h3 className="font-semibold text-base text-cyan-400 flex items-center gap-2">
