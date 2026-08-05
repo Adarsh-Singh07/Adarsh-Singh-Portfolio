@@ -228,6 +228,66 @@ export default function Home({ config, homeCards = [], currentMode, isDark, onRe
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] rounded-full filter blur-[150px] opacity-10 bg-[#007AFF]/20 pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 w-full">
+          
+          {/* Flagship Featured Showcase: EMIVO */}
+          <div className="mb-14">
+            <Link to="/projects/project-1785868472979">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={{ scale: 1.01, y: -4 }}
+                transition={{ duration: 0.4 }}
+                className={`relative p-8 md:p-10 rounded-[36px] border overflow-hidden cursor-pointer group transition-all duration-500 ${
+                  isDark 
+                    ? 'bg-gradient-to-br from-neutral-900/90 via-neutral-950/90 to-slate-950 border-cyan-500/25 hover:border-cyan-400/60 shadow-[0_0_50px_rgba(0,229,255,0.08)]' 
+                    : 'bg-gradient-to-br from-white via-sky-50/50 to-slate-50 border-sky-300 hover:border-sky-500 shadow-[0_20px_40px_rgba(0,122,255,0.06)]'
+                }`}
+              >
+                {/* Background ambient glow */}
+                <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-cyan-500/10 filter blur-[80px] pointer-events-none group-hover:bg-cyan-500/20 transition-all duration-500" />
+                
+                <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                  <div className="max-w-2xl">
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                        <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                        Building EMIVO
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest font-semibold">
+                        Flagship AI Project
+                      </span>
+                    </div>
+
+                    <h3 className="text-2xl md:text-3xl font-sans font-bold tracking-tight mb-3 group-hover:text-cyan-400 transition-colors duration-300">
+                      EMIVO — Autonomous AI Software Engineering Platform
+                    </h3>
+
+                    <p className={`text-sm font-light leading-relaxed mb-5 ${isDark ? 'text-slate-300' : 'text-slate-650'}`}>
+                      An AI-native multi-agent development environment powered by LangGraph, Graph Prompting, and specialized AI agents that collaborate to plan, generate, test, and evolve production-ready software autonomously.
+                    </p>
+
+                    <div className="flex flex-wrap gap-2 text-[10px] font-mono">
+                      {['LangGraph', 'Graph Prompting', 'Multi-Agent AI', 'FastAPI', 'Next.js', 'Vercel'].map(tech => (
+                        <span key={tech} className={`px-2.5 py-1 rounded-lg border ${
+                          isDark ? 'bg-white/5 border-white/10 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
+                        }`}>
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 self-end md:self-center">
+                    <span className="px-6 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg group-hover:shadow-cyan-500/30 transition-all duration-300 flex items-center gap-2">
+                      <span>Explore EMIVO</span>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            </Link>
+          </div>
+
           {/* Section Heading */}
           <div className="mb-12 text-left">
             <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#007AFF] block mb-2">

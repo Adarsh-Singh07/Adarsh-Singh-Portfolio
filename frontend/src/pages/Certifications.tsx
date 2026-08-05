@@ -46,9 +46,16 @@ const GoogleCloudLogo = ({ className = "w-5.5 h-5.5" }: { className?: string }) 
   </svg>
 );
 
-const AWSLogo = ({ className = "w-6 h-6" }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M12.2 20.9c-4.9 0-8.9-3-8.9-6.7 0-2.3 1.6-4.3 4.1-5.4.3-.1.6.1.6.4v.1c0 .2-.1.4-.4.5C5.5 10.7 4.3 12.3 4.3 14.2c0 3 3.5 5.5 7.9 5.5.9 0 1.8-.1 2.6-.4.3-.1.6.1.7.3.1.2 0 .5-.2.6-.9.4-2 .7-3.1.7zm5.5-3.6c-.3 0-.6-.2-.7-.4l-2.4-3.8c-.1-.2-.1-.4 0-.6s.3-.3.5-.3h4.7c.3 0 .5.1.6.3s.1.4 0 .6l-2.4 3.8c-.1.2-.2.4-.3.4zm.5-8.5v3.1c0 .4-.3.7-.7.7h-3.1c-.4 0-.7-.3-.7-.7V8.8c0-.4.3-.7.7-.7H17.5c.4 0 .7.3.7.7z" fill="#FF9900"/>
+const AWSLogo = ({ className = "w-7 h-7" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path fill="#FF9900" d="M18.74 19.38c-2.4 1.77-5.88 2.7-8.91 2.7-4.23 0-8.04-1.56-10.89-4.17-.24-.21-.03-.51.24-.36 3.09 1.77 6.9 2.82 10.83 2.82 2.67 0 5.61-.63 8.22-1.92.39-.21.75.27.51.93zm1.14-1.89c-.33-.42-1.2-1.02-1.62-1.53-.12-.15.03-.27.18-.18 1.05.6 2.79 1.74 3.03 2.07.24.33.09.63-.3.63-.24 0-.84-.45-1.29-.99z"/>
+    <path fill="#FF9900" d="M6.86 11.53c0 .87-.15 1.53-.45 1.98-.3.45-.75.68-1.35.68-.54 0-.96-.2-1.26-.6-.3-.4-.45-1.01-.45-1.83 0-.87.15-1.54.45-2 .3-.46.72-.69 1.26-.69.57 0 1 .22 1.3.66.3.44.45 1.04.45 1.8zm2.46.12c0-1.44-.36-2.58-1.08-3.42C7.52 7.39 6.5 6.97 5.18 6.97c-.72 0-1.38.15-1.98.45V4.2H1.04v10.59h2.16v-.9c.63.42 1.35.63 2.16.63 1.23 0 2.22-.45 2.97-1.35.75-.9 1.13-2.06 1.13-3.48zm5.58 3.12l-2.04-7.44h-2.19l-2.07 7.44h2.1l.39-1.56h1.83l.36 1.56h2.02zm-3.21-3.21l.54-2.31h.06l.54 2.31h-1.14zm11.25-4.23c-.39-.18-.9-.27-1.53-.27-1.11 0-1.92.36-2.43 1.08v-.81h-2.16v7.44h2.16v-3.75c0-.66.15-1.17.45-1.53.3-.36.72-.54 1.26-.54.39 0 .69.06.9.18l.35-1.8z"/>
+  </svg>
+);
+
+const IBMLogo = ({ className = "w-6 h-6" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+    <path fill="#0f62fe" d="M0 6h8v2H0zm0 4h8v2H0zm0 4h8v2H0zm0 4h8v2H0zm0 4h8v2H0zm12-16h8v2h-8zm0 4h8v2h-8zm0 4h8v2h-8zm0 4h8v2h-8zm0 4h8v2h-8zm12-16h8v2h-8zm0 4h8v2h-8zm0 4h8v2h-8zm0 4h8v2h-8zm0 4h8v2h-8z"/>
   </svg>
 );
 
@@ -59,10 +66,10 @@ const CourseraLogo = ({ className = "w-5.5 h-5.5" }: { className?: string }) => 
   </svg>
 );
 
-const getIssuerTheme = (issuer: string, isDark: boolean) => {
-  const norm = (issuer || '').toLowerCase();
+const getIssuerTheme = (issuer: string, title: string = '', isDark: boolean = true) => {
+  const norm = (issuer + ' ' + title).toLowerCase();
   
-  if (norm.includes('google') || norm.includes('gcp') || norm.includes('cloud')) {
+  if (norm.includes('google') || norm.includes('gcp')) {
     return {
       glow: 'hover:shadow-[0_0_35px_-5px_rgba(66,133,244,0.18)]',
       borderHover: 'hover:border-[#4285F4]/40 dark:hover:border-[#4285F4]/55',
@@ -75,6 +82,19 @@ const getIssuerTheme = (issuer: string, isDark: boolean) => {
     };
   }
   
+  if (norm.includes('ibm')) {
+    return {
+      glow: 'hover:shadow-[0_0_35px_-5px_rgba(15,98,254,0.18)]',
+      borderHover: 'hover:border-[#0f62fe]/40 dark:hover:border-[#0f62fe]/55',
+      logoBtn: (
+        <div className="w-12 h-12 rounded-2xl bg-[#0f62fe]/10 border border-[#0f62fe]/20 flex items-center justify-center text-[#0f62fe] transition-all duration-300">
+          <IBMLogo />
+        </div>
+      ),
+      accentColor: '#0f62fe'
+    };
+  }
+
   if (norm.includes('microsoft') || norm.includes('azure')) {
     return {
       glow: 'hover:shadow-[0_0_35px_-5px_rgba(127,186,0,0.18)]',
@@ -283,7 +303,7 @@ export default function Certifications({ certifications, currentMode, isDark, on
         {sortedCerts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {sortedCerts.map((cert) => {
-              const theme = getIssuerTheme(cert.issuer, isDark);
+              const theme = getIssuerTheme(cert.issuer, cert.title, isDark);
               const fallbackId = `fallback-badge-${cert.id}`;
               
               return (
