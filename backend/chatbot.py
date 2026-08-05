@@ -355,8 +355,6 @@ Here is my official CV & Portfolio Knowledge Base context:
         # Cost math for gemini-2.5-flash: $0.075 / 1M input, $0.30 / 1M output
         cost_est = (tokens_input * 0.075 / 1_000_000) + (tokens_output * 0.30 / 1_000_000)
         
-        response_text = response.text
-        
         # 1. Parse unanswered questions
         if "[UNANSWERED]" in response_text:
             response_text = response_text.replace("[UNANSWERED]", "").strip()
