@@ -12,6 +12,7 @@ import Navbar from './components/Navbar';
 import Breadcrumbs from './components/Breadcrumbs';
 import { Loader2 } from 'lucide-react';
 import Chatbot from './components/Chatbot';
+import SmoothScroll from './components/SmoothScroll';
 
 // Lazy load route pages for performance & LCP bundles optimizations
 const Home = lazy(() => import('./pages/Home'));
@@ -75,7 +76,7 @@ function AnimatedRoutes({
         className="w-full flex-grow"
       >
         <Routes location={location}>
-          <Route path="/" element={<Home config={profileData.hero} homeCards={profileData.homeCards} currentMode={currentMode} isDark={isDark} onRefreshData={onRefreshData} />} />
+          <Route path="/" element={<Home config={profileData.hero} homeCards={profileData.homeCards} projects={profileData.projects} currentMode={currentMode} isDark={isDark} onRefreshData={onRefreshData} />} />
           <Route path="/projects" element={<Projects projects={profileData.projects} currentMode={currentMode} isDark={isDark} onRefreshData={onRefreshData} />} />
           <Route path="/skills" element={<Skills categories={profileData.skills} strengths={profileData.strengths || []} currentMode={currentMode} isDark={isDark} onRefreshData={onRefreshData} />} />
           <Route path="/certifications" element={<Certifications certifications={profileData.certifications} currentMode={currentMode} isDark={isDark} onRefreshData={onRefreshData} />} />
@@ -177,60 +178,62 @@ export default function App() {
   return (
     <MotionConfig reducedMotion="user">
       <BrowserRouter>
-        <AnalyticsTracker />
-        <div className={`min-h-screen flex flex-col relative font-sans transition-colors duration-200 overflow-x-hidden ${
-          isDark ? 'bg-[#121212] text-slate-100' : 'bg-[#FDFBF7] text-neutral-900'
-        }`}>
-          
-          {/* Global sticky persistent glass Navbar */}
-          <Navbar 
-            isDark={isDark} 
-            toggleTheme={toggleTheme} 
-            currentMode={currentMode} 
-            onModeChange={handleModeChange} 
-            rolesList={roles}
-          />
+        <SmoothScroll>
+          <AnalyticsTracker />
+          <div className={`min-h-screen flex flex-col relative font-sans transition-colors duration-200 overflow-x-hidden ${
+            isDark ? 'bg-[#121212] text-slate-100' : 'bg-[#FDFBF7] text-neutral-900'
+          }`}>
+            
+            {/* Global sticky persistent glass Navbar */}
+            <Navbar 
+              isDark={isDark} 
+              toggleTheme={toggleTheme} 
+              currentMode={currentMode} 
+              onModeChange={handleModeChange} 
+              rolesList={roles}
+            />
 
-          {profileData ? (
-            <main className="relative flex-grow flex flex-col justify-start">
-              {loading && (
-                <div className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#00E5FF] via-indigo-500 to-pink-500 animate-pulse z-[60]" />
-              )}
-              <Breadcrumbs isDark={isDark} />
-              <Suspense fallback={
-                <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-                  <Loader2 className="w-8 h-8 animate-spin text-[#007AFF]" />
-                </div>
-              }>
-                <AnimatedRoutes 
-                  profileData={profileData} 
-                  currentMode={currentMode} 
-                  isDark={isDark} 
-                  onRefreshData={() => setRefreshTrigger(prev => prev + 1)}
-                />
-              </Suspense>
-            </main>
-          ) : loading ? (
-            <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#121212] text-white">
-              <Loader2 className="w-8 h-8 animate-spin text-sky-400 mb-4" />
-              <span className="font-display text-xs tracking-widest uppercase">Initializing Adarsh Singh Portfolio...</span>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center h-screen flex-grow">
-              <div className="text-center">
-                <span className="font-display font-medium text-red-500 text-sm block mb-2">Architectural Loading Fault</span>
-                <button 
-                  onClick={() => setCurrentMode('general')}
-                  className="px-4 py-2 border rounded-full text-xs hover:bg-neutral-800 hover:text-white"
-                >
-                  Reset Core Engine State
-                </button>
+            {profileData ? (
+              <main className="relative flex-grow flex flex-col justify-start">
+                {loading && (
+                  <div className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#00E5FF] via-indigo-500 to-pink-500 animate-pulse z-[60]" />
+                )}
+                <Breadcrumbs isDark={isDark} />
+                <Suspense fallback={
+                  <div className="flex-grow flex items-center justify-center min-h-[50vh]">
+                    <Loader2 className="w-8 h-8 animate-spin text-[#007AFF]" />
+                  </div>
+                }>
+                  <AnimatedRoutes 
+                    profileData={profileData} 
+                    currentMode={currentMode} 
+                    isDark={isDark} 
+                    onRefreshData={() => setRefreshTrigger(prev => prev + 1)}
+                  />
+                </Suspense>
+              </main>
+            ) : loading ? (
+              <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#121212] text-white">
+                <Loader2 className="w-8 h-8 animate-spin text-sky-400 mb-4" />
+                <span className="font-display text-xs tracking-widest uppercase">Initializing Adarsh Singh Portfolio...</span>
               </div>
-            </div>
-          )}
-          {/* Global Gen AI Chatbot representing Adarsh */}
-          <Chatbot isDark={isDark} currentMode={currentMode} />
-        </div>
+            ) : (
+              <div className="flex items-center justify-center h-screen flex-grow">
+                <div className="text-center">
+                  <span className="font-display font-medium text-red-500 text-sm block mb-2">Architectural Loading Fault</span>
+                  <button 
+                    onClick={() => setCurrentMode('general')}
+                    className="px-4 py-2 border rounded-full text-xs hover:bg-neutral-800 hover:text-white"
+                  >
+                    Reset Core Engine State
+                  </button>
+                </div>
+              </div>
+            )}
+            {/* Global Gen AI Chatbot representing Adarsh */}
+            <Chatbot isDark={isDark} currentMode={currentMode} />
+          </div>
+        </SmoothScroll>
       </BrowserRouter>
     </MotionConfig>
   );

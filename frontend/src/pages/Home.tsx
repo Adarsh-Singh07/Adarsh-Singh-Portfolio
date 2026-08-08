@@ -6,9 +6,10 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { HeroConfig, HomeCard, ProfileMode } from '../types';
+import { HeroConfig, HomeCard, ProfileMode, Project } from '../types';
 import Hero from '../sections/Hero';
 import SEO from '../components/SEO';
+import HorizontalScrollShowcase from '../components/HorizontalScrollShowcase';
 import { Sparkles, Award, Database, Cpu, MessageSquare, Mail, Layers, ArrowRight } from 'lucide-react';
 import DetailEditModal from '../components/DetailEditModal';
 import PortfolioService from '../services/api';
@@ -16,12 +17,13 @@ import PortfolioService from '../services/api';
 interface HomeProps {
   config: HeroConfig;
   homeCards?: HomeCard[];
+  projects?: Project[];
   currentMode: ProfileMode;
   isDark: boolean;
   onRefreshData?: () => void;
 }
 
-export default function Home({ config, homeCards = [], currentMode, isDark, onRefreshData }: HomeProps) {
+export default function Home({ config, homeCards = [], projects = [], currentMode, isDark, onRefreshData }: HomeProps) {
   const [selectedCard, setSelectedCard] = useState<HomeCard | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(null);
@@ -380,6 +382,11 @@ export default function Home({ config, homeCards = [], currentMode, isDark, onRe
           )}
         </div>
       </section>
+
+      {/* Dual-Axis Lenis Horizontal Smooth Scroll Showcase */}
+      {projects && projects.length > 0 && (
+        <HorizontalScrollShowcase projects={projects} isDark={isDark} />
+      )}
 
       {/* FAQ Accordion Section for SEO & LLM Scraping */}
       <section className={`py-16 md:py-24 border-t relative overflow-hidden transition-colors duration-200 ${
