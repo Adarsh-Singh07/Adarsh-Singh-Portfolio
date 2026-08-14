@@ -6,41 +6,53 @@ coverage/
 .yarn/
 .pnpm-store/
 
-# Python Virtual Environment and cache
-backend/.venv/
-.venv/
-venv/
-ENV/
-__pycache__/
+# Python
 **/__pycache__/
 *.pyc
 *.pyo
 *.pyd
+.venv/
+venv/
+ENV/
+backend/.venv/
 .pytest_cache/
+**/.pytest_cache/
 
-# Databases and transient client-generated records
-backend/data/portfolio.db
-backend/data/contact_messages.json
-backend/data/files_hash.json
-backend/data/admin_credentials.json
-backend/data/avatar.jpg
-backend/data/backups/
-
-# Local Environment secrets
+# Secrets / environment
 .env
 .env.local
 .env.*.local
 !.env.example
+backend/.env
+backend/.env.local
+backend/.env.*.local
+backend/.env.backup*
 
-# OS metadata and logs
+# Runtime data and databases
+backend/data/
+backend/*.log
+**/*.log
+
+# Test artifacts outside the test package
+backend/test_*.py
+
+# Deployment/runtime scripts that may embed host-specific values
+# backend/setup_vps.sh and backend/setup_domain.sh are intentionally kept in source control
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS metadata
 .DS_Store
 Thumbs.db
-*.log
 .firebase/
 .antigravity/
 PROGRESS_TRACKER.md
 .agents/
 
-
-
-.agents/
+# Docker secrets/runtime overrides
+docker-compose.override.yml
+.secrets/

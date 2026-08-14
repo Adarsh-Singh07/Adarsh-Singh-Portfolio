@@ -19,9 +19,12 @@ if os.path.exists(dotenv_path):
 import db
 import rag
 from chatbot import router as chatbot_router
+from email_engine.router import router as email_router
+from email_engine import db as email_db
 
 app = FastAPI(title="Adarsh Singh Portfolio Core API", version="1.0.0")
 app.include_router(chatbot_router)
+app.include_router(email_router)
 
 # Resolve admin passcode securely at startup
 admin_pass = os.environ.get("ADMIN_PASSCODE")
@@ -79,6 +82,7 @@ SMTP_CONFIG_JSON = os.path.join(DATA_DIR, "smtp_config.json")
 def on_startup():
     """Initializes SQLite database and triggers RAG semantic index generation on launch."""
     db.init_db()
+    email_db.init_email_db()
     api_key = os.environ.get("GEMINI_API_KEY")
     if api_key:
         try:
@@ -618,20 +622,48 @@ async def submit_contact(payload: ContactPayload, background_tasks: BackgroundTa
         intent_category=intent_category
     )
         
-    # Attempt background SMTP dispatch
+    # Attempt background dispatch via the configured email provider (Zoho default / Lark when configured)
     background_tasks.add_task(
-        send_outreach_email, 
+        _dispatch_contact_email,
         payload.name,
         payload.email,
         payload.subject,
         payload.message,
         intent_category
     )
-        
+    
     return {
         "success": True, 
         "message": "Transmission secured. Adarsh will reach out within 24 hours."
     }
+
+
+async def _dispatch_contact_email(name: str, email: str, subject: str, message: str, intent_category: str):
+    """
+    Dispatches the contact-form acknowledgement + admin notification through the
+    configured email provider. Zoho remains the default until EMAIL_PROVIDER=lark
+    is verified with live credentials. Never raises into the request path.
+    """
+    provider_name = os.getenv("EMAIL_PROVIDER", "zoho").lower()
+    try:
+        if provider_name == "lark":
+            from email_engine.zoho_provider import get_email_provider
+            provider = get_email_provider()
+            from_email = "contact@adarshsingh.in"
+            body_html = f"<p>Hi {html.escape(name)},</p><p>Thanks for reaching out via adarshsingh.in. We've received your message and will respond within 24 hours.</p>"
+            await provider.send_message(
+                to=[email],
+                subject="Thank you for contacting Adarsh Singh",
+                body_html=body_html,
+                body_text="Thanks for reaching out! We received your message.",
+                from_email=from_email,
+                reply_to="contact@adarshsingh.in",
+            )
+        else:
+            # Legacy Zoho/Resend path (unchanged behavior)
+            send_outreach_email(name, email, subject, message, intent_category)
+    except Exception as e:
+        print(f"Contact email dispatch failed ({provider_name}): {e}")
 
 # --- ANALYTICS & RAG OBSERVABILITY ENDPOINTS ---
 
@@ -1022,3 +1054,6 @@ if __name__ == "__main__":
     import uvicorn
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+
+from social_jobs_router import router as social_jobs_router
+app.include_router(social_jobs_router)
