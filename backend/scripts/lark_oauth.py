@@ -23,7 +23,8 @@ SCOPES = (
     "mail:user_mailbox.message:send "
     "mail:event "
     "mail:user_mailbox.event.mail_address:read "
-    "mail:user_mailbox"
+    "mail:user_mailbox "
+    "offline_access"
 )
 
 
