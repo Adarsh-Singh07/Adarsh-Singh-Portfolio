@@ -21,7 +21,8 @@ TOKEN_URL = f"{LARK_DOMAIN}/open-apis/authen/v2/oauth/token"
 SCOPES = (
     "mail:user_mailbox.message:readonly "
     "mail:user_mailbox.message:send "
-    "mail:user_mailbox.event:subscribe "
+    "mail:event "
+    "mail:user_mailbox.event.mail_address:read "
     "mail:user_mailbox"
 )
 
