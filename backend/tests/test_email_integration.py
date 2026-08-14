@@ -49,8 +49,10 @@ class TestLarkAuth:
         url = auth.build_oauth_url("https://api.adarshsingh.in/api/v1/portfolio/email/lark/oauth/callback")
         assert "mail:user_mailbox.message:readonly" in url
         assert "mail:user_mailbox.message:send" in url
-        assert "mail:user_mailbox.event:subscribe" in url
+        assert "mail:event" in url
+        assert "mail:user_mailbox.event.mail_address:read" in url
         assert "mail:user_mailbox" in url
+        assert "offline_access" in url
 
     def test_build_oauth_url_contains_expected_fields(self):
         auth = LarkAuth()
