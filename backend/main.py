@@ -76,11 +76,36 @@ async def add_security_headers(request: Request, call_next):
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 PROFILE_JSON = os.path.join(DATA_DIR, "profile.json")
 MESSAGES_JSON = os.path.join(DATA_DIR, "contact_messages.json")
-SMTP_CONFIG_JSON = os.path.join(DATA_DIR, "smtp_config.json")
+MESSAGES_JSON = os.path.join(DATA_DIR, "contact_messages.json")
+
+async def token_lifecycle_loop():
+    """Background task to proactively refresh Lark Mail tokens before they expire."""
+    import time
+    import asyncio
+    from lark.auth import LarkAuth
+    
+    while True:
+        try:
+            auth = LarkAuth()
+            data = auth._load_tokens()
+            if data and "expires_at" in data:
+                # If less than 15 minutes to expiration, force refresh
+                if time.time() > data["expires_at"] - 900:
+                    print("Lark token nearing expiry. Proactively refreshing...")
+                    await auth.refresh_user_token(force=True)
+            elif data and "refresh_token" in data and "expires_at" not in data:
+                print("Lark token missing expires_at. Proactively refreshing to fix...")
+                await auth.refresh_user_token(force=True)
+        except Exception as e:
+            pass # Silently ignore auth initialization errors if not configured yet
+            
+        # Check every 2 minutes
+        await asyncio.sleep(120)
 
 @app.on_event("startup")
-def on_startup():
+async def on_startup():
     """Initializes SQLite database and triggers RAG semantic index generation on launch."""
+    import asyncio
     db.init_db()
     email_db.init_email_db()
     api_key = os.environ.get("GEMINI_API_KEY")
@@ -91,6 +116,9 @@ def on_startup():
             print(f"Database indexing on startup failed: {e}")
     else:
         print("GEMINI_API_KEY is not defined in environment. RAG indexing skipped.")
+    
+    # Start the token lifecycle background task
+    asyncio.create_task(token_lifecycle_loop())
 
 # Admin credentials resolving & hashing
 ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
@@ -361,14 +389,6 @@ class ContactPayload(BaseModel):
 class PasscodePayload(BaseModel):
     passcode: str
 
-class SmtpConfigPayload(BaseModel):
-    SMTP_HOST: str
-    SMTP_PORT: int
-    SMTP_USER: str
-    SMTP_PASSWORD: str
-    SMTP_TO: str
-    RESEND_API_KEY: str
-    RESEND_FROM: str
 
 class RoleCreatePayload(BaseModel):
     id: str
@@ -460,68 +480,6 @@ async def add_or_update_role(payload: RoleCreatePayload, request: Request):
         
     return {"success": True, "message": f"Role '{payload.label}' configured successfully."}
 
-@app.get("/api/v1/portfolio/admin/smtp")
-async def get_smtp_settings(request: Request):
-    """Retrieves current SMTP and Resend configuration (passwords masked)."""
-    token = get_token_from_request(request)
-    if not verify_session_token(token):
-        raise HTTPException(status_code=401, detail="Unauthorized session.")
-        
-    from mail_helper import get_smtp_config
-    cfg = get_smtp_config()
-    
-    password_mask = "********" if cfg["password"] else ""
-    resend_key_mask = "********" if cfg["resend_api_key"] else ""
-    
-    return {
-        "SMTP_HOST": cfg["host"] or "",
-        "SMTP_PORT": cfg["port"],
-        "SMTP_USER": cfg["user"] or "",
-        "SMTP_PASSWORD": password_mask,
-        "SMTP_TO": cfg["to"] or "",
-        "RESEND_API_KEY": resend_key_mask,
-        "RESEND_FROM": cfg["resend_from"] or "onboarding@resend.dev"
-    }
-
-@app.post("/api/v1/portfolio/admin/smtp")
-async def save_smtp_settings(payload: SmtpConfigPayload, request: Request):
-    """Saves SMTP and Resend API settings to persistent smtp_config.json."""
-    token = get_token_from_request(request)
-    if not verify_session_token(token):
-        raise HTTPException(status_code=401, detail="Unauthorized session.")
-        
-    current_data = {}
-    if os.path.exists(SMTP_CONFIG_JSON):
-        try:
-            with open(SMTP_CONFIG_JSON, "r", encoding="utf-8") as f:
-                current_data = json.load(f)
-        except Exception:
-            pass
-            
-    current_password = current_data.get("SMTP_PASSWORD") or os.getenv("SMTP_PASSWORD") or ""
-    current_resend_key = current_data.get("RESEND_API_KEY") or os.getenv("RESEND_API_KEY") or ""
-    
-    saved_password = payload.SMTP_PASSWORD if payload.SMTP_PASSWORD != "********" else current_password
-    saved_resend_key = payload.RESEND_API_KEY if payload.RESEND_API_KEY != "********" else current_resend_key
-    
-    new_config = {
-        "SMTP_HOST": payload.SMTP_HOST,
-        "SMTP_PORT": payload.SMTP_PORT,
-        "SMTP_USER": payload.SMTP_USER,
-        "SMTP_PASSWORD": saved_password,
-        "SMTP_TO": payload.SMTP_TO,
-        "RESEND_API_KEY": saved_resend_key,
-        "RESEND_FROM": payload.RESEND_FROM
-    }
-    
-    try:
-        os.makedirs(DATA_DIR, exist_ok=True)
-        with open(SMTP_CONFIG_JSON, "w", encoding="utf-8") as f:
-            json.dump(new_config, f, indent=2)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to save SMTP config: {str(e)}")
-        
-    return {"success": True, "message": "SMTP settings saved successfully."}
 
 @app.get("/api/v1/portfolio/profile")
 async def get_profile(mode: str = Query(default="general")):
@@ -622,7 +580,7 @@ async def submit_contact(payload: ContactPayload, background_tasks: BackgroundTa
         intent_category=intent_category
     )
         
-    # Attempt background dispatch via the configured email provider (Zoho default / Lark when configured)
+    # Attempt background dispatch via Lark Mail
     background_tasks.add_task(
         _dispatch_contact_email,
         payload.name,
@@ -640,30 +598,13 @@ async def submit_contact(payload: ContactPayload, background_tasks: BackgroundTa
 
 async def _dispatch_contact_email(name: str, email: str, subject: str, message: str, intent_category: str):
     """
-    Dispatches the contact-form acknowledgement + admin notification through the
-    configured email provider. Zoho remains the default until EMAIL_PROVIDER=lark
-    is verified with live credentials. Never raises into the request path.
+    Dispatches the contact-form acknowledgement + admin notification through Lark Mail.
+    Never raises into the request path.
     """
-    provider_name = os.getenv("EMAIL_PROVIDER", "zoho").lower()
     try:
-        if provider_name == "lark":
-            from email_engine.zoho_provider import get_email_provider
-            provider = get_email_provider()
-            from_email = "contact@adarshsingh.in"
-            body_html = f"<p>Hi {html.escape(name)},</p><p>Thanks for reaching out via adarshsingh.in. We've received your message and will respond within 24 hours.</p>"
-            await provider.send_message(
-                to=[email],
-                subject="Thank you for contacting Adarsh Singh",
-                body_html=body_html,
-                body_text="Thanks for reaching out! We received your message.",
-                from_email=from_email,
-                reply_to="contact@adarshsingh.in",
-            )
-        else:
-            # Legacy Zoho/Resend path (unchanged behavior)
-            send_outreach_email(name, email, subject, message, intent_category)
+        await send_outreach_email(name, email, subject, message, intent_category)
     except Exception as e:
-        print(f"Contact email dispatch failed ({provider_name}): {e}")
+        print(f"Contact email dispatch failed: {e}")
 
 # --- ANALYTICS & RAG OBSERVABILITY ENDPOINTS ---
 

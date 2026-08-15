@@ -87,6 +87,8 @@ class TestLarkAuth:
         auth.user_access_token = "u_old"
         auth.refresh_token = "r_old"
         auth._user_token_exp = 0.0
+        auth.get_persisted_user_access_token = MagicMock(return_value=None)
+        auth.get_persisted_refresh_token = MagicMock(return_value="r_old")
         fake_resp = _FakeAsyncResponse({"code": 0, "data": {"access_token": "u_new", "refresh_token": "r_new", "expires_in": 3600}})
         fake_client = _FakeAsyncClient(fake_resp, expected_method="POST", expected_url=USER_TOKEN_ENDPOINT)
         with patch("httpx.AsyncClient", return_value=fake_client):
@@ -145,10 +147,10 @@ class TestLarkProviderBatchModify:
         auth.get_tenant_access_token = AsyncMock(return_value="tenant_123")
         provider = LarkMailProvider(auth=auth)
         captured = {}
-        async def fake_request(method, url, token, json_body=None):
+        async def fake_request(method, url, token_type, json_body=None, _retry=True):
             captured["method"] = method
             captured["url"] = url
-            captured["token"] = token
+            captured["token"] = token_type
             captured["body"] = json_body
             return {"code": 0, "data": {}}
         provider._request = fake_request
@@ -159,7 +161,7 @@ class TestLarkProviderBatchModify:
             "add_label_ids": [],
             "remove_label_ids": ["UNREAD"],
         }
-        assert captured["token"] == "tenant_123"
+        assert captured["token"] == "tenant"
         assert captured["url"] == "https://open.larksuite.com/open-apis/mail/v1/user_mailboxes/me/messages/batch_modify"
 
     @pytest.mark.asyncio
@@ -168,9 +170,9 @@ class TestLarkProviderBatchModify:
         auth.get_tenant_access_token = AsyncMock(return_value="tenant_123")
         provider = LarkMailProvider(auth=auth)
         captured = {}
-        async def fake_request(method, url, token, json_body=None):
+        async def fake_request(method, url, token_type, json_body=None, _retry=True):
             captured["body"] = json_body
-            captured["token"] = token
+            captured["token"] = token_type
             return {"code": 0, "data": {}}
         provider._request = fake_request
         result = await provider.mark_read("me", ["msg_1"], is_read=False)
@@ -179,7 +181,7 @@ class TestLarkProviderBatchModify:
             "add_label_ids": ["UNREAD"],
             "remove_label_ids": [],
         }
-        assert captured["token"] == "tenant_123"
+        assert captured["token"] == "tenant"
 
     @pytest.mark.asyncio
     async def test_move_message_uses_add_folder(self):
@@ -187,9 +189,9 @@ class TestLarkProviderBatchModify:
         auth.get_tenant_access_token = AsyncMock(return_value="tenant_123")
         provider = LarkMailProvider(auth=auth)
         captured = {}
-        async def fake_request(method, url, token, json_body=None):
+        async def fake_request(method, url, token_type, json_body=None, _retry=True):
             captured["body"] = json_body
-            captured["token"] = token
+            captured["token"] = token_type
             return {"code": 0, "data": {}}
         provider._request = fake_request
         result = await provider.move_message("me", ["msg_1"], "ARCHIVED")
@@ -197,7 +199,7 @@ class TestLarkProviderBatchModify:
             "message_ids": ["msg_1"],
             "add_folder": "ARCHIVED",
         }
-        assert captured["token"] == "tenant_123"
+        assert captured["token"] == "tenant"
 
 
 # ============================================================================
@@ -281,8 +283,8 @@ class TestIdempotency:
 
 
 class TestStatusEndpoint:
-    def test_email_status_default_zoho(self):
+    def test_email_status_default_lark(self):
         client = TestClient(main.app)
         resp = client.get("/api/v1/portfolio/email/status")
         assert resp.status_code == 200
-        assert resp.json()["provider"] == "zoho"
+        assert resp.json()["provider"] == "lark"

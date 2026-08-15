@@ -420,7 +420,7 @@ Here is my official CV & Portfolio Knowledge Base context:
         # Dispatch alert email synchronously
         try:
             print("Dispatching critical Chatbot failure alert...")
-            send_alert_email(rca_subject, rca_message)
+            await send_alert_email(rca_subject, rca_message)
         except Exception as mail_err:
             print(f"Failed to send alert email: {mail_err}")
         

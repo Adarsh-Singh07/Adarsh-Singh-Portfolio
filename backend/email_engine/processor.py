@@ -8,7 +8,7 @@ from typing import Optional, Dict, Any, List
 
 from email_engine.models import ClassificationResult, EmailRecord
 from email_engine.classifier import Classifier
-from email_engine.zoho_provider import get_email_provider
+from email_engine.provider_factory import get_email_provider
 from lark.aliases import get_alias_info, is_auto_reply_allowed, NO_AUTO_REPLY_ALIASES, all_aliases
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "portfolio.db")
@@ -125,3 +125,69 @@ class EmailProcessor:
             return {"action": "auto_reply", "auto_send": True, "requires_human": False}
 
         return {"action": "none", "auto_send": False, "requires_human": False}
+
+    async def execute_reply(self, message_id: str, sender: str, subject: str, body_text: str, thread_id: Optional[str] = None):
+        """Generates an AI reply using RAG context and sends it via LarkMailProvider."""
+        import rag
+        from google import genai
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            print("Cannot execute AI reply: GEMINI_API_KEY not set.")
+            return False
+            
+        context = ""
+        try:
+            results = rag.retrieve_context(api_key, body_text, top_k=3)
+            if results:
+                context = "\n".join([r['text'] for r in results])
+        except Exception as e:
+            print(f"RAG retrieval failed during auto-reply: {e}")
+
+        prompt = f"""You are Adarsh Singh's AI assistant. Draft a professional, friendly, and concise email reply to the following inquiry.
+Use the provided knowledge base context to answer any questions if relevant. Do not make up facts.
+If the context doesn't have the answer, politely state that Adarsh will review this personally soon.
+
+Context:
+{context}
+
+Original Email Subject: {subject}
+Original Email Body:
+{body_text}
+
+Draft the reply text only. No subject line. Sign off as "Adarsh's AI Assistant".
+"""
+        
+        try:
+            client = genai.Client(api_key=api_key)
+            resp = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=prompt
+            )
+            reply_text = resp.text.strip()
+            
+            provider = get_email_provider()
+            await provider.reply_to_message(
+                message_id=message_id,
+                to=[sender],
+                body_text=reply_text,
+                body_html=f"<p>{reply_text.replace(chr(10), '<br>')}</p>",
+                thread_id=thread_id
+            )
+            print(f"Auto-reply sent successfully for message {message_id}")
+            
+            # Update status in DB
+            conn = self._conn()
+            try:
+                conn.execute(
+                    "UPDATE emails SET reply_status = 'replied' WHERE provider_message_id = ?",
+                    (message_id,)
+                )
+                conn.commit()
+            finally:
+                conn.close()
+                
+            return True
+        except Exception as e:
+            print(f"Failed to execute AI reply: {e}")
+            return False
+
