@@ -571,22 +571,14 @@ async def submit_contact(payload: ContactPayload, background_tasks: BackgroundTa
         except Exception as e:
             print(f"Outreach intent classification failed: {e}")
             
-    # Record lead in SQLite
-    db.save_contact_message(
-        name=payload.name,
-        email=payload.email,
-        subject=payload.subject,
-        message=payload.message,
-        intent_category=intent_category
-    )
-        
-    # Attempt background dispatch via Lark Mail
+    from connection_service import handle_connection_request
     background_tasks.add_task(
-        _dispatch_contact_email,
+        handle_connection_request,
         payload.name,
         payload.email,
         payload.subject,
         payload.message,
+        "Contact Form",
         intent_category
     )
     
@@ -595,16 +587,6 @@ async def submit_contact(payload: ContactPayload, background_tasks: BackgroundTa
         "message": "Transmission secured. Adarsh will reach out within 24 hours."
     }
 
-
-async def _dispatch_contact_email(name: str, email: str, subject: str, message: str, intent_category: str):
-    """
-    Dispatches the contact-form acknowledgement + admin notification through Lark Mail.
-    Never raises into the request path.
-    """
-    try:
-        await send_outreach_email(name, email, subject, message, intent_category)
-    except Exception as e:
-        print(f"Contact email dispatch failed: {e}")
 
 # --- ANALYTICS & RAG OBSERVABILITY ENDPOINTS ---
 

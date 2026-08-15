@@ -307,14 +307,7 @@ Here is my official CV & Portfolio Knowledge Base context:
             lead_email = lead_match.group(2).strip()
             lead_message = lead_match.group(3).strip()
             
-            # Save the lead in db
-            db.save_contact_message(
-                name=lead_name,
-                email=lead_email,
-                subject="Chatbot Lead Connection Request",
-                message=lead_message,
-                intent_category="Hiring Inquiry"
-            )
+            from connection_service import handle_connection_request
             
             # Remove the tag from the final response text
             response_text = re.sub(
@@ -324,13 +317,15 @@ Here is my official CV & Portfolio Knowledge Base context:
                 flags=re.IGNORECASE | re.DOTALL
             ).strip()
             
-            # Send notification email and HTML confirmation in background
+            # Send notification email, whatsapp, and HTML confirmation in background
             background_tasks.add_task(
-                send_outreach_email,
+                handle_connection_request,
                 lead_name,
                 lead_email,
                 "Chatbot Connection request to Adarsh",
-                lead_message
+                lead_message,
+                "Chatbot",
+                "Hiring Inquiry"
             )
         
         # Generate Message IDs
