@@ -17,7 +17,12 @@ import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from lark.auth import LarkAuth, USER_TOKEN_ENDPOINT, REQUIRED_SCOPES
+from lark.auth import (
+    LarkAuth,
+    USER_TOKEN_ENDPOINT,
+    REQUIRED_SCOPES,
+    USER_TOKEN_REFRESH_MARGIN_SECONDS,
+)
 from lark.provider import LarkMailProvider
 from lark.aliases import get_alias_info, is_auto_reply_allowed
 from email_engine.models import (
@@ -98,6 +103,44 @@ class TestLarkAuth:
         assert body["grant_type"] == "refresh_token"
         assert body["refresh_token"] == "r_old"
         assert body["client_id"] == "cli_test"
+
+    @pytest.mark.asyncio
+    async def test_get_user_access_token_refreshes_after_90_minutes(self):
+        auth = LarkAuth()
+        auth.get_persisted_user_access_token = MagicMock(return_value="u_old")
+        auth._load_tokens = MagicMock(
+            return_value={
+                "access_token": "u_old",
+                "refresh_token": "r_old",
+                "expires_at": 10_000 + USER_TOKEN_REFRESH_MARGIN_SECONDS - 1,
+            }
+        )
+        auth.refresh_user_token = AsyncMock(return_value="u_new")
+
+        with patch("lark.auth.time.time", return_value=10_000):
+            token = await auth.get_user_access_token()
+
+        assert token == "u_new"
+        auth.refresh_user_token.assert_awaited_once_with()
+
+    @pytest.mark.asyncio
+    async def test_get_user_access_token_reuses_token_before_90_minutes(self):
+        auth = LarkAuth()
+        auth.get_persisted_user_access_token = MagicMock(return_value="u_current")
+        auth._load_tokens = MagicMock(
+            return_value={
+                "access_token": "u_current",
+                "refresh_token": "r_current",
+                "expires_at": 10_000 + USER_TOKEN_REFRESH_MARGIN_SECONDS + 1,
+            }
+        )
+        auth.refresh_user_token = AsyncMock(return_value="unexpected")
+
+        with patch("lark.auth.time.time", return_value=10_000):
+            token = await auth.get_user_access_token()
+
+        assert token == "u_current"
+        auth.refresh_user_token.assert_not_awaited()
 
 
 class _FakeAsyncResponse:

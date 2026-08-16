@@ -10,6 +10,7 @@ from email_engine.models import ClassificationResult, EmailRecord
 from email_engine.classifier import Classifier
 from email_engine.provider_factory import get_email_provider
 from lark.aliases import get_alias_info, is_auto_reply_allowed, NO_AUTO_REPLY_ALIASES, all_aliases
+from timezone_ist import now_ist_iso
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "portfolio.db")
 
@@ -87,7 +88,7 @@ class EmailProcessor:
                     subject,
                     body_text,
                     body_html,
-                    received_at or time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                    received_at or now_ist_iso(),
                     alias,
                     classification.model_dump_json(),
                     "processed",
@@ -115,67 +116,36 @@ class EmailProcessor:
         if alias.lower() in [a.lower() for a in NO_AUTO_REPLY_ALIASES]:
             return {"action": "blocked_noreply_alias", "auto_send": False, "requires_human": True}
 
-        if classification.requires_human or classification.category.value in HUMAN_REVIEW_CATEGORIES:
-            return {"action": "human_review", "auto_send": False, "requires_human": True}
-
-        if classification.confidence < 0.7:
-            return {"action": "low_confidence_review", "auto_send": False, "requires_human": True}
-
-        if classification.category.value in AUTO_REPLY_CATEGORIES:
-            return {"action": "auto_reply", "auto_send": True, "requires_human": False}
-
-        return {"action": "none", "auto_send": False, "requires_human": False}
+        # Send AI reply for all other received mail when enabled.
+        return {"action": "auto_reply", "auto_send": True, "requires_human": False}
 
     async def execute_reply(self, message_id: str, sender: str, subject: str, body_text: str, thread_id: Optional[str] = None):
-        """Generates an AI reply using RAG context and sends it via LarkMailProvider."""
-        import rag
-        from google import genai
-        api_key = os.getenv("GEMINI_API_KEY")
-        if not api_key:
-            print("Cannot execute AI reply: GEMINI_API_KEY not set.")
-            return False
-            
-        context = ""
+        """Generates an AI reply using the same multi-key/model fallback as the chatbot, then sends it."""
         try:
-            results = rag.retrieve_context(api_key, body_text, top_k=3)
-            if results:
-                context = "\n".join([r['text'] for r in results])
-        except Exception as e:
-            print(f"RAG retrieval failed during auto-reply: {e}")
+            import ai_reply
 
-        prompt = f"""You are Adarsh Singh's AI assistant. Draft a professional, friendly, and concise email reply to the following inquiry.
-Use the provided knowledge base context to answer any questions if relevant. Do not make up facts.
-If the context doesn't have the answer, politely state that Adarsh will review this personally soon.
-
-Context:
-{context}
-
-Original Email Subject: {subject}
-Original Email Body:
-{body_text}
-
-Draft the reply text only. No subject line. Sign off as "Adarsh's AI Assistant".
-"""
-        
-        try:
-            client = genai.Client(api_key=api_key)
-            resp = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt
+            reply_text = await ai_reply.generate_reply(
+                name="Adarsh",
+                message=body_text,
+                source="Inbound Email",
+                extra_context="",
             )
-            reply_text = resp.text.strip()
-            
+
             provider = get_email_provider()
-            await provider.reply_to_message(
+            clean_subject = subject.strip()
+            if not clean_subject.lower().startswith("re:"):
+                clean_subject = f"Re: {clean_subject}"
+
+            send_result = await provider.reply_to_message(
                 message_id=message_id,
+                thread_id=thread_id,
                 to=[sender],
+                subject=clean_subject,
                 body_text=reply_text,
                 body_html=f"<p>{reply_text.replace(chr(10), '<br>')}</p>",
-                thread_id=thread_id
             )
-            print(f"Auto-reply sent successfully for message {message_id}")
-            
-            # Update status in DB
+            print(f"Auto-reply sent successfully for message {message_id}: {send_result}")
+
             conn = self._conn()
             try:
                 conn.execute(
@@ -185,7 +155,7 @@ Draft the reply text only. No subject line. Sign off as "Adarsh's AI Assistant".
                 conn.commit()
             finally:
                 conn.close()
-                
+
             return True
         except Exception as e:
             print(f"Failed to execute AI reply: {e}")

@@ -97,7 +97,7 @@ class LarkMailProvider(EmailProvider):
     ) -> Dict[str, Any]:
         mailbox = from_email or "me"
         payload: Dict[str, Any] = {
-            "to": [{"mailbox": t} for t in to],
+            "to": [{"mail_address": t} for t in to],
             "subject": subject,
         }
         if body_text:
@@ -105,13 +105,13 @@ class LarkMailProvider(EmailProvider):
         if body_html:
             payload["body_html"] = body_html
         if cc:
-            payload["cc"] = [{"mailbox": c} for c in cc]
+            payload["cc"] = [{"mail_address": c} for c in cc]
         if bcc:
-            payload["bcc"] = [{"mailbox": b} for b in bcc]
+            payload["bcc"] = [{"mail_address": b} for b in bcc]
         if from_email:
-            payload["head_from"] = {"mailbox": from_email, "name": "Adarsh Singh"}
+            payload["head_from"] = {"mail_address": from_email, "name": "Adarsh Singh"}
         if reply_to:
-            payload["reply_to"] = [{"mailbox": reply_to}]
+            payload["reply_to"] = [{"mail_address": reply_to}]
         if attachments:
             payload["attachments"] = attachments
         if dedupe_key:
@@ -154,7 +154,7 @@ class LarkMailProvider(EmailProvider):
 
     async def get_message(self, user_mailbox_id: str, message_id: str) -> Dict[str, Any]:
         url = f"{MAIL_BASE}/{user_mailbox_id}/messages/{message_id}"
-        data = await self._request("GET", url, "tenant")
+        data = await self._request("GET", url, "user")
         return data["data"]
 
     async def get_thread(self, user_mailbox_id: str, thread_id: str) -> Dict[str, Any]:

@@ -3,6 +3,8 @@ import sqlite3
 import json
 from datetime import datetime
 
+from timezone_ist import now_ist_iso
+
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 DB_PATH = os.path.join(DATA_DIR, "portfolio.db")
 
@@ -123,7 +125,7 @@ def save_chat_session(session_id: str, role_mode: str):
     try:
         conn.execute(
             "INSERT OR IGNORE INTO chat_sessions (id, created_at, role_mode) VALUES (?, ?, ?)",
-            (session_id, datetime.utcnow().isoformat() + "Z", role_mode)
+            (session_id, now_ist_iso(), role_mode)
         )
         conn.commit()
     except Exception as e:
@@ -156,7 +158,7 @@ def save_chat_message(
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
-                msg_id, session_id, role, content, datetime.utcnow().isoformat() + "Z",
+                msg_id, session_id, role, content, now_ist_iso(),
                 chunks_json, prompt_template, latency_ms,
                 tokens_input, tokens_output, cost_est
             )
@@ -179,12 +181,12 @@ def save_feedback(message_id: str, rating: int, comment: str = None):
         if row:
             conn.execute(
                 "UPDATE visitor_feedback SET rating = ?, comment = ?, created_at = ? WHERE message_id = ?",
-                (rating, comment, datetime.utcnow().isoformat() + "Z", message_id)
+                (rating, comment, now_ist_iso(), message_id)
             )
         else:
             conn.execute(
                 "INSERT INTO visitor_feedback (message_id, rating, comment, created_at) VALUES (?, ?, ?, ?)",
-                (message_id, rating, comment, datetime.utcnow().isoformat() + "Z")
+                (message_id, rating, comment, now_ist_iso())
             )
         conn.commit()
     except Exception as e:
@@ -196,16 +198,18 @@ def save_contact_message(name: str, email: str, subject: str, message: str, inte
     """Saves outreach message and its AI-determined intent category."""
     conn = get_db_connection()
     try:
-        conn.execute(
+        cursor = conn.execute(
             """
             INSERT INTO contact_messages (name, email, subject, message, created_at, intent_category)
             VALUES (?, ?, ?, ?, ?, ?)
             """,
-            (name, email, subject, message, datetime.utcnow().isoformat() + "Z", intent_category)
+            (name, email, subject, message, now_ist_iso(), intent_category),
         )
         conn.commit()
+        return cursor.lastrowid
     except Exception as e:
         print(f"Error saving contact message to DB: {e}")
+        return None
     finally:
         conn.close()
 
@@ -218,7 +222,7 @@ def save_unanswered_question(session_id: str, question: str):
             INSERT INTO unanswered_questions (session_id, question, created_at, resolved)
             VALUES (?, ?, ?, 0)
             """,
-            (session_id, question, datetime.utcnow().isoformat() + "Z")
+            (session_id, question, now_ist_iso())
         )
         conn.commit()
     except Exception as e:
@@ -267,7 +271,7 @@ def save_file_backup(filename: str, content: str | bytes, source: str = "system"
         if latest and latest["file_hash"] == file_hash:
             return  # No changes detected, skip duplicate insertion
             
-        now_str = datetime.utcnow().isoformat() + "Z"
+        now_str = now_ist_iso()
         if is_text:
             conn.execute(
                 "INSERT INTO file_backups (filename, content_text, file_hash, source, created_at) VALUES (?, ?, ?, ?, ?)",
@@ -302,6 +306,50 @@ def get_file_backups(filename: str = None, limit: int = 50):
         return [dict(r) for r in rows]
     except Exception as e:
         print(f"Error getting file backups: {e}")
+        return []
+    finally:
+        conn.close()
+
+def save_email_action(contact_id: int, action_type: str, status: str, detail: str = ""):
+    """Records an action status for a contact/email for auditability."""
+    conn = get_db_connection()
+    try:
+        conn.execute(
+            """
+            INSERT INTO email_actions (email_id, action_type, status, detail, created_at)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (
+                contact_id,
+                action_type,
+                status,
+                detail,
+                now_ist_iso(),
+            ),
+        )
+        conn.commit()
+    except Exception as e:
+        print(f"Error saving email action: {e}")
+    finally:
+        conn.close()
+
+def get_email_actions(contact_id: int = None, limit: int = 50):
+    """Retrieves action status records, optionally filtered by contact/email id."""
+    conn = get_db_connection()
+    try:
+        if contact_id:
+            rows = conn.execute(
+                "SELECT * FROM email_actions WHERE email_id = ? ORDER BY id DESC LIMIT ?",
+                (contact_id, limit),
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT * FROM email_actions ORDER BY id DESC LIMIT ?",
+                (limit,),
+            ).fetchall()
+        return [dict(r) for r in rows]
+    except Exception as e:
+        print(f"Error getting email actions: {e}")
         return []
     finally:
         conn.close()

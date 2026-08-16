@@ -40,6 +40,10 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 TOKENS_FILE = DATA_DIR / "lark_tokens.json"
 LOCK_DIR = DATA_DIR / "lark_tokens.lock"
 
+# Lark access tokens last about two hours. Rotate at roughly 90 minutes of age,
+# leaving 30 minutes for retries before the current access token expires.
+USER_TOKEN_REFRESH_MARGIN_SECONDS = 30 * 60
+
 REQUIRED_SCOPES = (
     "mail:user_mailbox.message:readonly "
     "mail:user_mailbox.message:send "
@@ -107,6 +111,9 @@ class LarkAuth:
         temp_file = TOKENS_FILE.with_suffix(".tmp")
         with open(temp_file, "w", encoding="utf-8") as f:
             json.dump(data, f)
+            f.flush()
+            os.fsync(f.fileno())
+        temp_file.chmod(0o600)
         temp_file.replace(TOKENS_FILE)
 
     def get_persisted_user_access_token(self) -> Optional[str]:
@@ -191,44 +198,62 @@ class LarkAuth:
         """Refreshes the user access token safely handling locks. If force=True, bypasses expiry check."""
         await self._acquire_lock()
         try:
-            # Re-read to ensure another concurrent request didn't just refresh it while we were waiting for lock
             current_acc = self.get_persisted_user_access_token()
             if current_acc and not force:
-                return current_acc
-                
+                # Proactive refresh if within safety margin
+                data = self._load_tokens()
+                expires_at = data.get("expires_at", 0)
+                if expires_at - time.time() > USER_TOKEN_REFRESH_MARGIN_SECONDS:
+                    return current_acc
+                print("LARK token refresh: proactive refresh triggered")
+
             refresh_token = self.get_persisted_refresh_token()
             if not refresh_token:
                 raise LarkAuthError("No refresh token available. Please re-authorize via OAuth.")
-                
-            async with httpx.AsyncClient(timeout=10) as client:
-                resp = await client.post(
+
+            async def _do_refresh(client, rt):
+                return await client.post(
                     USER_TOKEN_ENDPOINT,
                     json={
                         "grant_type": "refresh_token",
                         "client_id": self.app_id,
                         "client_secret": self.app_secret,
-                        "refresh_token": refresh_token,
+                        "refresh_token": rt,
                     },
                 )
+
+            async with httpx.AsyncClient(timeout=10) as client:
+                resp = await _do_refresh(client, refresh_token)
                 data = resp.json()
                 if data.get("code") != 0:
-                    raise LarkAuthError(f"User token refresh error: {data.get('msg')} ({data.get('code')})")
-                
+                    # Try fallback to env refresh token if persisted token is invalid/revoked
+                    env_rt = os.getenv("LARK_REFRESH_TOKEN")
+                    if env_rt and env_rt != refresh_token:
+                        resp = await _do_refresh(client, env_rt)
+                        data = resp.json()
+                        if data.get("code") != 0:
+                            raise LarkAuthError(f"User token refresh error: {data.get('msg')} ({data.get('code')})")
+                        print("LARK token refresh: recovered using fallback env refresh token")
+                    else:
+                        raise LarkAuthError(f"User token refresh error: {data.get('msg')} ({data.get('code')})")
+
                 token_data = data.get("data", data)
                 acc_token = token_data["access_token"]
                 new_ref_token = token_data.get("refresh_token", refresh_token)
                 exp = token_data.get("expires_in", 7200)
-                
+
                 self._save_tokens(acc_token, new_ref_token, exp)
                 return acc_token
         finally:
             self._release_lock()
 
     async def get_user_access_token(self) -> str:
-        """Returns a valid user access token, refreshing securely if expired."""
+        """Returns a user token, rotating it before its final 30 minutes."""
         acc_token = self.get_persisted_user_access_token()
-        if acc_token:
+        data = self._load_tokens()
+        remaining = data.get("expires_at", 0) - time.time()
+        if acc_token and remaining > USER_TOKEN_REFRESH_MARGIN_SECONDS:
             return acc_token
-        
-        # Token expired or missing, attempt safe refresh
+
+        # The directory lock prevents concurrent webhook/background rotations.
         return await self.refresh_user_token()

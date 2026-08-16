@@ -1,24 +1,23 @@
 import os
 import html
-from datetime import datetime
+import base64
 from email_engine.provider_factory import get_email_provider
+from timezone_ist import now_ist_human
+import db
 
-async def send_outreach_email(visitor_name: str, visitor_email: str, subject: str, message: str, intent_category: str = "General Question"):
+SIGNATURE = "\nBest regards,\nAdarsh Singh"
+
+async def send_outreach_email(visitor_name: str, visitor_email: str, subject: str, message: str, intent_category: str = "General Question", visitor_ack: bool = True):
     """
-    Sends a dual email using Lark Mail:
-    1. A notification to Adarsh (admin).
-    2. A premium HTML auto-responder to the visitor.
+    Sends admin notification via Lark Mail.
+    Visitor-facing reply is handled separately as a single AI reply.
     """
     provider = get_email_provider()
     escaped_name = html.escape(visitor_name)
     escaped_email = html.escape(visitor_email)
     escaped_subject = html.escape(subject)
     escaped_message = html.escape(message)
-    current_year = datetime.now().year
     
-    # ---------------------------------------------
-    # 1. DISPATCH NOTIFICATION TO ADARSH (ADMIN)
-    # ---------------------------------------------
     admin_recipient = "admin@adarshsingh.in"
     html_admin = f"""
     <!DOCTYPE html>
@@ -49,7 +48,7 @@ async def send_outreach_email(visitor_name: str, visitor_email: str, subject: st
           <div class="meta-data">
             <div class="meta-item"><span class="meta-label">From:</span> {escaped_name} ({escaped_email})</div>
             <div class="meta-item"><span class="meta-label">Subject:</span> {escaped_subject}</div>
-            <div class="meta-item"><span class="meta-label">Date:</span> {datetime.now().strftime("%B %d, %Y at %I:%M %p")}</div>
+            <div class="meta-item"><span class="meta-label">Date:</span> {now_ist_human()}</div>
           </div>
           <h3 style="margin-top: 0; color: #1e293b; font-size: 18px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">Message</h3>
           <div class="message-body">{escaped_message}</div>
@@ -63,6 +62,7 @@ async def send_outreach_email(visitor_name: str, visitor_email: str, subject: st
     """
     
     admin_sent = False
+    visitor_sent = False
     try:
         print("Attempting to send Admin Notification via Lark Mail API...")
         await provider.send_message(
@@ -76,48 +76,71 @@ async def send_outreach_email(visitor_name: str, visitor_email: str, subject: st
     except Exception as e:
         print(f"Lark Mail Admin Notification failed: {e}")
 
-    # ---------------------------------------------
-    # 2. DISPATCH AUTO-RESPONDER TO VISITOR
-    # ---------------------------------------------
-    reply_to_address = "contact@adarshsingh.in" if intent_category in ["Hiring Inquiry", "Collaboration"] else "support@adarshsingh.in"
-    html_visitor = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <style>
-        body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; margin: 0; padding: 40px 0; color: #334155; }}
-        .wrapper {{ max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; padding: 40px; border: 1px solid #e2e8f0; }}
-        h1 {{ color: #0f172a; margin-top: 0; }}
-      </style>
-    </head>
-    <body>
-      <div class="wrapper">
-        <h1>Thanks for reaching out 👋</h1>
-        <p>Hi {escaped_name},</p>
-        <p>Thank you for contacting me through my portfolio. I've successfully received your message and will personally review it as soon as possible.</p>
-        <p><strong>Your Message:</strong><br/>{escaped_message}</p>
-        <p>Best regards,<br/>Adarsh Singh</p>
-      </div>
-    </body>
-    </html>
+    return admin_sent, visitor_sent
+
+async def send_ai_reply_email(
+    name: str,
+    visitor_email: str,
+    subject: str,
+    message: str,
+    source: str = "Contact Form",
+    contact_id: int = None,
+) -> bool:
     """
-    
-    visitor_sent = False
+    Generates a single AI response as Adarsh and sends it via Lark Mail.
+    """
+    provider = get_email_provider()
+    ai_sent = False
+    ai_error_detail = ""
+
     try:
-        print("Attempting to send Visitor Auto-responder via Lark Mail API...")
+        print("Attempting to generate and send AI reply via Lark Mail API...")
+        import ai_reply
+
+        context = ""
+        try:
+            import rag
+            results = rag.retrieve_context(os.getenv("GEMINI_API_KEY") or "", message, top_k=3)
+            if results:
+                context = "\n".join([r.get("text") or r.get("content") or "" for r in results])
+        except Exception as e:
+            print(f"RAG retrieval failed during AI reply generation: {e}")
+
+        reply_text = await ai_reply.generate_reply(
+            name=name,
+            message=message,
+            source=source,
+            extra_context=context,
+        )
+        reply_text = (reply_text or "").strip()
+        if reply_text and not reply_text.endswith(SIGNATURE.strip()):
+            reply_text = reply_text + SIGNATURE
+
         await provider.send_message(
             to=[visitor_email],
-            subject="Thank you for contacting Adarsh Singh",
-            body_html=html_visitor,
-            body_text="Thank you for reaching out! We received your message.",
-            reply_to=reply_to_address
+            subject=f"Re: {subject}",
+            body_text=reply_text,
+            body_html=f"<p>{reply_text.replace(chr(10), '<br>')}</p>",
         )
-        visitor_sent = True
+        ai_sent = True
+        print("AI reply sent successfully.")
     except Exception as e:
-        print(f"Lark Mail Visitor Auto-responder failed: {e}")
-        
-    return admin_sent or visitor_sent
+        ai_error_detail = str(e)
+        print(f"Lark Mail AI reply failed: {e}")
+
+    if contact_id:
+        try:
+            ai_error_short = (ai_error_detail or "")[:250]
+            db.save_email_action(
+                contact_id=contact_id,
+                action_type="ai_reply",
+                status="sent" if ai_sent else "failed",
+                detail=ai_error_short,
+            )
+        except Exception as e:
+            print(f"Error recording AI reply status: {e}")
+
+    return ai_sent
 
 async def send_alert_email(subject: str, html_body: str):
     """

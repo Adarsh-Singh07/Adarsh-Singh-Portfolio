@@ -13,6 +13,7 @@ from google.genai import types
 import db
 import rag
 from mail_helper import send_outreach_email, send_alert_email
+from timezone_ist import now_ist_iso
 
 router = APIRouter(prefix="/api/v1/portfolio", tags=["Chatbot"])
 
@@ -307,16 +308,9 @@ Here is my official CV & Portfolio Knowledge Base context:
             lead_email = lead_match.group(2).strip()
             lead_message = lead_match.group(3).strip()
             
-            # Save the lead in db
-            db.save_contact_message(
-                name=lead_name,
-                email=lead_email,
-                subject="Chatbot Lead Connection Request",
-                message=lead_message,
-                intent_category="Hiring Inquiry"
-            )
+            from connection_service import handle_connection_request
             
-            # Remove the tag from the final response text
+            # Remove the internal tag from the user-facing response
             response_text = re.sub(
                 r"\[SAVE_LEAD:\s*name=.*?\|email=.*?\|message=.*?\]", 
                 "", 
@@ -324,13 +318,15 @@ Here is my official CV & Portfolio Knowledge Base context:
                 flags=re.IGNORECASE | re.DOTALL
             ).strip()
             
-            # Send notification email and HTML confirmation in background
+            # Send notification email, whatsapp, and HTML confirmation in background
             background_tasks.add_task(
-                send_outreach_email,
+                handle_connection_request,
                 lead_name,
                 lead_email,
                 "Chatbot Connection request to Adarsh",
-                lead_message
+                lead_message,
+                "Chatbot",
+                "Hiring Inquiry"
             )
         
         # Generate Message IDs
@@ -391,7 +387,7 @@ Here is my official CV & Portfolio Knowledge Base context:
         <html>
         <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ffcccc; border-radius: 10px; background-color: #fffafb;">
             <h2 style="color: #d32f2f; border-bottom: 2px solid #ffcccc; padding-bottom: 10px; margin-top: 0;">⚠️ Chatbot API Failure Alert (RCA)</h2>
-            <p><strong>Timestamp:</strong> {datetime.utcnow().isoformat()}Z</p>
+            <p><strong>Timestamp:</strong> {now_ist_iso()}</p>
             <p><strong>Error Class:</strong> <code>{type(e).__name__}</code></p>
             <p><strong>Diagnostic Message:</strong> <span style="color: #c62828;">{str(e)}</span></p>
             <p><strong>User Session ID:</strong> <code>{session_id}</code></p>
