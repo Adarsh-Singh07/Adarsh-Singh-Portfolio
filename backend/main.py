@@ -82,22 +82,22 @@ async def token_lifecycle_loop():
     """Background task to proactively refresh Lark Mail tokens before they expire."""
     import time
     import asyncio
-    from lark.auth import LarkAuth
+    from lark.auth import LarkAuth, USER_TOKEN_REFRESH_MARGIN_SECONDS
     
     while True:
         try:
             auth = LarkAuth()
             data = auth._load_tokens()
             if data and "expires_at" in data:
-                # If less than 15 minutes to expiration, force refresh
-                if time.time() > data["expires_at"] - 900:
+                # Rotate after about 90 minutes (30 minutes before expiration).
+                if time.time() > data["expires_at"] - USER_TOKEN_REFRESH_MARGIN_SECONDS:
                     print("Lark token nearing expiry. Proactively refreshing...")
                     await auth.refresh_user_token(force=True)
             elif data and "refresh_token" in data and "expires_at" not in data:
                 print("Lark token missing expires_at. Proactively refreshing to fix...")
                 await auth.refresh_user_token(force=True)
         except Exception as e:
-            pass # Silently ignore auth initialization errors if not configured yet
+            print(f"LARK_TOKEN_REFRESH_FAILED: {type(e).__name__}: {e}")
             
         # Check every 2 minutes
         await asyncio.sleep(120)
@@ -389,6 +389,13 @@ class ContactPayload(BaseModel):
 class PasscodePayload(BaseModel):
     passcode: str
 
+class VoiceContactPayload(BaseModel):
+    """Lead intake schema for the Addy/Nova voice assistant channel."""
+    name: str
+    email: EmailStr
+    message: str
+    subject: str = ""
+
 
 class RoleCreatePayload(BaseModel):
     id: str
@@ -571,23 +578,17 @@ async def submit_contact(payload: ContactPayload, background_tasks: BackgroundTa
         except Exception as e:
             print(f"Outreach intent classification failed: {e}")
             
-    # Record lead in SQLite
-    db.save_contact_message(
-        name=payload.name,
-        email=payload.email,
-        subject=payload.subject,
-        message=payload.message,
-        intent_category=intent_category
-    )
-        
-    # Attempt background dispatch via Lark Mail
+    from connection_service import handle_connection_request
     background_tasks.add_task(
-        _dispatch_contact_email,
+        handle_connection_request,
         payload.name,
         payload.email,
         payload.subject,
         payload.message,
-        intent_category
+        "Contact Form",
+        intent_category,
+        visitor_ack=False,
+        ai_reply_enabled=True,
     )
     
     return {
@@ -596,15 +597,75 @@ async def submit_contact(payload: ContactPayload, background_tasks: BackgroundTa
     }
 
 
-async def _dispatch_contact_email(name: str, email: str, subject: str, message: str, intent_category: str):
-    """
-    Dispatches the contact-form acknowledgement + admin notification through Lark Mail.
-    Never raises into the request path.
-    """
+def classify_contact_intent(subject: str, message: str) -> str:
+    """Classify outreach intent via Gemini using the same labels as the contact form."""
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        return "General Outreach"
     try:
-        await send_outreach_email(name, email, subject, message, intent_category)
+        client = genai.Client(api_key=api_key)
+        cat_prompt = f"""
+            Analyze this portfolio contact form message. Categorize the intent of the sender into exactly one of these labels:
+            - "Hiring Inquiry" (if discussing jobs, interviews, recruitment, hiring, contract work)
+            - "Collaboration" (if discussing side projects, open source, partnerships)
+            - "General Question" (if asking about technologies, certifications, blog posts)
+            - "Other" (if spam or uncategorized)
+
+            Subject: {subject}
+            Message: {message}
+
+            Return ONLY the label. Do not include extra explanation or markup.
+            """
+        cat_response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=cat_prompt,
+        )
+        parsed_intent = cat_response.text.strip().replace('"', '').replace("'", "")
+        if parsed_intent in ["Hiring Inquiry", "Collaboration", "General Question", "Other"]:
+            return parsed_intent
     except Exception as e:
-        print(f"Contact email dispatch failed: {e}")
+        print(f"Outreach intent classification failed: {e}")
+    return "General Outreach"
+
+
+@app.post("/api/v1/portfolio/contact/voice")
+async def submit_voice_contact(payload: VoiceContactPayload, background_tasks: BackgroundTasks, request: Request):
+    """
+    Lead intake for the Addy voice assistant (Nova comms channel).
+    Reuses the exact same notification pipeline as the website contact form:
+    Lark Mail notification to Adarsh, AI reply to the visitor, and a WhatsApp alert.
+    """
+    client_ip = request.client.host if request.client else "unknown"
+    # Nova confirms details with the visitor before dispatch, so the voice channel
+    # gets its own rate-limit bucket, separate from the website contact form.
+    # Limit matches the contact form (5 per 5 minutes).
+    if not check_rate_limit(f"voice:{client_ip}", limit=5, window=300):
+        raise HTTPException(
+            status_code=429,
+            detail="Too many voice submissions. Please wait before transmitting again."
+        )
+
+    subject = payload.subject.strip() or f"Voice connection request from {payload.name}"
+    intent_category = classify_contact_intent(subject, payload.message)
+
+    from connection_service import handle_connection_request
+    background_tasks.add_task(
+        handle_connection_request,
+        payload.name,
+        payload.email,
+        subject,
+        payload.message,
+        "Nova Voice Assistant",
+        intent_category,
+        visitor_ack=True,
+        ai_reply_enabled=True,
+    )
+
+    return {
+        "success": True,
+        "message": "Transmission secured. Adarsh has been notified and will reach out within 24 hours."
+    }
+
 
 # --- ANALYTICS & RAG OBSERVABILITY ENDPOINTS ---
 
