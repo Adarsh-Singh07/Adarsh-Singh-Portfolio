@@ -222,6 +222,52 @@ export default function Home({ config, homeCards = [], projects = [], currentMod
       {/* Spotlight Hero V2 */}
       <Hero config={config} isDark={isDark} />
 
+      {/* CTA Card — Talk to Addy */}
+      <section className={`py-10 border-t relative ${
+        isDark ? 'bg-[#0A0A0F] border-white/5' : 'bg-[#FDFBF7] border-black/5'
+      }`}>
+        <div className="max-w-7xl mx-auto px-6 md:px-12">
+            <a
+              href="https://api.adarshsingh.in"
+              target="_blank"
+              rel="noopener noreferrer"
+            className={`group block p-6 md:p-8 rounded-[24px] border transition-all duration-300 hover:shadow-lg ${
+              isDark
+                ? 'bg-gradient-to-br from-neutral-900 to-neutral-950 border-cyan-500/20 hover:border-cyan-400/50 hover:shadow-cyan-500/10'
+                : 'bg-white border-slate-200 hover:border-[#007AFF]/40 hover:shadow-[#007AFF]/10'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className={`w-2 h-2 rounded-full ${isDark ? 'bg-cyan-400' : 'bg-[#007AFF]'} animate-pulse`} />
+                  <span className={`text-[10px] font-mono uppercase tracking-widest font-bold ${
+                    isDark ? 'text-cyan-400' : 'text-[#007AFF]'
+                  }`}>Live AI Assistant</span>
+                </div>
+                <h3 className={`text-lg md:text-xl font-sans font-bold tracking-tight mb-1 ${
+                  isDark ? 'text-white' : 'text-neutral-900'
+                }`}>
+                  Wanna know about me?
+                </h3>
+                <p className={`text-xs md:text-sm font-light ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  Talk to Addy — Adarsh's AI twin. Ask about projects, experience, anything.
+                </p>
+              </div>
+              <span className={`px-4 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all duration-300 ${
+                isDark
+                  ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 group-hover:bg-cyan-500/20'
+                  : 'bg-[#007AFF]/10 text-[#007AFF] border border-[#007AFF]/20 group-hover:bg-[#007AFF]/20'
+              }`}>
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Talk to Addy</span>
+                <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
+              </span>
+            </div>
+          </a>
+        </div>
+      </section>
+
       {/* Premium Teaser Navigation Section */}
       <section className={`py-16 md:py-24 border-t relative overflow-hidden transition-colors duration-200 ${
         isDark ? 'bg-[#121212] border-white/5' : 'bg-[#FDFBF7] border-black/5'
