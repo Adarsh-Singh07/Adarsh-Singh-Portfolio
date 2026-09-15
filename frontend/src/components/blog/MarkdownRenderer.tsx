@@ -46,7 +46,7 @@ const CodeBlock = ({ node, inline, className, children, ...props }: any) => {
   }
 
   return (
-    <div className="relative group rounded-xl overflow-hidden my-8 border border-white/10 bg-[#0d1117] shadow-lg">
+    <div className="relative group rounded-xl overflow-hidden my-8 border border-white/10 bg-[#0d1117] text-[#e6edf3] shadow-lg">
       <div className="flex items-center justify-between px-4 py-2 bg-[#161b22] border-b border-white/10">
         <div className="flex gap-1.5">
           <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
@@ -54,19 +54,19 @@ const CodeBlock = ({ node, inline, className, children, ...props }: any) => {
           <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
         </div>
         {language && (
-          <span className="text-xs font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider">{language}</span>
+          <span className="text-xs font-mono text-[#8b949e] uppercase tracking-wider">{language}</span>
         )}
       </div>
       <div className="relative">
         <button
           onClick={handleCopy}
-          className="absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 text-[#e6edf3] opacity-0 group-hover:opacity-100 transition-opacity"
           aria-label="Copy code"
         >
           {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
         </button>
         <div className="overflow-x-auto p-4 custom-scrollbar">
-          <code className={className} {...props}>
+          <code className={`text-[#e6edf3] ${className}`} {...props}>
             {children}
           </code>
         </div>

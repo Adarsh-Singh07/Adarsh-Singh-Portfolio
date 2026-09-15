@@ -28,116 +28,15 @@ interface BlogDetailProps {
   onRefreshData?: () => void;
 }
 
-const staticArticles: Record<string, { title: string; excerpt: string; readTime: string; category: string; date: string; content: string; logoUrl: string; brandColor: string; tags?: string[]; difficulty?: 'Beginner' | 'Intermediate' | 'Advanced'; lastUpdated?: string; version?: string }> = {
-  "databricks-lakehouse": {
-    title: "The Magic of Databricks: Building a Data Lakehouse",
-    excerpt: "Imagine having the vast, bottomless storage of a data lake combined with the organized, easy-to-search structure of a data warehouse. That's the Databricks Lakehouse.",
-    readTime: "8 min read",
-    category: "Data Engineering",
-    date: "2026-07-15",
-    lastUpdated: "2026-07-17",
-    version: "v1.1",
-    difficulty: "Beginner",
-    logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/databricks/databricks-original.svg",
-    brandColor: "#FF3621",
-    tags: ["Databricks", "Data Lakehouse", "Spark", "Data Engineering"],
-    content: `Imagine you're running a massive library. \n\nTraditionally, you had two choices:\n1. **The Data Lake**: A giant warehouse where people just dump books in random piles. It holds everything, but finding a specific book is a nightmare.\n2. **The Data Warehouse**: A perfectly organized bookshelf. It's easy to search, but it's incredibly expensive to maintain, and it can only hold specific types of books.\n\nWhat if you could have the unlimited storage of the warehouse pile, but the perfect organization of the bookshelf? \n\nThat's the **Databricks Lakehouse**.\n\n## How it works\nDatabricks uses a technology called Delta Lake. Think of Delta Lake as an incredibly smart librarian who stands at the door of your warehouse. \n\nEvery time you throw a massive pile of messy data (like JSON logs or CSV files) into the lake, the librarian instantly catalogs it, cleans it up, and adds "transactions." If someone tries to read the data while it's being updated, the librarian ensures they don't see a broken half-written file.\n\n## The Magic of Spark\nUnder the hood, Databricks is powered by Apache Spark. Imagine hiring 1,000 workers to read 1,000 different pages of a book at the exact same time. Spark breaks down massive data jobs into tiny pieces and processes them in parallel across a cluster of machines.\n\n> [!TIP]\n> Next time you need to process terabytes of data, don't build a fragile pipeline. Just let the Lakehouse handle it.`
-  },
-  "langgraph-agents": {
-    title: "Teaching AI to Think in Loops with LangGraph",
-    excerpt: "Standard AI bots just give one answer and stop. But what if they could double-check their own work, fix their mistakes, and think in continuous loops? Enter LangGraph.",
-    readTime: "8 min read",
-    category: "AI Agents",
-    date: "2026-07-10",
-    lastUpdated: "2026-07-18",
-    version: "v1.3",
-    difficulty: "Advanced",
-    logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg",
-    brandColor: "#3776AB",
-    tags: ["LangGraph", "LLM", "AI Agents", "Python"],
-    content: `Most AI systems work like a drive-thru window. You ask a question, the AI gives you an answer, and the interaction is over. \n\nBut what if you need the AI to do something complex, like write a software program, test it, and fix its own bugs? A simple drive-thru won't work. You need the AI to think in **loops**.\n\n## Enter LangGraph\nLangGraph is a framework that allows Large Language Models (LLMs) to operate in cycles. \n\nInstead of a straight line, imagine a flowchart. \n1. The **Generator** writes the code.\n2. The **Reviewer** looks at the code and runs tests.\n3. If the tests fail, the Reviewer sends it *back* to the Generator with a list of errors.\n\nThis loop continues until the code works perfectly.\n\n## Why does this matter?\nBy giving AI the ability to reflect and retry, we see a massive jump in quality. It's the difference between asking someone to write an essay in one draft without looking at it, versus letting them revise it five times. LangGraph gives your AI the power of revision.`
-  },
-  "rag-system": {
-    title: "Giving AI a Perfect Memory: How RAG Actually Works",
-    excerpt: "Ever wish your AI could instantly pull up that one specific sentence from a 500-page manual? Retrieval-Augmented Generation (RAG) is the secret filing system making it happen.",
-    readTime: "10 min read",
-    category: "Generative AI",
-    date: "2026-07-05",
-    difficulty: "Intermediate",
-    logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tensorflow/tensorflow-original.svg",
-    brandColor: "#FF6F00",
-    tags: ["RAG", "Generative AI", "Vector Database", "Embeddings"],
-    content: `Imagine asking an incredibly smart professor a question about a highly specific, top-secret document they have never read. No matter how smart they are, they will either guess or hallucinate an answer. \n\nThis is the problem with ChatGPT and company data.\n\n## The RAG Solution\nRetrieval-Augmented Generation (RAG) fixes this by acting as the professor's research assistant. \n\nBefore the professor (the AI) answers your question, the research assistant (the Vector Database) sprints to the filing cabinet, finds the exactly relevant paragraphs from your company's documents, and hands them to the professor.\n\n"Here, use this context to answer the question," the assistant says.\n\n## The Secret Sauce: Chunking\nYou can't just hand the AI a 500-page PDF. It will get overwhelmed. Instead, we "chunk" the document into small paragraphs. When you ask a question, the system uses mathematics (Vector Embeddings) to find the 5 most relevant paragraphs out of millions, in milliseconds.\n\nRAG doesn't just make AI smarter; it gives it a perfect, factual memory of your proprietary data.`
-  },
-  "interviewos": {
-    title: "Building an AI Interviewer that Actually Listens",
-    excerpt: "We built InterviewOS to mock-interview engineers. It had to listen in real-time, understand messy coding thoughts, and grade answers fairly. Here is the architecture behind it.",
-    readTime: "9 min read",
-    category: "AI Systems",
-    date: "2026-06-28",
-    difficulty: "Advanced",
-    logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg",
-    brandColor: "#61DAFB",
-    content: `Technical interviews are stressful, subjective, and hard to scale. We wanted to build a platform that could conduct a mock interview just like a real Senior Engineer would—listening, adapting, and evaluating in real-time.\n\n## The Challenge of Latency\nIf you've ever talked to a voice AI, you know the awkward 5-second pause before it replies. In an interview, that pause destroys the illusion.\n\nWe had to build a system that was lightning fast. As the user speaks, their audio is streamed over WebSockets directly to the backend. We transcribe the audio on the fly, feeding it to an LLM before the user even finishes their sentence.\n\n## The Panel of Judges\nInstead of using one massive AI to grade the interview, we use a panel of specialized AI judges. \n- One AI only looks at code efficiency.\n- Another AI only grades communication style.\n- A third AI ensures the candidate didn't cheat.\n\nBy breaking the problem down, InterviewOS provides a deeply accurate, unbiased feedback report that actually helps engineers improve.`
-  },
-  "google-cloud-run": {
-    title: "Scaling Python from Zero to Hero on Cloud Run",
-    excerpt: "Deploying backend servers used to mean paying for machines even when no one was using them. Cloud Run changes the game by shrinking your app to zero when idle.",
-    readTime: "7 min read",
-    category: "Cloud",
-    date: "2026-06-18",
-    difficulty: "Beginner",
-    logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/googlecloud/googlecloud-original.svg",
-    brandColor: "#4285F4",
-    content: `Back in the day, hosting a server meant paying for a machine to stay awake 24/7, even if no one visited your website at 3 AM. You were paying to cool down idle processors.\n\n## The Serverless Revolution\nGoogle Cloud Run flips the script. Instead of renting a permanent server, you package your code into a "Container" (a standardized box). \n\nWhen a user visits your API, Cloud Run instantly spins up a container to serve the request. \nBut here is the magic part: when the user leaves, the container disappears. It scales down to exactly **zero**.\n\n## Why it's a Game Changer\nFor portfolio projects and side businesses, this means you pay absolutely $0 when you have no traffic. \n\nBut if your app suddenly goes viral and gets a million hits? Cloud Run will automatically clone your container a thousand times to handle the load, without you lifting a finger. It's the ultimate set-it-and-forget-it deployment strategy.`
-  },
-  "vector-search": {
-    title: "Searching by Meaning, Not Just Keywords",
-    excerpt: "Traditional databases look for exact word matches. Vector databases look for 'vibes' and meanings. Here is how Pgvector and Pinecone are revolutionizing search.",
-    readTime: "8 min read",
-    category: "Databases",
-    date: "2026-06-02",
-    difficulty: "Intermediate",
-    logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg",
-    brandColor: "#4169E1",
-    content: `Traditional databases are incredibly rigid. If you search for "shoes," they will strictly look for the exact word "shoes." If a product is labeled "sneakers," the database will say, "Sorry, I have no idea what that is."\n\n## Searching by Vibes\nVector Databases (like Pgvector or Pinecone) don't look at words; they look at **meanings**. \n\nThey convert text, images, and audio into lists of numbers (Vectors). In this numerical space, the word "shoes" and "sneakers" are physically right next to each other. \n\nSo when you search for "shoes," the database finds "sneakers," "boots," and "footwear" because they share the same semantic neighborhood or "vibe."\n\n## Why it's taking over\nThis is the engine powering modern AI recommendations, image searches, and RAG pipelines. By storing meaning instead of characters, we finally have search engines that actually understand what we want.`
-  },
-  "fastapi-production": {
-    title: "FastAPI: Making Python Fast Again",
-    excerpt: "FastAPI is incredible, but putting it in production can be tricky. If you block the main thread, the whole app freezes. Here are the secrets to keeping it blazing fast.",
-    readTime: "6 min read",
-    category: "Backend",
-    date: "2026-05-20",
-    difficulty: "Intermediate",
-    logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/fastapi/fastapi-original.svg",
-    brandColor: "#009688",
-    content: `Python has a reputation for being slow. For years, web frameworks handled one request at a time. If user A asked the server to download a large file, user B had to wait in line.\n\n## The Asynchronous Hero\nFastAPI fixes this by using asynchronous programming (async/await). \n\nImagine a waiter at a restaurant. A "synchronous" waiter takes your order, walks to the kitchen, and stands there staring at the chef until your food is ready. Meanwhile, other tables are starving.\n\nAn "asynchronous" waiter takes your order, hands it to the kitchen, and immediately goes to serve the next table. When your food is ready, they bring it to you. \n\n## Production Speed\nBy freeing up the server to handle thousands of requests while waiting on databases or external APIs, FastAPI allows Python to achieve speeds comparable to NodeJS and Go. It makes Python fast again.`
-  }
-};
+
 
 export default function BlogDetail({ blogs, currentMode = 'general', isDark, onRefreshData }: BlogDetailProps) {
   const { blogId } = useParams<{ blogId: string }>();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Find blog in static articles or dynamic database blogs
-  const staticBlog = staticArticles[blogId || ''];
-  const dynamicBlog = blogs.find(b => b.id === blogId);
-
-  const activeBlog: BlogNote | null = dynamicBlog || (staticBlog ? {
-    id: blogId!,
-    title: staticBlog.title,
-    excerpt: staticBlog.excerpt,
-    readTime: staticBlog.readTime,
-    category: staticBlog.category,
-    date: staticBlog.date,
-    url: '#',
-    content: staticBlog.content,
-    tags: staticBlog.tags,
-    logoUrl: staticBlog.logoUrl,
-    brandColor: staticBlog.brandColor,
-    priority: { general: 1, 'data-engineer': 1 }
-  } : null);
+  // Resolve the active article from the backend-provided blog list (single source of truth).
+  const activeBlog: BlogNote | null = (Array.isArray(blogs) ? blogs : []).find(b => b.id === blogId) || null;
 
   const { isFocusMode } = useReadingState();
 
@@ -313,24 +212,11 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
     }
   };
 
-  // Extract all articles for "Related Articles"
-  const allArticlesList = Object.keys(staticArticles).map(k => ({
-    id: k,
-    title: staticArticles[k].title,
-    excerpt: staticArticles[k].excerpt,
-    date: staticArticles[k].date,
-    category: staticArticles[k].category,
-    tags: staticArticles[k].tags,
-    difficulty: staticArticles[k].difficulty
-  })).concat(blogs.map(b => ({
-    id: b.id,
-    title: b.title,
-    excerpt: b.excerpt,
-    date: b.date,
-    category: b.category,
-    tags: b.tags,
-    difficulty: b.difficulty
-  })));
+  // Related Articles / search across the backend blog list.
+  const safeBlogs = Array.isArray(blogs) ? blogs : [];
+  const allArticlesList = safeBlogs.map(b => ({
+    id: b.id, title: b.title, excerpt: b.excerpt, date: b.date, category: b.category, tags: b.tags, difficulty: b.difficulty
+  }));
 
   return (
     <div className={`min-h-screen transition-colors duration-200 ${

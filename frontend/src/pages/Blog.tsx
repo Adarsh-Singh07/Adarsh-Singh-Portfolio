@@ -28,101 +28,11 @@ export default function Blog({ blogs, currentMode, isDark, onRefreshData }: Blog
   const [modalMode, setModalMode] = useState<'view' | 'create'>('view');
 
   const token = sessionStorage.getItem('admin-token') || localStorage.getItem('admin-token');
-  const isAdmin = !!token;  // Predefined high-quality articles metadata
-  const staticMetadata: BlogNote[] = [
-    {
-      id: "databricks-lakehouse",
-      title: "The Magic of Databricks: Building a Data Lakehouse",
-      excerpt: "Imagine having the vast, bottomless storage of a data lake combined with the organized, easy-to-search structure of a data warehouse. That's the Databricks Lakehouse.",
-      readTime: "8 min read",
-      category: "Data Engineering",
-      date: "2026-07-15",
-      url: "#",
-      logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/databricks/databricks-original.svg",
-      brandColor: "#FF3621",
-      priority: { general: 4, 'data-engineer': 4 }
-    },
-    {
-      id: "langgraph-agents",
-      title: "Teaching AI to Think in Loops with LangGraph",
-      excerpt: "Standard AI bots just give one answer and stop. But what if they could double-check their own work, fix their mistakes, and think in continuous loops? Enter LangGraph.",
-      readTime: "8 min read",
-      category: "AI Agents",
-      date: "2026-07-10",
-      url: "#",
-      logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg",
-      brandColor: "#3776AB",
-      priority: { general: 5, 'data-engineer': 5 }
-    },
-    {
-      id: "rag-system",
-      title: "Giving AI a Perfect Memory: How RAG Actually Works",
-      excerpt: "Ever wish your AI could instantly pull up that one specific sentence from a 500-page manual? Retrieval-Augmented Generation (RAG) is the secret filing system making it happen.",
-      readTime: "10 min read",
-      category: "Generative AI",
-      date: "2026-07-05",
-      url: "#",
-      logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tensorflow/tensorflow-original.svg",
-      brandColor: "#FF6F00",
-      priority: { general: 6, 'data-engineer': 6 }
-    },
-    {
-      id: "interviewos",
-      title: "Building an AI Interviewer that Actually Listens",
-      excerpt: "We built InterviewOS to mock-interview engineers. It had to listen in real-time, understand messy coding thoughts, and grade answers fairly. Here is the architecture behind it.",
-      readTime: "9 min read",
-      category: "AI Systems",
-      date: "2026-06-28",
-      url: "#",
-      logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg",
-      brandColor: "#61DAFB",
-      priority: { general: 7, 'data-engineer': 7 }
-    },
-    {
-      id: "google-cloud-run",
-      title: "Scaling Python from Zero to Hero on Cloud Run",
-      excerpt: "Deploying backend servers used to mean paying for machines even when no one was using them. Cloud Run changes the game by shrinking your app to zero when idle.",
-      readTime: "7 min read",
-      category: "Cloud",
-      date: "2026-06-18",
-      url: "#",
-      logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/googlecloud/googlecloud-original.svg",
-      brandColor: "#4285F4",
-      priority: { general: 8, 'data-engineer': 8 }
-    },
-    {
-      id: "vector-search",
-      title: "Searching by Meaning, Not Just Keywords",
-      excerpt: "Traditional databases look for exact word matches. Vector databases look for 'vibes' and meanings. Here is how Pgvector and Pinecone are revolutionizing search.",
-      readTime: "8 min read",
-      category: "Databases",
-      date: "2026-06-02",
-      url: "#",
-      logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg",
-      brandColor: "#4169E1",
-      priority: { general: 9, 'data-engineer': 9 }
-    },
-    {
-      id: "fastapi-production",
-      title: "FastAPI: Making Python Fast Again",
-      excerpt: "FastAPI is incredible, but putting it in production can be tricky. If you block the main thread, the whole app freezes. Here are the secrets to keeping it blazing fast.",
-      readTime: "6 min read",
-      category: "Backend",
-      date: "2026-05-20",
-      url: "#",
-      logoUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/fastapi/fastapi-original.svg",
-      brandColor: "#009688",
-      priority: { general: 10, 'data-engineer': 10 }
-    }
-  ];
+  const isAdmin = !!token;
 
-  // Merge static metadata with database items
-  const allBlogs = [...blogs];
-  staticMetadata.forEach(staticItem => {
-    if (!allBlogs.some(b => b.id === staticItem.id)) {
-      allBlogs.push(staticItem);
-    }
-  });
+  // Blog list is sourced from the backend profile (single source of truth).
+  // Guard against a missing/undefined array so the page never crashes to a blank screen.
+  const allBlogs: BlogNote[] = Array.isArray(blogs) ? [...blogs] : [];
 
   // Extract unique categories dynamically from merged list
   const categories = ['all', ...Array.from(new Set(allBlogs.map(blog => blog.category)))];

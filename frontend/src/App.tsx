@@ -10,6 +10,7 @@ import { ProfileMode, ProfileData, RoleDefinition } from './types';
 import PortfolioService from './services/api';
 import Navbar from './components/Navbar';
 import Breadcrumbs from './components/Breadcrumbs';
+import ErrorBoundary from './components/ErrorBoundary';
 import { Loader2 } from 'lucide-react';
 import Chatbot from './components/Chatbot';
 import SmoothScroll from './components/SmoothScroll';
@@ -204,12 +205,16 @@ export default function App() {
                     <Loader2 className="w-8 h-8 animate-spin text-[#007AFF]" />
                   </div>
                 }>
-                  <AnimatedRoutes 
-                    profileData={profileData} 
-                    currentMode={currentMode} 
-                    isDark={isDark} 
-                    onRefreshData={() => setRefreshTrigger(prev => prev + 1)}
-                  />
+                  {/* Wrap the routed content in an ErrorBoundary so any render
+                      crash shows a recoverable card instead of a blank screen. */}
+                  <ErrorBoundary isDark={isDark} key="routes">
+                    <AnimatedRoutes 
+                      profileData={profileData} 
+                      currentMode={currentMode} 
+                      isDark={isDark} 
+                      onRefreshData={() => setRefreshTrigger(prev => prev + 1)}
+                    />
+                  </ErrorBoundary>
                 </Suspense>
               </main>
             ) : loading ? (

@@ -691,62 +691,6 @@
     ],
     "blogs": [
       {
-        "id": "scalable-etl-azure-databricks",
-        "title": "Building Scalable ETL Pipelines with Azure Databricks for Financial Data Lakes",
-        "excerpt": "Explore the architecture and implementation of robust ETL pipelines using Python and Azure Databricks, specifically tailored for handling large-scale financial datasets and enabling advanced BI analytics.",
-        "readTime": "7 min read",
-        "category": "Data Engineering",
-        "date": "2024-07-15",
-        "url": "#",
-        "priority": {
-          "general": 2,
-          "data-engineer": 1,
-          "ai-engineer": 99
-        }
-      },
-      {
-        "id": "agentic-ai-rag-dynamic-pricing",
-        "title": "Leveraging Agentic AI and RAG for Dynamic Pricing in On-Demand Services",
-        "excerpt": "Dive into how Agentic AI and Retrieval-Augmented Generation (RAG) can be integrated into microservices architectures to enable real-time, data-driven dynamic pricing and enhance customer support through LLM-powered chatbots.",
-        "readTime": "9 min read",
-        "category": "Generative AI",
-        "date": "2024-06-20",
-        "url": "#",
-        "priority": {
-          "general": 5,
-          "data-engineer": 99,
-          "ai-engineer": 99
-        }
-      },
-      {
-        "id": "personalizing-email-openai-llm",
-        "title": "Personalizing Email Campaigns with OpenAI: A Practical Guide to LLM Integration",
-        "excerpt": "Learn how to build an automated email campaign tool using Python and the OpenAI API to generate personalized content at scale, improving engagement and campaign effectiveness.",
-        "readTime": "6 min read",
-        "category": "AI/ML",
-        "date": "2024-05-10",
-        "url": "#",
-        "priority": {
-          "general": 3,
-          "data-engineer": 3,
-          "ai-engineer": 2
-        }
-      },
-      {
-        "id": "real-time-isl-translation-ml",
-        "title": "Real-Time Indian Sign Language Translation: An ML Pipeline with TensorFlow & OpenCV",
-        "excerpt": "Discover the technical challenges and solutions in developing a low-latency, real-time machine learning system for Indian Sign Language translation, from model optimization to deployment.",
-        "readTime": "8 min read",
-        "category": "Machine Learning",
-        "date": "2024-04-01",
-        "url": "#",
-        "priority": {
-          "general": 4,
-          "data-engineer": 99,
-          "ai-engineer": 3
-        }
-      },
-      {
         "id": "langgraph-agents",
         "title": "Teaching AI to Think in Loops with LangGraph",
         "excerpt": "Standard AI bots just give one answer and stop. But what if they could double-check their own work, fix their mistakes, and think in continuous loops? Enter LangGraph.",
@@ -799,6 +743,110 @@
           "general": 1,
           "data-engineer": 1,
           "ai-engineer": 1
+        }
+      },
+      {
+        "id": "databricks-lakehouse",
+        "title": "The Magic of Databricks: Building a Data Lakehouse",
+        "excerpt": "Imagine the vast storage of a data lake combined with the organized structure of a data warehouse. That's the Databricks Lakehouse.",
+        "readTime": "4 min read",
+        "category": "Data Engineering",
+        "date": "2026-07-15",
+        "url": "#",
+        "content": "# The Magic of Databricks: Building a Data Lakehouse\n\nYou probably have two problems and you call them by different names, but they're really the same problem wearing two hats.\n\nThe **data lake** is where you dump everything — raw logs, sensor readings, JSON, CSV, the works. It's unlimited and cheap, but finding a specific thing in it is a nightmare.\n\nThe **data warehouse** is the opposite: perfectly organized, fast to query, and built for reporting. But it's expensive to maintain and it can only hold data you've already decided to structure.\n\nThe **lakehouse** is the bet that you don't have to choose. You get lake-scale storage with warehouse-style discipline on top of it. Databricks is the most popular way to build one, and the whole trick lives in one idea: put a *transactional layer* on top of open-format files.\n\n## How It Actually Works\n\nUnder the hood, Databricks uses **Delta Lake**. Picture your lake as a warehouse where people just throw boxes in. Delta is the librarian who stands at the door: every time you drop in a box of messy data, she instantly catalogs it, cleans it up, and records the transaction.\n\nThat \"record the transaction\" part is what makes it special. It's what lets you ask the lake to behave like a database:\n\n- **ACID transactions** — commit or roll back. A partial write can never leave you a half-baked table.\n- **Concurrency** — a reader never sees a table mid-update.\n- **Schema enforcement** — the lake rejects records that don't match, so bad data can't quietly rot your analytics.\n- **Time travel** — query the table as it looked at any past commit.\n\nSo you get warehouse safety without leaving the open, cheap, scalable file storage of the lake.\n\n## The Spark That Makes It Fast\n\nA lakehouse is useless if queries crawl. Databricks runs on **Apache Spark**, and the reason Spark is the engine here is parallelism. Imagine a job that reads a terabyte of data. Instead of one machine grinding through it, Spark splits the work into thousands of tiny tasks and runs them across a cluster at the same time.\n\nTwo things make this practical rather than theoretical:\n\n- **Out-of-core execution** — Spark handles data bigger than memory by spilling to disk, so the cluster isn't hostage to RAM size.\n- **Columnar storage (Parquet/Delta)** — reading only the columns you need and skipping whole row groups means a dashboard query doesn't scan the entire table.\n\nTogether, \"split it up + read only what matters\" is why a query that would take hours on one box finishes in minutes on a cluster.\n\n## The Three Layers That Keep It Usable\n\nTeams that keep their lakehouse healthy layer it, and the reason is the same as any good architecture — **isolate the mess from the clean**:\n\n| Layer | Contents | Mindset |\n|-------|----------|---------|\n| **Bronze** | Raw, exactly-as-received data | Immutable evidence. Never edited. |\n| **Silver** | Cleaned, deduplicated, typed | The trustworthy source. |\n| **Gold** | Business aggregates and KPIs | What dashboards and models actually read. |\n\nEach layer only reads from the one below it. That means a bug in your cleaning logic can never corrupt the raw evidence — you just re-derive silver and gold. The raw layer is your safety net.\n\n## Why It's Worth It\n\nBefore lakehouses, the choice was blunt: fast-and-expensive (warehouse) or cheap-and-slow (lake). The lakehouse erases the choice. You store once, at lake prices, and query with warehouse discipline on demand.\n\n> [!TIP]\n> **Next time you need to query terabytes, don't build a fragile pipeline — let the lakehouse handle it.** The pattern is: land raw, layer bronze→silver→gold, and let Spark's parallelism do the heavy lifting.\n",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/databricks/databricks-original.svg",
+        "brandColor": "#FF3621",
+        "tags": [
+          "Databricks",
+          "Data Lakehouse",
+          "Spark",
+          "Delta Lake"
+        ],
+        "difficulty": "Beginner",
+        "lastUpdated": "2026-09-16",
+        "version": "1.1",
+        "priority": {
+          "general": 4,
+          "data-engineer": 4,
+          "ai-engineer": 99
+        }
+      },
+      {
+        "id": "interviewos",
+        "title": "Building an AI Interviewer that Actually Listens",
+        "excerpt": "We built InterviewOS to mock-interview engineers in real time. Here is the architecture that makes it fast, fair, and useful.",
+        "readTime": "4 min read",
+        "category": "AI Systems",
+        "date": "2026-06-28",
+        "url": "#",
+        "content": "# Building an AI Interviewer That Actually Listens\n\nWe built InterviewOS to mock-interview engineers like a real senior would: listen in real time, tolerate messy out-loud thinking, and grade answers fairly. This post is the architecture behind it — and, more importantly, the parts that nearly broke.\n\n## The Core Tension\n\nA static interviewer asks question 3 after question 2, regardless of what the candidate just said. A *real* interviewer adapts: the candidate mumbles a confusing answer, so the interviewer asks a clarifying follow-up; they confidently say \"I don't know,\" so the interviewer moves on. That adaptation is the whole product, and it forces the system to be **fast and stateful at the same time**, which is a hard combo to pull off.\n\n## Problem 1: The 5-Second Pause\n\nAnyone who's talked to a voice assistant knows the awkward gap before it replies. In an interview, a 5-second gap after every sentence *breaks the illusion*. The candidate stops talking, the silence drags, and the flow dies.\n\nThe fix is to stop waiting for the candidate to finish a full sentence. Instead, stream the audio and start transcribing before they're done:\n\n```text\nMicrophone\n   |\n   +--> streaming ASR (word by word, as they speak)\n   |\n   +--> the interviewer model gets partial text in real time\n   |\n   +--> it can start formulating a response while the\n         candidate is still finishing\n```\n\nThe latency budget that makes it feel live is tight:\n\n| Stage | Budget |\n|-------|--------|\n| Audio chunked and sent | ~100 ms |\n| Streaming transcription | ~200–400 ms |\n| LLM response started | first token < ~600 ms |\n| TTS begins speaking | ~1 s from end of their sentence |\n\nThe trick is that the expensive model work *starts early*. You don't transcribe the full sentence, then think, then speak. You transcribe as-you-go and pipeline it.\n\n## Problem 2: Messy Out-Loud Thinking\n\nCandidates don't answer in clean sentences. They say \"um, well, I think you'd probably...\", correct themselves, trail off, then restart. A naive system that treats the transcript as a finished statement will misunderstand constantly.\n\nTwo things help:\n\n- **Wait for a silence window, not punctuation.** A period is not a signal they're done. A short pause (say 700 ms of silence) is. Use that to delimit a turn.\n- **Give the model the correction.** When a candidate backtracks (\"actually, no, wait, I meant...\"), feed the whole thing including the backtrack. The correction *is* the answer.\n\n## Problem 3: Grading Fairly (The \"Panel of Judges\")\n\nThe biggest design decision. One big model grading \"how good was this answer?\" produces a mushy number — it weights fluency and substance and confidence all together, and you can't tell which one moved the score.\n\nWe split it into a **panel of specialized judges**, each looking at one thing:\n\n- **Correctness judge** — is the technical content right?\n- **Communication judge** — can you actually follow their reasoning?\n- **Honesty / cheat judge** — did they recite an answer, or do they genuinely understand it?\n\nEach judge returns its own score *and a short reason*. The panel's outputs are combined into a report, and — critically — the candidate sees the reasons, not just a grade. \"You said the answer but couldn't explain why it works\" is actionable. \"Score: 6.2\" is not.\n\n## The Architecture, End to End\n\n```text\nCandidate's mic\n   |\n   +-->(streaming ASR)--> partial transcript\n   |\n   +--> Interviewer model  <--- (conversation state, question plan)\n   |\n   +--> TTS --> back to the candidate\n   |\n   +--> when the interview ends:\n          panel of judges --> per-dimension scores + reasons\n                              --> structured report\n```\n\nThe interviewer model holds **conversation state** (what's been covered, what's left in the question plan), so it can steer back to unaddressed areas instead of rambling.\n\n## What We'd Get Wrong On Purpose Next Time\n\n- **Over-engineering the judges.** Three focused judges beat one grand \"evaluate everything\" model that's hard to debug.\n- **Grading from the transcript alone.** Tone and hesitation carry signal. The audio track matters for the honesty judge, and throwing it away loses that.\n- **Forgetting the report.** The score is the easy part. The *explainable* breakdown is what makes a candidate actually learn something from the mock.\n\n## Key Takeaways\n\n- Live feels live only if expensive work starts *early* — pipeline transcription, thinking, and speech instead of chaining them.\n- Delimit turns on **silence**, not punctuation, and keep the backtrack — it's part of the answer.\n- Split grading into a **panel of single-minded judges**, each with a reason, and show the reasons to the candidate.\n- The conversation state that steers unasked areas is the difference between an interviewer and a Q&A bot.\n",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg",
+        "brandColor": "#61DAFB",
+        "tags": [
+          "AI Systems",
+          "Real-Time",
+          "Architecture",
+          "LLM"
+        ],
+        "difficulty": "Advanced",
+        "lastUpdated": "2026-09-16",
+        "version": "1.0",
+        "priority": {
+          "general": 7,
+          "data-engineer": 7,
+          "ai-engineer": 4
+        }
+      },
+      {
+        "id": "google-cloud-run",
+        "title": "Scaling Python from Zero to Hero on Cloud Run",
+        "excerpt": "Cloud Run flips the server cost model: your app scales to zero when idle, and clones itself when traffic spikes.",
+        "readTime": "4 min read",
+        "category": "Cloud",
+        "date": "2026-06-18",
+        "url": "#",
+        "content": "# Scaling Python from Zero to Hero on Cloud Run\n\nDeploying a backend used to mean a decision: rent a machine, keep it awake 24/7, and pay for it whether anyone visits or not. Cloud Run changes the math by making the \"always-on\" part optional. If your app has traffic, it's running. If it doesn't, it's gone, and so is the bill.\n\n## The Old Way\n\nThe pre-serverless world was simple: `ssh` into a box, install Python, run the server, open a port, keep it up. That box costs money every single hour of the month. A demo site that gets visited twice a day is still paying for 24/7.\n\n## How Cloud Run Changes the Shape\n\nInstead of \"a server I manage,\" you hand Cloud Run **a container**. The container is just a standardized box: your Python code, its dependencies, and a `Dockerfile` telling it how to start. That's the whole artifact.\n\nCloud Run does the rest:\n\n1. **It listens** for requests pointed at your URL.\n2. **The first request** after a quiet period starts a container (cold start, a few hundred ms to a couple of seconds).\n3. **While traffic is flowing**, it keeps containers running.\n4. **When traffic stops**, it scales to zero. No idle cost.\n\nThe \"zero\" is the point. Scale down to zero means your portfolio project, an API that gets hit rarely, or a tool you only use on weekends costs you nothing at rest.\n\n## The Scaling That Actually Scalet\n\nThe same service that scales to zero will also scale *up* automatically. Cloud Run adds one container per concurrent request (by default), so if your app gets 200 concurrent requests, you get up to 200 containers. No load balancer config, no horizontal-autoscaling group, no \"how many instances should I set?\"\n\n```text\n0 requests    ->  0 containers   ->  $0\n1 request     ->  1 container\n50 requests   ->  50 containers\n(requests go away) -> scale back to 0\n```\n\nThe thing that trips people up: each container is still a *Python process*, so a single request that blocks the whole process (say, a synchronous network call that holds the event loop) blocks that container's other work. Keep your handlers fast and `async`-friendly, or raise your per-container concurrency.\n\n## What You Still Own\n\nCloud Run removes the infra layer, not the code layer. You're still responsible for:\n\n- **Writing a container that starts in under 10 seconds.** Cold start latency is your container build time plus your app's startup. Ship a small image, warm up fast.\n- **Healthy HTTP responses.** Cloud Run uses your app's responses to decide if a container is working. A container that hangs on startup gets recycled.\n- **Secrets and config.** Use the secret manager, not a `.env` baked into the image.\n- **Observability.** You don't run a server anymore, so you don't get a terminal to log into. Structure your logs so the cloud logging view is actually useful.\n\n## The Practical Recipe\n\n```text\nDockerfile\n   |  -- your python app + deps\n   |\nCloud Build (or your CI)\n   |  -- build the image, push to a registry\n   |\nCloud Run\n   |  -- deploy the image, set service account, scale 0..N\n   |\nHTTPS endpoint\n      -- your API or app is live\n```\n\nThat's the entire deployment path. No VM to patch, no firewall to babysit, no \"is the cron job to restart the service still running.\"\n\n## When It Doesn't Fit\n\nHonest counterexamples:\n\n- **Long-running work.** A job that runs 45 minutes will keep a container (and the bill) alive. Split \"start the job\" (fast, serverless) from \"run the job\" (a queue or a batch service).\n- **Stateful connections.** If your app holds a persistent database connection, watch for the connection pool getting closed when a container idles. Open connections lazily per request, or manage a pool carefully.\n- **Real-time sockets.** WebSockets and server-sent events need a bit more thought under scale-to-zero, because the \"no traffic = no container\" model has edges.\n\n## Why It's a Game Changer\n\nFor the 90% of projects that aren't high-load production systems, Cloud Run is the right default. You get HTTPS, autoscaling, and scale-to-zero without buying infrastructure. The mental model shift is real: instead of \"how many boxes do I run?\", the question is \"what should one request do?\" — and that's a much simpler question to answer.\n\n> [!TIP]\n> **If your app gets visited more like \"sometimes\" than \"constantly,\" scale-to-zero is the single biggest cost and complexity win you can get.**\n",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/googlecloud/googlecloud-original.svg",
+        "brandColor": "#4285F4",
+        "tags": [
+          "Cloud",
+          "Serverless",
+          "Python",
+          "GCP"
+        ],
+        "difficulty": "Beginner",
+        "lastUpdated": "2026-09-16",
+        "version": "1.0",
+        "priority": {
+          "general": 8,
+          "data-engineer": 6,
+          "ai-engineer": 6
+        }
+      },
+      {
+        "id": "vector-search",
+        "title": "Searching by Meaning, Not Just Keywords",
+        "excerpt": "Traditional databases match words. Vector databases match meaning. Here is how Pgvector and Pinecone power modern search and RAG.",
+        "readTime": "5 min read",
+        "category": "Databases",
+        "date": "2026-06-02",
+        "url": "#",
+        "content": "# Searching by Meaning, Not Just Keywords\n\nTraditional databases have one big weakness that only shows up when your data starts being *real* instead of *tidy*. Ask a regular database for \"shoes\" and it gives you every row with the word \"shoes\" — but the row labeled \"sneakers\" or \"footwear\" is invisible to it. It matches **tokens**, not **meaning**. Vector search is the fix, and it's quietly the reason the newest generation of search and AI apps feel like they actually understand you.\n\n## The Core Idea\n\nA vector database doesn't store words. It stores **meaning as numbers**.\n\nThe trick is an **embedding**: a model converts any text (or image, or audio) into a list of numbers — a point in a high-dimensional space. The beautiful property of that space is that *things with similar meaning end up close together*. So \"shoes\" and \"sneakers\" live right next to each other, and both sit far away from \"shoelace\" (which a keyword search would happily treat as the same word).\n\n```text\n        \"sneakers\"  ●\n                    ●  \"shoes\"\n        \"footwear\"  ●\n                    .\n   .\n \"shoelace\"          .\n .\n```\n\nNow when you search, you don't ask \"find the word X.\" You ask \"find what's *near this meaning*.\" The database finds your query's neighbors, and it finds related words it's never seen.\n\n## Why Keyword Search Feels Stupid to Us\n\nWe never actually search by exact tokens. Ask Google for a \"reset my password\" and it returns \"can't log in\" results, because it *understands* the intent. A pure keyword engine can't do that — it's a phone-book lookup, not a comprehension. Every \"I can't find things I'm sure are there\" frustration you've had with a database search box is this problem.\n\nEmbeddings are how you give a search system comprehension. The model sees \"reset password\" and \"can't log in\" and maps them to nearly the same neighborhood, because they *are* nearly the same intent.\n\n## How the Pipeline Actually Works\n\nIt's not magic; it's three steps and a clever index:\n\n```text\n  1. EMBED each document\n     \"How to claim a refund\"  ->  [0.2, -0.1, 0.7, ...]\n  2. STORE the vectors in an index that's fast to search\n     (a few thousand dimensions, billions of points)\n  3. QUERY: embed the user's question, find the nearest neighbors\n     \"how do I get my money back\"  ->  same neighborhood as #1\n```\n\nStep 2 is where the real engineering lives. A brute-force \"compare against every vector\" search is fine for a few thousand documents and useless for a few million — that's **O(n) every query**. The databases that made this practical (like `pgvector` in Postgres, or Pinecone, Weaviate, Qdrant) use **approximate nearest-neighbor (ANN)** indexes that skip most of the space and get you the right answer in milliseconds, at a tiny recall cost.\n\n```text\nBrute force:  compare query vs ALL vectors      -> slow, exact\nANN index:    hop through a graph / buckets      -> fast, ~99% of the right answer\n```\n\nYou trade a fraction of perfect accuracy for a hundred times the speed. For search, that's an obvious win.\n\n## Where It's Already Everywhere\n\nYou've used vector search without knowing it:\n\n- **RAG (retrieval-augmented generation)** — the AI chatbot that answers from *your* docs. It embeds your documents, retrieves the nearest few to the question, and hands them to the model. No retrieval, it hallucinates. Retrieval is what grounds it.\n- **Recommendation \"because you looked at X\"** — find the things in the same neighborhood as what you clicked.\n- **Image search** — \"find images like this one\" is just \"find the vectors near this image's vector.\"\n- **Semantic search** in any app where \"near-miss\" should count as a hit.\n\nThe common thread: **the query and the content are in the same meaning-space**, so relevance is distance.\n\n## The Part People Get Wrong\n\nThree habits that make or break it in practice:\n\n- **Pick the embedding model to fit your content.** A model trained on general English text is different from one tuned for code, for legal, for your own domain. Worst embeddings are rarely \"bad vectors\" — they're the *wrong* vectors for your data.\n- **Keep the chunks sensible.** The embedding model has a limit on how much text it can turn into one vector. Over-stuff it and you blur the meaning; chunk too small and you lose context. The sweet spot is \"one clear idea per chunk.\"\n- **Store the text next to the vector.** Always. When a search returns a hit, you want the actual content, not just \"some number\" — and when your model changes, you'll need to re-embed and you can't do that without the source.\n\n## The Bottom Line\n\nKeyword search answered \"does this word appear?\" Vector search answers \"does this *mean* the same thing?\" For anything where the user types what they *want* instead of what's *written* — and that's most of real search — meaning is the only query that works. That's the engine underneath the modern \"it just gets it\" apps, and it's why the whole stack — from the chatbot to the image search — now routes through a vector database first.\n\n> [!TIP]\n> **The first time your users type a query and get nothing, even though the answer clearly exists in your data, that's the moment to reach for a vector index.**\n",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg",
+        "brandColor": "#4169E1",
+        "tags": [
+          "Vector DB",
+          "Databases",
+          "RAG",
+          "Search"
+        ],
+        "difficulty": "Intermediate",
+        "lastUpdated": "2026-09-16",
+        "version": "1.0",
+        "priority": {
+          "general": 9,
+          "data-engineer": 5,
+          "ai-engineer": 2
         }
       }
     ],
@@ -1486,7 +1534,7 @@
         "id": "scalable-etl-azure-databricks",
         "title": "Building Scalable ETL Pipelines with Azure Databricks for Financial Data Lakes",
         "excerpt": "Explore the architecture and implementation of robust ETL pipelines using Python and Azure Databricks, specifically tailored for handling large-scale financial datasets and enabling advanced BI analytics.",
-        "readTime": "7 min read",
+        "readTime": "4 min read",
         "category": "Data Engineering",
         "date": "2024-07-15",
         "url": "#",
@@ -1494,13 +1542,25 @@
           "general": 2,
           "data-engineer": 1,
           "ai-engineer": 99
-        }
+        },
+        "content": "# Building Scalable ETL Pipelines with Azure Databricks for Financial Data\n\nMoving financial data is different from moving anything else. A late or wrong number here doesn't just break a dashboard — it breaks trust, and in finance, trust is the product. This post walks through how to design ETL pipelines with Python and Azure Databricks that stay fast, accurate, and auditable as the data grows.\n\n## Why ETL Still Matters\n\nBefore anything else, a quick refresher on the three letters:\n\n- **Extract** — pull raw data out of wherever it lives: bank feeds, market-data vendors, internal databases.\n- **Transform** — clean it, standardize it, and reshape it into something analysts can trust.\n- **Load** — write it into a destination that your BI tools and models can query fast.\n\nSounds simple. The hard part is doing that reliably when the same pipeline runs every day against data that never behaves the same way twice.\n\n## The Architecture: From Raw Sources to BI\n\nA pipeline that holds up in production is layered, not a single giant script. A pattern that works well is the **medallion architecture**:\n\n| Layer | What lives there | Rules |\n|-------|------------------|-------|\n| **Bronze** | Raw, untouched source files | Immutable. Never edited, only appended. |\n| **Silver** | Cleaned, deduplicated, type-validated data | One record per event, normalized. |\n| **Gold** | Aggregates and business-level facts | Safe to build dashboards and models on. |\n\nEach layer only reads from the layer below it. That separation means a bug in your cleaning logic can never corrupt the raw evidence — you can always re-derive.\n\n## Where Databricks Fits\n\nDatabricks brings three things to this setup:\n\n1. **Apache Spark** — the engine that splits a big job across many machines, so a pipeline that took hours on one box finishes in minutes.\n2. **Notebooks** — the same workspace for exploration and production jobs, which keeps the \"why\" of each step next to the \"how\".\n3. **Unity Catalog** — a single place that tracks who can see which table, which matters a lot when financial data is involved.\n\n## A Typical Pipeline, in Pseudocode\n\nThe bronze layer is intentionally dumb. It just lands data:\n\n```python\n# Bronze: land the raw feed, keep the source filename for audit\nraw = spark.read.parquet(f\"abfss://landing@{storage}.dfs.fabrik.net/trades_2026-09-15/\")\nraw.write.mode(\"append\").format(\"delta\").save(\"bronze.raw_trades\")\n```\n\nThe silver layer is where you earn your keep:\n\n```python\n# Silver: dedupe + type-validate before anything else touches it\nsilver = (\n    spark.read.table(\"bronze.raw_trades\")\n    .dropDuplicates([\"trade_id\"])\n    .withColumn(\"price\", F.col(\"price\").cast(\"decimal(18,4)\"))\n)\nsilver.write.mode(\"overwrite\").format(\"delta\").save(\"silver.trades\")\n```\n\nTwo details in that snippet are not trivial:\n\n- **Dedupe on a business key** (`trade_id`), not row identity. Feeds re-send; double-counted trades are the classic financial-data failure.\n- **Cast money to `decimal`**, not `float`. Floating point is a convenience for science and a liability for currency — `0.1 + 0.2` is not `0.3` in binary. Use fixed-point decimals for anything with a price tag.\n\n## The Financial-Specific Concerns\n\nThese are the requirements that separate a toy pipeline from one a finance team will sign off on:\n\n- **Idempotency** — re-running today's job must not double-count today's trades. Delta tables with `MERGE` and stable business keys make re-runs safe.\n- **Audit trail** — keep the source filename and load timestamp on every record. When someone asks \"why is this number different?\", you can trace it back to the exact file it came from.\n- **Sensitive fields** — PII and account numbers don't need to live in every layer. Strip or mask them at bronze → silver so downstream analysts never see them.\n- **Late data** — financial feeds are famously late. Design silver/gold as re-computable: when yesterday's corrected file arrives, re-run that day's slice instead of patching tables by hand.\n\n## Scaling From Batch to Streaming\n\nBatch (every hour or every day) is the right starting point. But the moment a trader needs a number that's two hours stale, you'll feel the pressure. Databricks handles the leap to streaming with the same abstraction — the same Delta table can be written by a batch job or a streaming query, and consumers of that table don't notice the difference.\n\n## Key Takeaways\n\n- Layer your pipeline (bronze → silver → gold) so raw evidence is never lost.\n- Use `decimal` for money. Always.\n- Make every job idempotent so re-runs are safe.\n- Keep audit metadata with the data, not in a separate note.\n- Design gold as re-computable — late corrections are a fact of financial data, not an edge case.\n",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/azure/azure-original.svg",
+        "brandColor": "#0078D4",
+        "tags": [
+          "Azure Databricks",
+          "ETL",
+          "Spark",
+          "Data Lakehouse"
+        ],
+        "difficulty": "Intermediate",
+        "version": "1.0",
+        "lastUpdated": "2026-09-16"
       },
       {
         "id": "agentic-ai-rag-dynamic-pricing",
         "title": "Leveraging Agentic AI and RAG for Dynamic Pricing in On-Demand Services",
         "excerpt": "Dive into how Agentic AI and Retrieval-Augmented Generation (RAG) can be integrated into microservices architectures to enable real-time, data-driven dynamic pricing and enhance customer support through LLM-powered chatbots.",
-        "readTime": "9 min read",
+        "readTime": "5 min read",
         "category": "Generative AI",
         "date": "2024-06-20",
         "url": "#",
@@ -1508,13 +1568,25 @@
           "general": 1,
           "data-engineer": 2,
           "ai-engineer": 1
-        }
+        },
+        "content": "# Leveraging Agentic AI and RAG for Dynamic Pricing in On-Demand Services\n\nOn-demand businesses — ride-share, delivery, freelance marketplaces — run on one question asked thousands of times a day: *what should this be priced right now?* Doing that well means blending signal (demand, time of day, nearby capacity, competitor rates) with judgment (a big event is tonight, a driver just got stranded). This post shows how Agentic AI plus RAG can do both without retraining anything.\n\n## Why Pricing Is a Retrieval Problem, Not Just a Math Problem\n\nA pricing rule in a database is rigid. `If rain AND 8pm, multiply by 1.5` is a great shortcut, but it can't answer the open-ended question: *\"Given everything we know about this city and this hour, what's a fair price?\"*\n\nTwo pieces of context matter a lot and are hard to hard-code:\n\n1. **Company knowledge** — past incidents, support threads, pricing experiments, internal docs (\"we learned last monsoon that surge capped at 3x churned new users\").\n2. **Fresh external signal** — event calendars, weather, local news.\n\nRAG is the mechanism that fetches the right slices of (1) at the moment of the decision. Agentic AI is the loop that combines that retrieved context with (2) and with its own reasoning to arrive at a price and explain *why*.\n\n## RAG: Giving the Pricer Company Memory\n\nBefore the pricing agent answers, a retrieval step pulls the most relevant internal knowledge. Conceptually:\n\n```text\nQuery: \"Should we surge for the city's biggest concert tonight?\"\n   |\n   v\nVector search over: past surge outcomes, support complaints,\n                    pricing experiment readouts, competitor notes\n   |\n   v\nTop 5 relevant chunks (the RAG context)\n   |\n   v\nAgent prompt: [retrieved context] + [live demand signal] + question\n   |\n   v\nProposed price + one-line reason\n```\n\nThe retrieval step is the same machinery as in any RAG system — chunking, embedding, vector search — but here it feeds a *decision agent*, not a chatbot. The payoff is that the pricing logic learns from company history without anyone retraining a model. When a new experiment result is written to the docs, it's automatically in the agent's reach the next day.\n\n## The Agent Loop\n\nThe agent isn't one prompt; it's a loop that can check its own work:\n\n1. **Plan** — list what it needs: current demand, capacity, tonight's events, last month's similar-surge outcome.\n2. **Retrieve** — pull the relevant internal knowledge (RAG) and external signals.\n3. **Compute** — draft a price and a multiplier.\n4. **Sanity-check** — is it within business guardrails (max multiplier, floor price, region rules)? Does it contradict a known experiment result?\n5. **Revise or emit** — if the check fails, loop back with the constraint; if it passes, output the price *and* the reason.\n\nStep 4 is the part that makes it production-grade: a bare LLM happily suggests \"price it at 8x because it's busy\"; a constrained agent knows your guardrail says \"never above 3x\", corrects itself, and tells you why.\n\n## Integrating With Microservices\n\nYou don't replace your pricing service; you give it a brain. The agent runs behind an API, and the existing service keeps doing the fast mechanical work:\n\n```text\nPricing service (fast, deterministic, high-QPS)\n   |\n   +---> simple on-demand rules   (microseconds, covers 90% of calls)\n   |\n   +---> Agentic RAG service      (milliseconds-to-seconds, the hard cases)\n        \"This city + this hour + this event = non-standard\"\n```\n\nThe rule path handles routine pricing cheaply. The agent path is invoked only when something is unusual enough that the rulebook doesn't confidently cover it — a new city, an unexpected event, a signal you've never seen. That hybrid keeps costs down and keeps the common case instant.\n\n## Keeping the RAG Layer Fresh\n\nThe whole value is only as good as the retrieved knowledge. Three habits that keep it healthy:\n\n- **Write experiment outcomes as docs** — every A/B test on pricing should produce a short, retrievable note (\"Capping surge at 3x in metro X raised revenue 4% and held retention\"). That makes the next decision better.\n- **Time-stamp your knowledge** — last monsoon's surge behavior is less relevant than this week's. Weight recent chunks higher so the agent favors current signal.\n- **Permission-aware retrieval** — a pricing agent for region A shouldn't be reading region B's confidential numbers. Filter retrieval by who's asking.\n\n## The Customer-Side Bonus\n\nThe same agentic RAG stack, pointed at your FAQ and past issues, becomes a support copilot: \"Why is this surging?\" answered in seconds with the actual reason, from the same knowledge base that drove the price. One retrieval layer, two products.\n\n## Key Takeaways\n\n- RAG turns your pricing knowledge into something an agent can retrieve on demand — no retraining.\n- The agent is a *loop with guardrails*, not a single prompt: plan, retrieve, compute, sanity-check, emit.\n- Keep the fast rule path for routine calls; invoke the agent only for the non-standard cases.\n- Write experiment results as retrievable docs so every decision improves the next one.\n",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg",
+        "brandColor": "#FFC107",
+        "tags": [
+          "Agentic AI",
+          "RAG",
+          "Dynamic Pricing",
+          "Microservices"
+        ],
+        "difficulty": "Advanced",
+        "version": "1.0",
+        "lastUpdated": "2026-09-16"
       },
       {
         "id": "personalizing-email-openai-llm",
         "title": "Personalizing Email Campaigns with OpenAI: A Practical Guide to LLM Integration",
         "excerpt": "Learn how to build an automated email campaign tool using Python and the OpenAI API to generate personalized content at scale, improving engagement and campaign effectiveness.",
-        "readTime": "6 min read",
+        "readTime": "4 min read",
         "category": "AI/ML",
         "date": "2024-05-10",
         "url": "#",
@@ -1522,7 +1594,19 @@
           "general": 3,
           "data-engineer": 3,
           "ai-engineer": 2
-        }
+        },
+        "content": "# Personalizing Email Campaigns with OpenAI: A Practical Guide\n\n\"Hi [First_Name]\" is not personalization. Personalization means the subject line, the offer, and the angle all fit *this* recipient — and doing that at the scale of 50,000 subscribers by hand is impossible. This guide shows how to wire an LLM into your email pipeline so the content adapts to each person while your sending infrastructure stays exactly the same.\n\n## The Setup\n\nYou have two systems that don't currently talk:\n\n- **Your CRM / audience data** — segments, purchase history, engagement, known interests.\n- **Your sending provider** — the thing that actually delivers the mail.\n\nThe LLM is the bridge. It reads structured data in, and writes human copy out. The sending provider doesn't care where the copy came from.\n\n```text\nFor each recipient (or batch):\n   1. Build a context blob: { name, segment, last_purchase, items_browsed }\n   2. Call the model with that context + your campaign brief\n   3. Get back: { subject, preview, body, cta_text }\n   4. Merge into your email template\n   5. Hand off to your sending provider as usual\n```\n\nStep 5 is the key insight: **you are not replacing your email platform.** You're just giving it better copy. All of the deliverability, SPF/DKIM, and bounce handling you already have stays in place.\n\n## Writing the Prompt\n\nThe prompt is where most of the value lives, so be deliberate. A strong one has three parts:\n\n```text\nSYSTEM:\nYou write short, punchy marketing email. You match the reader's level\nof interest. You never invent facts — you only use the context given.\n\nCONTEXT:\nName: Priya\nSegment: \"Lapsed 90 days\"\nLast purchase: \"Running shoes, 3 months ago\"\nEngagement: \"Opened our last 2 emails, clicked 0\"\n\nBRIEF:\nWrite a win-back subject + one-line preview + short body. The offer is\n20% off, valid 48h. Tone: friendly, not corporate. No exclamation spam.\n\nOUTPUT (JSON):\n{ \"subject\": \"...\", \"preview\": \"...\", \"body\": \"...\", \"cta_text\": \"...\" }\n```\n\nTwo rules worth following:\n\n- **Constrain it to the context.** The single most common LLM email bug is the model inventing a discount or a product the reader never bought. Tell it explicitly that it may only reference what's in the context.\n- **Demand structured output** (JSON) so you can pipe it into your template without fragile string parsing.\n\n## Scaling It\n\nDoing 50,000 calls one-by-one is slow and expensive to manage. The practical patterns:\n\n- **Batch by template, not by person.** If 400 people share a segment *and* a similar purchase, they can share a generation with only the name and last-purchase swapped. Group your audience into a few dozen \"personalization buckets\" and generate one version per bucket.\n- **Cache aggressively.** The same bucket produces the same copy. Compute it once, reuse it for every recipient in the bucket.\n- **Async it.** Don't block your send on the model. Generate ahead of send time, store the copy, and let your queue do the delivery.\n\n## Measuring \"Did It Work\"\n\nThe moment you can A/B test, you can't stop. Two buckets, one LLM-personalized and one your old static version, split the audience. Watch:\n\n| Metric | What you're really measuring |\n|--------|------------------------------|\n| Open rate | Did the subject line earn the click? |\n| Click-through | Did the body pull them into the offer? |\n| Conversion | Did the offer + angle actually close? |\n| Unsubscribe / spam | Did it feel *too* targeted or weird? |\n\nPersonalization that raises unsubscribes is personalization that failed. Targeted-ness is not the same as relevant — a line that mentions the exact shoe someone bought three months ago can read as \"they're tracking me.\" Keep the tone warm, not surveillance-y.\n\n## The Failure Modes to Engineer Around\n\n- **Rate limits** — your provider's per-minute ceiling. Batch + queue solves it; don't fire 50,000 requests at once.\n- **Hallucinated claims** — constrain to context, and validate the output schema before it ever reaches the template.\n- **Cost drift** — a 50k-subscriber send at full-per-person generation can get pricey fast. The bucketed approach cuts it by an order of magnitude.\n- **Deliverability is still on you** — the LLM can produce great copy, but one spammy subject line can hurt your domain reputation. Keep your deliverability tooling and monitoring untouched.\n\n## Key Takeaways\n\n- The LLM sits *between* your data and your sender; it doesn't replace either.\n- Constrain the model to the context and demand JSON — that kills the two biggest bugs.\n- Generate per-bucket, cache, and run async. Don't block your send on the model.\n- A/B test against your old static copy, and treat unsubscribe rate as a real signal.\n",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/openai/openai-plain.svg",
+        "brandColor": "#412991",
+        "tags": [
+          "OpenAI",
+          "Email Marketing",
+          "LLM",
+          "Python"
+        ],
+        "difficulty": "Beginner",
+        "version": "1.0",
+        "lastUpdated": "2026-09-16"
       },
       {
         "id": "agnes-3-0-flash-free-guide",
@@ -1543,6 +1627,110 @@
           "general": 1,
           "data-engineer": 1,
           "ai-engineer": 1
+        }
+      },
+      {
+        "id": "databricks-lakehouse",
+        "title": "The Magic of Databricks: Building a Data Lakehouse",
+        "excerpt": "Imagine the vast storage of a data lake combined with the organized structure of a data warehouse. That's the Databricks Lakehouse.",
+        "readTime": "4 min read",
+        "category": "Data Engineering",
+        "date": "2026-07-15",
+        "url": "#",
+        "content": "# The Magic of Databricks: Building a Data Lakehouse\n\nYou probably have two problems and you call them by different names, but they're really the same problem wearing two hats.\n\nThe **data lake** is where you dump everything — raw logs, sensor readings, JSON, CSV, the works. It's unlimited and cheap, but finding a specific thing in it is a nightmare.\n\nThe **data warehouse** is the opposite: perfectly organized, fast to query, and built for reporting. But it's expensive to maintain and it can only hold data you've already decided to structure.\n\nThe **lakehouse** is the bet that you don't have to choose. You get lake-scale storage with warehouse-style discipline on top of it. Databricks is the most popular way to build one, and the whole trick lives in one idea: put a *transactional layer* on top of open-format files.\n\n## How It Actually Works\n\nUnder the hood, Databricks uses **Delta Lake**. Picture your lake as a warehouse where people just throw boxes in. Delta is the librarian who stands at the door: every time you drop in a box of messy data, she instantly catalogs it, cleans it up, and records the transaction.\n\nThat \"record the transaction\" part is what makes it special. It's what lets you ask the lake to behave like a database:\n\n- **ACID transactions** — commit or roll back. A partial write can never leave you a half-baked table.\n- **Concurrency** — a reader never sees a table mid-update.\n- **Schema enforcement** — the lake rejects records that don't match, so bad data can't quietly rot your analytics.\n- **Time travel** — query the table as it looked at any past commit.\n\nSo you get warehouse safety without leaving the open, cheap, scalable file storage of the lake.\n\n## The Spark That Makes It Fast\n\nA lakehouse is useless if queries crawl. Databricks runs on **Apache Spark**, and the reason Spark is the engine here is parallelism. Imagine a job that reads a terabyte of data. Instead of one machine grinding through it, Spark splits the work into thousands of tiny tasks and runs them across a cluster at the same time.\n\nTwo things make this practical rather than theoretical:\n\n- **Out-of-core execution** — Spark handles data bigger than memory by spilling to disk, so the cluster isn't hostage to RAM size.\n- **Columnar storage (Parquet/Delta)** — reading only the columns you need and skipping whole row groups means a dashboard query doesn't scan the entire table.\n\nTogether, \"split it up + read only what matters\" is why a query that would take hours on one box finishes in minutes on a cluster.\n\n## The Three Layers That Keep It Usable\n\nTeams that keep their lakehouse healthy layer it, and the reason is the same as any good architecture — **isolate the mess from the clean**:\n\n| Layer | Contents | Mindset |\n|-------|----------|---------|\n| **Bronze** | Raw, exactly-as-received data | Immutable evidence. Never edited. |\n| **Silver** | Cleaned, deduplicated, typed | The trustworthy source. |\n| **Gold** | Business aggregates and KPIs | What dashboards and models actually read. |\n\nEach layer only reads from the one below it. That means a bug in your cleaning logic can never corrupt the raw evidence — you just re-derive silver and gold. The raw layer is your safety net.\n\n## Why It's Worth It\n\nBefore lakehouses, the choice was blunt: fast-and-expensive (warehouse) or cheap-and-slow (lake). The lakehouse erases the choice. You store once, at lake prices, and query with warehouse discipline on demand.\n\n> [!TIP]\n> **Next time you need to query terabytes, don't build a fragile pipeline — let the lakehouse handle it.** The pattern is: land raw, layer bronze→silver→gold, and let Spark's parallelism do the heavy lifting.\n",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/databricks/databricks-original.svg",
+        "brandColor": "#FF3621",
+        "tags": [
+          "Databricks",
+          "Data Lakehouse",
+          "Spark",
+          "Delta Lake"
+        ],
+        "difficulty": "Beginner",
+        "lastUpdated": "2026-09-16",
+        "version": "1.1",
+        "priority": {
+          "general": 4,
+          "data-engineer": 4,
+          "ai-engineer": 99
+        }
+      },
+      {
+        "id": "interviewos",
+        "title": "Building an AI Interviewer that Actually Listens",
+        "excerpt": "We built InterviewOS to mock-interview engineers in real time. Here is the architecture that makes it fast, fair, and useful.",
+        "readTime": "4 min read",
+        "category": "AI Systems",
+        "date": "2026-06-28",
+        "url": "#",
+        "content": "# Building an AI Interviewer That Actually Listens\n\nWe built InterviewOS to mock-interview engineers like a real senior would: listen in real time, tolerate messy out-loud thinking, and grade answers fairly. This post is the architecture behind it — and, more importantly, the parts that nearly broke.\n\n## The Core Tension\n\nA static interviewer asks question 3 after question 2, regardless of what the candidate just said. A *real* interviewer adapts: the candidate mumbles a confusing answer, so the interviewer asks a clarifying follow-up; they confidently say \"I don't know,\" so the interviewer moves on. That adaptation is the whole product, and it forces the system to be **fast and stateful at the same time**, which is a hard combo to pull off.\n\n## Problem 1: The 5-Second Pause\n\nAnyone who's talked to a voice assistant knows the awkward gap before it replies. In an interview, a 5-second gap after every sentence *breaks the illusion*. The candidate stops talking, the silence drags, and the flow dies.\n\nThe fix is to stop waiting for the candidate to finish a full sentence. Instead, stream the audio and start transcribing before they're done:\n\n```text\nMicrophone\n   |\n   +--> streaming ASR (word by word, as they speak)\n   |\n   +--> the interviewer model gets partial text in real time\n   |\n   +--> it can start formulating a response while the\n         candidate is still finishing\n```\n\nThe latency budget that makes it feel live is tight:\n\n| Stage | Budget |\n|-------|--------|\n| Audio chunked and sent | ~100 ms |\n| Streaming transcription | ~200–400 ms |\n| LLM response started | first token < ~600 ms |\n| TTS begins speaking | ~1 s from end of their sentence |\n\nThe trick is that the expensive model work *starts early*. You don't transcribe the full sentence, then think, then speak. You transcribe as-you-go and pipeline it.\n\n## Problem 2: Messy Out-Loud Thinking\n\nCandidates don't answer in clean sentences. They say \"um, well, I think you'd probably...\", correct themselves, trail off, then restart. A naive system that treats the transcript as a finished statement will misunderstand constantly.\n\nTwo things help:\n\n- **Wait for a silence window, not punctuation.** A period is not a signal they're done. A short pause (say 700 ms of silence) is. Use that to delimit a turn.\n- **Give the model the correction.** When a candidate backtracks (\"actually, no, wait, I meant...\"), feed the whole thing including the backtrack. The correction *is* the answer.\n\n## Problem 3: Grading Fairly (The \"Panel of Judges\")\n\nThe biggest design decision. One big model grading \"how good was this answer?\" produces a mushy number — it weights fluency and substance and confidence all together, and you can't tell which one moved the score.\n\nWe split it into a **panel of specialized judges**, each looking at one thing:\n\n- **Correctness judge** — is the technical content right?\n- **Communication judge** — can you actually follow their reasoning?\n- **Honesty / cheat judge** — did they recite an answer, or do they genuinely understand it?\n\nEach judge returns its own score *and a short reason*. The panel's outputs are combined into a report, and — critically — the candidate sees the reasons, not just a grade. \"You said the answer but couldn't explain why it works\" is actionable. \"Score: 6.2\" is not.\n\n## The Architecture, End to End\n\n```text\nCandidate's mic\n   |\n   +-->(streaming ASR)--> partial transcript\n   |\n   +--> Interviewer model  <--- (conversation state, question plan)\n   |\n   +--> TTS --> back to the candidate\n   |\n   +--> when the interview ends:\n          panel of judges --> per-dimension scores + reasons\n                              --> structured report\n```\n\nThe interviewer model holds **conversation state** (what's been covered, what's left in the question plan), so it can steer back to unaddressed areas instead of rambling.\n\n## What We'd Get Wrong On Purpose Next Time\n\n- **Over-engineering the judges.** Three focused judges beat one grand \"evaluate everything\" model that's hard to debug.\n- **Grading from the transcript alone.** Tone and hesitation carry signal. The audio track matters for the honesty judge, and throwing it away loses that.\n- **Forgetting the report.** The score is the easy part. The *explainable* breakdown is what makes a candidate actually learn something from the mock.\n\n## Key Takeaways\n\n- Live feels live only if expensive work starts *early* — pipeline transcription, thinking, and speech instead of chaining them.\n- Delimit turns on **silence**, not punctuation, and keep the backtrack — it's part of the answer.\n- Split grading into a **panel of single-minded judges**, each with a reason, and show the reasons to the candidate.\n- The conversation state that steers unasked areas is the difference between an interviewer and a Q&A bot.\n",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg",
+        "brandColor": "#61DAFB",
+        "tags": [
+          "AI Systems",
+          "Real-Time",
+          "Architecture",
+          "LLM"
+        ],
+        "difficulty": "Advanced",
+        "lastUpdated": "2026-09-16",
+        "version": "1.0",
+        "priority": {
+          "general": 7,
+          "data-engineer": 7,
+          "ai-engineer": 4
+        }
+      },
+      {
+        "id": "google-cloud-run",
+        "title": "Scaling Python from Zero to Hero on Cloud Run",
+        "excerpt": "Cloud Run flips the server cost model: your app scales to zero when idle, and clones itself when traffic spikes.",
+        "readTime": "4 min read",
+        "category": "Cloud",
+        "date": "2026-06-18",
+        "url": "#",
+        "content": "# Scaling Python from Zero to Hero on Cloud Run\n\nDeploying a backend used to mean a decision: rent a machine, keep it awake 24/7, and pay for it whether anyone visits or not. Cloud Run changes the math by making the \"always-on\" part optional. If your app has traffic, it's running. If it doesn't, it's gone, and so is the bill.\n\n## The Old Way\n\nThe pre-serverless world was simple: `ssh` into a box, install Python, run the server, open a port, keep it up. That box costs money every single hour of the month. A demo site that gets visited twice a day is still paying for 24/7.\n\n## How Cloud Run Changes the Shape\n\nInstead of \"a server I manage,\" you hand Cloud Run **a container**. The container is just a standardized box: your Python code, its dependencies, and a `Dockerfile` telling it how to start. That's the whole artifact.\n\nCloud Run does the rest:\n\n1. **It listens** for requests pointed at your URL.\n2. **The first request** after a quiet period starts a container (cold start, a few hundred ms to a couple of seconds).\n3. **While traffic is flowing**, it keeps containers running.\n4. **When traffic stops**, it scales to zero. No idle cost.\n\nThe \"zero\" is the point. Scale down to zero means your portfolio project, an API that gets hit rarely, or a tool you only use on weekends costs you nothing at rest.\n\n## The Scaling That Actually Scalet\n\nThe same service that scales to zero will also scale *up* automatically. Cloud Run adds one container per concurrent request (by default), so if your app gets 200 concurrent requests, you get up to 200 containers. No load balancer config, no horizontal-autoscaling group, no \"how many instances should I set?\"\n\n```text\n0 requests    ->  0 containers   ->  $0\n1 request     ->  1 container\n50 requests   ->  50 containers\n(requests go away) -> scale back to 0\n```\n\nThe thing that trips people up: each container is still a *Python process*, so a single request that blocks the whole process (say, a synchronous network call that holds the event loop) blocks that container's other work. Keep your handlers fast and `async`-friendly, or raise your per-container concurrency.\n\n## What You Still Own\n\nCloud Run removes the infra layer, not the code layer. You're still responsible for:\n\n- **Writing a container that starts in under 10 seconds.** Cold start latency is your container build time plus your app's startup. Ship a small image, warm up fast.\n- **Healthy HTTP responses.** Cloud Run uses your app's responses to decide if a container is working. A container that hangs on startup gets recycled.\n- **Secrets and config.** Use the secret manager, not a `.env` baked into the image.\n- **Observability.** You don't run a server anymore, so you don't get a terminal to log into. Structure your logs so the cloud logging view is actually useful.\n\n## The Practical Recipe\n\n```text\nDockerfile\n   |  -- your python app + deps\n   |\nCloud Build (or your CI)\n   |  -- build the image, push to a registry\n   |\nCloud Run\n   |  -- deploy the image, set service account, scale 0..N\n   |\nHTTPS endpoint\n      -- your API or app is live\n```\n\nThat's the entire deployment path. No VM to patch, no firewall to babysit, no \"is the cron job to restart the service still running.\"\n\n## When It Doesn't Fit\n\nHonest counterexamples:\n\n- **Long-running work.** A job that runs 45 minutes will keep a container (and the bill) alive. Split \"start the job\" (fast, serverless) from \"run the job\" (a queue or a batch service).\n- **Stateful connections.** If your app holds a persistent database connection, watch for the connection pool getting closed when a container idles. Open connections lazily per request, or manage a pool carefully.\n- **Real-time sockets.** WebSockets and server-sent events need a bit more thought under scale-to-zero, because the \"no traffic = no container\" model has edges.\n\n## Why It's a Game Changer\n\nFor the 90% of projects that aren't high-load production systems, Cloud Run is the right default. You get HTTPS, autoscaling, and scale-to-zero without buying infrastructure. The mental model shift is real: instead of \"how many boxes do I run?\", the question is \"what should one request do?\" — and that's a much simpler question to answer.\n\n> [!TIP]\n> **If your app gets visited more like \"sometimes\" than \"constantly,\" scale-to-zero is the single biggest cost and complexity win you can get.**\n",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/googlecloud/googlecloud-original.svg",
+        "brandColor": "#4285F4",
+        "tags": [
+          "Cloud",
+          "Serverless",
+          "Python",
+          "GCP"
+        ],
+        "difficulty": "Beginner",
+        "lastUpdated": "2026-09-16",
+        "version": "1.0",
+        "priority": {
+          "general": 8,
+          "data-engineer": 6,
+          "ai-engineer": 6
+        }
+      },
+      {
+        "id": "vector-search",
+        "title": "Searching by Meaning, Not Just Keywords",
+        "excerpt": "Traditional databases match words. Vector databases match meaning. Here is how Pgvector and Pinecone power modern search and RAG.",
+        "readTime": "5 min read",
+        "category": "Databases",
+        "date": "2026-06-02",
+        "url": "#",
+        "content": "# Searching by Meaning, Not Just Keywords\n\nTraditional databases have one big weakness that only shows up when your data starts being *real* instead of *tidy*. Ask a regular database for \"shoes\" and it gives you every row with the word \"shoes\" — but the row labeled \"sneakers\" or \"footwear\" is invisible to it. It matches **tokens**, not **meaning**. Vector search is the fix, and it's quietly the reason the newest generation of search and AI apps feel like they actually understand you.\n\n## The Core Idea\n\nA vector database doesn't store words. It stores **meaning as numbers**.\n\nThe trick is an **embedding**: a model converts any text (or image, or audio) into a list of numbers — a point in a high-dimensional space. The beautiful property of that space is that *things with similar meaning end up close together*. So \"shoes\" and \"sneakers\" live right next to each other, and both sit far away from \"shoelace\" (which a keyword search would happily treat as the same word).\n\n```text\n        \"sneakers\"  ●\n                    ●  \"shoes\"\n        \"footwear\"  ●\n                    .\n   .\n \"shoelace\"          .\n .\n```\n\nNow when you search, you don't ask \"find the word X.\" You ask \"find what's *near this meaning*.\" The database finds your query's neighbors, and it finds related words it's never seen.\n\n## Why Keyword Search Feels Stupid to Us\n\nWe never actually search by exact tokens. Ask Google for a \"reset my password\" and it returns \"can't log in\" results, because it *understands* the intent. A pure keyword engine can't do that — it's a phone-book lookup, not a comprehension. Every \"I can't find things I'm sure are there\" frustration you've had with a database search box is this problem.\n\nEmbeddings are how you give a search system comprehension. The model sees \"reset password\" and \"can't log in\" and maps them to nearly the same neighborhood, because they *are* nearly the same intent.\n\n## How the Pipeline Actually Works\n\nIt's not magic; it's three steps and a clever index:\n\n```text\n  1. EMBED each document\n     \"How to claim a refund\"  ->  [0.2, -0.1, 0.7, ...]\n  2. STORE the vectors in an index that's fast to search\n     (a few thousand dimensions, billions of points)\n  3. QUERY: embed the user's question, find the nearest neighbors\n     \"how do I get my money back\"  ->  same neighborhood as #1\n```\n\nStep 2 is where the real engineering lives. A brute-force \"compare against every vector\" search is fine for a few thousand documents and useless for a few million — that's **O(n) every query**. The databases that made this practical (like `pgvector` in Postgres, or Pinecone, Weaviate, Qdrant) use **approximate nearest-neighbor (ANN)** indexes that skip most of the space and get you the right answer in milliseconds, at a tiny recall cost.\n\n```text\nBrute force:  compare query vs ALL vectors      -> slow, exact\nANN index:    hop through a graph / buckets      -> fast, ~99% of the right answer\n```\n\nYou trade a fraction of perfect accuracy for a hundred times the speed. For search, that's an obvious win.\n\n## Where It's Already Everywhere\n\nYou've used vector search without knowing it:\n\n- **RAG (retrieval-augmented generation)** — the AI chatbot that answers from *your* docs. It embeds your documents, retrieves the nearest few to the question, and hands them to the model. No retrieval, it hallucinates. Retrieval is what grounds it.\n- **Recommendation \"because you looked at X\"** — find the things in the same neighborhood as what you clicked.\n- **Image search** — \"find images like this one\" is just \"find the vectors near this image's vector.\"\n- **Semantic search** in any app where \"near-miss\" should count as a hit.\n\nThe common thread: **the query and the content are in the same meaning-space**, so relevance is distance.\n\n## The Part People Get Wrong\n\nThree habits that make or break it in practice:\n\n- **Pick the embedding model to fit your content.** A model trained on general English text is different from one tuned for code, for legal, for your own domain. Worst embeddings are rarely \"bad vectors\" — they're the *wrong* vectors for your data.\n- **Keep the chunks sensible.** The embedding model has a limit on how much text it can turn into one vector. Over-stuff it and you blur the meaning; chunk too small and you lose context. The sweet spot is \"one clear idea per chunk.\"\n- **Store the text next to the vector.** Always. When a search returns a hit, you want the actual content, not just \"some number\" — and when your model changes, you'll need to re-embed and you can't do that without the source.\n\n## The Bottom Line\n\nKeyword search answered \"does this word appear?\" Vector search answers \"does this *mean* the same thing?\" For anything where the user types what they *want* instead of what's *written* — and that's most of real search — meaning is the only query that works. That's the engine underneath the modern \"it just gets it\" apps, and it's why the whole stack — from the chatbot to the image search — now routes through a vector database first.\n\n> [!TIP]\n> **The first time your users type a query and get nothing, even though the answer clearly exists in your data, that's the moment to reach for a vector index.**\n",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg",
+        "brandColor": "#4169E1",
+        "tags": [
+          "Vector DB",
+          "Databases",
+          "RAG",
+          "Search"
+        ],
+        "difficulty": "Intermediate",
+        "lastUpdated": "2026-09-16",
+        "version": "1.0",
+        "priority": {
+          "general": 9,
+          "data-engineer": 5,
+          "ai-engineer": 2
         }
       }
     ],
@@ -2242,7 +2430,7 @@
         "id": "agentic-ai-rag-dynamic-pricing",
         "title": "Leveraging Agentic AI and RAG for Dynamic Pricing in On-Demand Services",
         "excerpt": "Dive into how Agentic AI and Retrieval-Augmented Generation (RAG) can be integrated into microservices architectures to enable real-time, data-driven dynamic pricing and enhance customer support through LLM-powered chatbots.",
-        "readTime": "9 min read",
+        "readTime": "5 min read",
         "category": "Generative AI",
         "date": "2024-06-20",
         "url": "#",
@@ -2250,13 +2438,25 @@
           "general": 1,
           "data-engineer": 2,
           "ai-engineer": 1
-        }
+        },
+        "content": "# Leveraging Agentic AI and RAG for Dynamic Pricing in On-Demand Services\n\nOn-demand businesses — ride-share, delivery, freelance marketplaces — run on one question asked thousands of times a day: *what should this be priced right now?* Doing that well means blending signal (demand, time of day, nearby capacity, competitor rates) with judgment (a big event is tonight, a driver just got stranded). This post shows how Agentic AI plus RAG can do both without retraining anything.\n\n## Why Pricing Is a Retrieval Problem, Not Just a Math Problem\n\nA pricing rule in a database is rigid. `If rain AND 8pm, multiply by 1.5` is a great shortcut, but it can't answer the open-ended question: *\"Given everything we know about this city and this hour, what's a fair price?\"*\n\nTwo pieces of context matter a lot and are hard to hard-code:\n\n1. **Company knowledge** — past incidents, support threads, pricing experiments, internal docs (\"we learned last monsoon that surge capped at 3x churned new users\").\n2. **Fresh external signal** — event calendars, weather, local news.\n\nRAG is the mechanism that fetches the right slices of (1) at the moment of the decision. Agentic AI is the loop that combines that retrieved context with (2) and with its own reasoning to arrive at a price and explain *why*.\n\n## RAG: Giving the Pricer Company Memory\n\nBefore the pricing agent answers, a retrieval step pulls the most relevant internal knowledge. Conceptually:\n\n```text\nQuery: \"Should we surge for the city's biggest concert tonight?\"\n   |\n   v\nVector search over: past surge outcomes, support complaints,\n                    pricing experiment readouts, competitor notes\n   |\n   v\nTop 5 relevant chunks (the RAG context)\n   |\n   v\nAgent prompt: [retrieved context] + [live demand signal] + question\n   |\n   v\nProposed price + one-line reason\n```\n\nThe retrieval step is the same machinery as in any RAG system — chunking, embedding, vector search — but here it feeds a *decision agent*, not a chatbot. The payoff is that the pricing logic learns from company history without anyone retraining a model. When a new experiment result is written to the docs, it's automatically in the agent's reach the next day.\n\n## The Agent Loop\n\nThe agent isn't one prompt; it's a loop that can check its own work:\n\n1. **Plan** — list what it needs: current demand, capacity, tonight's events, last month's similar-surge outcome.\n2. **Retrieve** — pull the relevant internal knowledge (RAG) and external signals.\n3. **Compute** — draft a price and a multiplier.\n4. **Sanity-check** — is it within business guardrails (max multiplier, floor price, region rules)? Does it contradict a known experiment result?\n5. **Revise or emit** — if the check fails, loop back with the constraint; if it passes, output the price *and* the reason.\n\nStep 4 is the part that makes it production-grade: a bare LLM happily suggests \"price it at 8x because it's busy\"; a constrained agent knows your guardrail says \"never above 3x\", corrects itself, and tells you why.\n\n## Integrating With Microservices\n\nYou don't replace your pricing service; you give it a brain. The agent runs behind an API, and the existing service keeps doing the fast mechanical work:\n\n```text\nPricing service (fast, deterministic, high-QPS)\n   |\n   +---> simple on-demand rules   (microseconds, covers 90% of calls)\n   |\n   +---> Agentic RAG service      (milliseconds-to-seconds, the hard cases)\n        \"This city + this hour + this event = non-standard\"\n```\n\nThe rule path handles routine pricing cheaply. The agent path is invoked only when something is unusual enough that the rulebook doesn't confidently cover it — a new city, an unexpected event, a signal you've never seen. That hybrid keeps costs down and keeps the common case instant.\n\n## Keeping the RAG Layer Fresh\n\nThe whole value is only as good as the retrieved knowledge. Three habits that keep it healthy:\n\n- **Write experiment outcomes as docs** — every A/B test on pricing should produce a short, retrievable note (\"Capping surge at 3x in metro X raised revenue 4% and held retention\"). That makes the next decision better.\n- **Time-stamp your knowledge** — last monsoon's surge behavior is less relevant than this week's. Weight recent chunks higher so the agent favors current signal.\n- **Permission-aware retrieval** — a pricing agent for region A shouldn't be reading region B's confidential numbers. Filter retrieval by who's asking.\n\n## The Customer-Side Bonus\n\nThe same agentic RAG stack, pointed at your FAQ and past issues, becomes a support copilot: \"Why is this surging?\" answered in seconds with the actual reason, from the same knowledge base that drove the price. One retrieval layer, two products.\n\n## Key Takeaways\n\n- RAG turns your pricing knowledge into something an agent can retrieve on demand — no retraining.\n- The agent is a *loop with guardrails*, not a single prompt: plan, retrieve, compute, sanity-check, emit.\n- Keep the fast rule path for routine calls; invoke the agent only for the non-standard cases.\n- Write experiment results as retrievable docs so every decision improves the next one.\n",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg",
+        "brandColor": "#FFC107",
+        "tags": [
+          "Agentic AI",
+          "RAG",
+          "Dynamic Pricing",
+          "Microservices"
+        ],
+        "difficulty": "Advanced",
+        "version": "1.0",
+        "lastUpdated": "2026-09-16"
       },
       {
         "id": "personalizing-email-openai-llm",
         "title": "Personalizing Email Campaigns with OpenAI: A Practical Guide to LLM Integration",
         "excerpt": "Learn how to build an automated email campaign tool using Python and the OpenAI API to generate personalized content at scale, improving engagement and campaign effectiveness.",
-        "readTime": "6 min read",
+        "readTime": "4 min read",
         "category": "AI/ML",
         "date": "2024-05-10",
         "url": "#",
@@ -2264,13 +2464,25 @@
           "general": 3,
           "data-engineer": 3,
           "ai-engineer": 2
-        }
+        },
+        "content": "# Personalizing Email Campaigns with OpenAI: A Practical Guide\n\n\"Hi [First_Name]\" is not personalization. Personalization means the subject line, the offer, and the angle all fit *this* recipient — and doing that at the scale of 50,000 subscribers by hand is impossible. This guide shows how to wire an LLM into your email pipeline so the content adapts to each person while your sending infrastructure stays exactly the same.\n\n## The Setup\n\nYou have two systems that don't currently talk:\n\n- **Your CRM / audience data** — segments, purchase history, engagement, known interests.\n- **Your sending provider** — the thing that actually delivers the mail.\n\nThe LLM is the bridge. It reads structured data in, and writes human copy out. The sending provider doesn't care where the copy came from.\n\n```text\nFor each recipient (or batch):\n   1. Build a context blob: { name, segment, last_purchase, items_browsed }\n   2. Call the model with that context + your campaign brief\n   3. Get back: { subject, preview, body, cta_text }\n   4. Merge into your email template\n   5. Hand off to your sending provider as usual\n```\n\nStep 5 is the key insight: **you are not replacing your email platform.** You're just giving it better copy. All of the deliverability, SPF/DKIM, and bounce handling you already have stays in place.\n\n## Writing the Prompt\n\nThe prompt is where most of the value lives, so be deliberate. A strong one has three parts:\n\n```text\nSYSTEM:\nYou write short, punchy marketing email. You match the reader's level\nof interest. You never invent facts — you only use the context given.\n\nCONTEXT:\nName: Priya\nSegment: \"Lapsed 90 days\"\nLast purchase: \"Running shoes, 3 months ago\"\nEngagement: \"Opened our last 2 emails, clicked 0\"\n\nBRIEF:\nWrite a win-back subject + one-line preview + short body. The offer is\n20% off, valid 48h. Tone: friendly, not corporate. No exclamation spam.\n\nOUTPUT (JSON):\n{ \"subject\": \"...\", \"preview\": \"...\", \"body\": \"...\", \"cta_text\": \"...\" }\n```\n\nTwo rules worth following:\n\n- **Constrain it to the context.** The single most common LLM email bug is the model inventing a discount or a product the reader never bought. Tell it explicitly that it may only reference what's in the context.\n- **Demand structured output** (JSON) so you can pipe it into your template without fragile string parsing.\n\n## Scaling It\n\nDoing 50,000 calls one-by-one is slow and expensive to manage. The practical patterns:\n\n- **Batch by template, not by person.** If 400 people share a segment *and* a similar purchase, they can share a generation with only the name and last-purchase swapped. Group your audience into a few dozen \"personalization buckets\" and generate one version per bucket.\n- **Cache aggressively.** The same bucket produces the same copy. Compute it once, reuse it for every recipient in the bucket.\n- **Async it.** Don't block your send on the model. Generate ahead of send time, store the copy, and let your queue do the delivery.\n\n## Measuring \"Did It Work\"\n\nThe moment you can A/B test, you can't stop. Two buckets, one LLM-personalized and one your old static version, split the audience. Watch:\n\n| Metric | What you're really measuring |\n|--------|------------------------------|\n| Open rate | Did the subject line earn the click? |\n| Click-through | Did the body pull them into the offer? |\n| Conversion | Did the offer + angle actually close? |\n| Unsubscribe / spam | Did it feel *too* targeted or weird? |\n\nPersonalization that raises unsubscribes is personalization that failed. Targeted-ness is not the same as relevant — a line that mentions the exact shoe someone bought three months ago can read as \"they're tracking me.\" Keep the tone warm, not surveillance-y.\n\n## The Failure Modes to Engineer Around\n\n- **Rate limits** — your provider's per-minute ceiling. Batch + queue solves it; don't fire 50,000 requests at once.\n- **Hallucinated claims** — constrain to context, and validate the output schema before it ever reaches the template.\n- **Cost drift** — a 50k-subscriber send at full-per-person generation can get pricey fast. The bucketed approach cuts it by an order of magnitude.\n- **Deliverability is still on you** — the LLM can produce great copy, but one spammy subject line can hurt your domain reputation. Keep your deliverability tooling and monitoring untouched.\n\n## Key Takeaways\n\n- The LLM sits *between* your data and your sender; it doesn't replace either.\n- Constrain the model to the context and demand JSON — that kills the two biggest bugs.\n- Generate per-bucket, cache, and run async. Don't block your send on the model.\n- A/B test against your old static copy, and treat unsubscribe rate as a real signal.\n",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/openai/openai-plain.svg",
+        "brandColor": "#412991",
+        "tags": [
+          "OpenAI",
+          "Email Marketing",
+          "LLM",
+          "Python"
+        ],
+        "difficulty": "Beginner",
+        "version": "1.0",
+        "lastUpdated": "2026-09-16"
       },
       {
         "id": "real-time-isl-translation-ml",
         "title": "Real-Time Indian Sign Language Translation: An ML Pipeline with TensorFlow & OpenCV",
         "excerpt": "Discover the technical challenges and solutions in developing a low-latency, real-time machine learning system for Indian Sign Language translation, from model optimization to deployment.",
-        "readTime": "8 min read",
+        "readTime": "6 min read",
         "category": "Machine Learning",
         "date": "2024-04-01",
         "url": "#",
@@ -2278,7 +2490,19 @@
           "general": 4,
           "data-engineer": 99,
           "ai-engineer": 3
-        }
+        },
+        "content": "# Real-Time Indian Sign Language Translation: An ML Pipeline with TensorFlow & OpenCV\n\nBuilding a system that watches video and converts sign language into text in real time is a small miracle of computer vision — and a brutally hard engineering problem. This post walks through the pipeline we built, the hard parts, and the mistakes that cost us weeks.\n\n## Why This Is Hard\n\nSign language recognition has three properties that make it much tougher than, say, image classification:\n\n- **It's temporal.** A word in Indian Sign Language (ISL) is a *movement*, not a frame. A single static image rarely contains enough information to know what was said.\n- **It's person-dependent.** The same sign, made by two different people at different speeds and in different lighting, produces different pixel patterns. The model has to be invariant to the signer.\n- **It's sparse in data.** There's no single \"ISL ImageNet\". The datasets out there are small, class-imbalanced, and often noisy.\n\nThose three together are why a naive \"train a CNN on frames\" approach breaks down fast.\n\n## The High-Level Pipeline\n\n```text\nCamera / video\n   |\n   +--> (1) Hand detection + keypoint extraction   [OpenCV + MediaPipe]\n   |\n   +--> (2) Frame-window construction             [temporal slicing]\n   |\n   +--> (3) Encoder: sign -> features             [TensorFlow, per-window]\n   |\n   +--> (4) Language model: features -> text      [sequence model]\n   |\n   +--> (5) Post-processing: smoothing + display  [hysteresis, UI]\n```\n\nEach step has a specific reason to exist. Let's go through them.\n\n## Stage 1: Landmarks, Not Pixels\n\nThe biggest single improvement we made was to stop feeding raw pixels to the model and instead feed **hand and face landmarks**. Modern detectors (like MediaPipe Hands) extract 21 joint positions per hand in about 20–40 ms on a CPU.\n\nWhy this matters:\n\n- **Invariance for free.** Two people doing the same sign produce very different pixels but nearly identical landmark geometry. Landmarks make the model person-independent by construction.\n- **Cheaper.** Landmark vectors are on the order of 60–120 floats per frame. Training on that is two orders of magnitude faster than on images.\n- **Lower-resolution tolerant.** The model no longer cares whether the video is 720p or 4K — the landmark coordinates are normalized to a 2-D canonical space.\n\nOpenCV still does heavy lifting here: reading video, resizing, and doing face detection for head-pose features (head tilt and turn carry meaning in ISL).\n\n## Stage 2: The Temporal Window\n\nA single frame of landmarks is a snapshot, not a word. Real signs unfold over several hundred milliseconds. The pipeline builds **windows of N consecutive landmark frames** (typically 5–15, depending on sign speed) and treats the window as one training example.\n\nThe hard part is that the windows for adjacent signs overlap. A sliding window with stride 1 produces many overlapping examples — which is *good* for training (data augmentation) but means your final predictions at inference time have to be **deduplicated**. If the model says \"hello\" for 7 consecutive frames, you don't want to print \"hellohellohellohellohello\". A hysteresis / state-machine layer in post-processing solves this: only emit a word when the model's confidence is stable for a few frames.\n\n## Stage 3: The Encoder\n\nThe encoder takes a time series of landmarks (a tensor of shape `[time, joints, coords]`) and produces a per-window feature vector. Two architectures we tried:\n\n- **LSTM / GRU over the landmark time series.** Simple, works decently, struggles a bit with longer signs.\n- **Temporal ConvNet.** Faster to train, more robust to short-duration signs. What we settled on.\n\nA small heads-up for anyone trying to train a Temporal ConvNet from scratch on a laptop: the window stride choice dominates accuracy more than most hyperparameters. Pick it before you start training, because changing it means re-collecting and re-aligning your entire labeled dataset.\n\n## Stage 4: The Language Model\n\nAt this point, each window has a \"which sign was this\" score. To turn that into a readable sentence you want a language layer — the ISL sign vocabulary has grammatical ordering rules, and pure per-window prediction will produce ungrammatical output.\n\nOptions, in order of complexity:\n\n1. **Per-window argmax + hysteresis.** Cheapest, most brittle. Produces token sequences, not sentences.\n2. **Small RNN / transformer over the sign-token stream.** Learns sign-sequence grammar.\n3. **Full end-to-end neural MT.** Best quality, needs the most data and the most compute.\n\nFor a demo or a first real deployment, option 2 is the sweet spot.\n\n## Data: The Real Bottleneck\n\nLet's be honest about what actually gates a project like this. It's rarely the model. It's:\n\n- **Class balance.** Most ISL alphabets have 25–30 letters plus a long tail of word-level signs. The tail classes have so little data that the model will quietly fail on them forever. Collecting more tail data beats any architecture trick.\n- **Variability.** For each sign, you need it performed by many different people, at many speeds, in different lighting. A signer doing \"hello\" at three different speeds looks like three different signs to a naive model.\n- **Annotation cost.** Per-word labeling is slow. Semi-automated tooling (human in the loop, watch the raw landmark stream, accept/reject) cuts it dramatically.\n\n## Performance Budget\n\nTo feel \"real-time\" to the user, the whole pipeline has to complete in under ~150 ms. We split the budget like this:\n\n| Stage | Target | Notes |\n|-------|--------|-------|\n| Video decode + pre-process | 5–10 ms | OpenCV is fine on CPU. |\n| Landmark detection | 25–40 ms | MediaPipe on a modern CPU. |\n| Encoder | 15–25 ms | A small Temporal ConvNet fits comfortably on CPU. |\n| Language layer | 10–20 ms | Only runs on a stable detection, not every frame. |\n| Post-processing + UI | ~5 ms | Cheap. |\n\nEverything up to the language layer fits in a 150 ms budget on a mid-range laptop. The language layer is deferred to \"whenever we're confident about the last word\" — it doesn't run every frame.\n\n## What We Would Do Differently\n\nA few honest notes for anyone starting from scratch:\n\n- **Don't hand-label the first 1000 clips yourself.** Get 10 different people to do 100 clips each and use those as the bootstrap. One performer's 1000 clips is worse than 10 people's 100.\n- **Log landmarks, not pixels.** Storing landmark streams instead of raw video makes re-training two orders of magnitude cheaper and the dataset ten times smaller.\n- **Pick your evaluation metric before training.** \"Did it work\" is not a metric. Use word error rate on a held-out signer (a signer not in training) — that's the one that matters when you actually deploy.\n\n## Key Takeaways\n\n- Landmark-based input beats pixel-based input on every axis that matters: invariance, speed, and dataset size.\n- Signs are temporal — use sliding windows, and use a hysteresis layer to avoid repeated outputs.\n- The language layer matters more than people think; per-window argmax alone produces ungrammatical output.\n- Data beats architecture. More diverse signers and more tail-class examples will outperform any clever model.\n- Budget for ~150 ms end-to-end, and defer expensive computation to stable detections.\n",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tensorflow/tensorflow-original.svg",
+        "brandColor": "#FF6F00",
+        "tags": [
+          "Computer Vision",
+          "TensorFlow",
+          "OpenCV",
+          "ISL"
+        ],
+        "difficulty": "Advanced",
+        "version": "1.0",
+        "lastUpdated": "2026-09-16"
       },
       {
         "id": "agnes-3-0-flash-free-guide",
@@ -2299,6 +2523,110 @@
           "general": 1,
           "data-engineer": 1,
           "ai-engineer": 1
+        }
+      },
+      {
+        "id": "databricks-lakehouse",
+        "title": "The Magic of Databricks: Building a Data Lakehouse",
+        "excerpt": "Imagine the vast storage of a data lake combined with the organized structure of a data warehouse. That's the Databricks Lakehouse.",
+        "readTime": "4 min read",
+        "category": "Data Engineering",
+        "date": "2026-07-15",
+        "url": "#",
+        "content": "# The Magic of Databricks: Building a Data Lakehouse\n\nYou probably have two problems and you call them by different names, but they're really the same problem wearing two hats.\n\nThe **data lake** is where you dump everything — raw logs, sensor readings, JSON, CSV, the works. It's unlimited and cheap, but finding a specific thing in it is a nightmare.\n\nThe **data warehouse** is the opposite: perfectly organized, fast to query, and built for reporting. But it's expensive to maintain and it can only hold data you've already decided to structure.\n\nThe **lakehouse** is the bet that you don't have to choose. You get lake-scale storage with warehouse-style discipline on top of it. Databricks is the most popular way to build one, and the whole trick lives in one idea: put a *transactional layer* on top of open-format files.\n\n## How It Actually Works\n\nUnder the hood, Databricks uses **Delta Lake**. Picture your lake as a warehouse where people just throw boxes in. Delta is the librarian who stands at the door: every time you drop in a box of messy data, she instantly catalogs it, cleans it up, and records the transaction.\n\nThat \"record the transaction\" part is what makes it special. It's what lets you ask the lake to behave like a database:\n\n- **ACID transactions** — commit or roll back. A partial write can never leave you a half-baked table.\n- **Concurrency** — a reader never sees a table mid-update.\n- **Schema enforcement** — the lake rejects records that don't match, so bad data can't quietly rot your analytics.\n- **Time travel** — query the table as it looked at any past commit.\n\nSo you get warehouse safety without leaving the open, cheap, scalable file storage of the lake.\n\n## The Spark That Makes It Fast\n\nA lakehouse is useless if queries crawl. Databricks runs on **Apache Spark**, and the reason Spark is the engine here is parallelism. Imagine a job that reads a terabyte of data. Instead of one machine grinding through it, Spark splits the work into thousands of tiny tasks and runs them across a cluster at the same time.\n\nTwo things make this practical rather than theoretical:\n\n- **Out-of-core execution** — Spark handles data bigger than memory by spilling to disk, so the cluster isn't hostage to RAM size.\n- **Columnar storage (Parquet/Delta)** — reading only the columns you need and skipping whole row groups means a dashboard query doesn't scan the entire table.\n\nTogether, \"split it up + read only what matters\" is why a query that would take hours on one box finishes in minutes on a cluster.\n\n## The Three Layers That Keep It Usable\n\nTeams that keep their lakehouse healthy layer it, and the reason is the same as any good architecture — **isolate the mess from the clean**:\n\n| Layer | Contents | Mindset |\n|-------|----------|---------|\n| **Bronze** | Raw, exactly-as-received data | Immutable evidence. Never edited. |\n| **Silver** | Cleaned, deduplicated, typed | The trustworthy source. |\n| **Gold** | Business aggregates and KPIs | What dashboards and models actually read. |\n\nEach layer only reads from the one below it. That means a bug in your cleaning logic can never corrupt the raw evidence — you just re-derive silver and gold. The raw layer is your safety net.\n\n## Why It's Worth It\n\nBefore lakehouses, the choice was blunt: fast-and-expensive (warehouse) or cheap-and-slow (lake). The lakehouse erases the choice. You store once, at lake prices, and query with warehouse discipline on demand.\n\n> [!TIP]\n> **Next time you need to query terabytes, don't build a fragile pipeline — let the lakehouse handle it.** The pattern is: land raw, layer bronze→silver→gold, and let Spark's parallelism do the heavy lifting.\n",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/databricks/databricks-original.svg",
+        "brandColor": "#FF3621",
+        "tags": [
+          "Databricks",
+          "Data Lakehouse",
+          "Spark",
+          "Delta Lake"
+        ],
+        "difficulty": "Beginner",
+        "lastUpdated": "2026-09-16",
+        "version": "1.1",
+        "priority": {
+          "general": 4,
+          "data-engineer": 4,
+          "ai-engineer": 99
+        }
+      },
+      {
+        "id": "interviewos",
+        "title": "Building an AI Interviewer that Actually Listens",
+        "excerpt": "We built InterviewOS to mock-interview engineers in real time. Here is the architecture that makes it fast, fair, and useful.",
+        "readTime": "4 min read",
+        "category": "AI Systems",
+        "date": "2026-06-28",
+        "url": "#",
+        "content": "# Building an AI Interviewer That Actually Listens\n\nWe built InterviewOS to mock-interview engineers like a real senior would: listen in real time, tolerate messy out-loud thinking, and grade answers fairly. This post is the architecture behind it — and, more importantly, the parts that nearly broke.\n\n## The Core Tension\n\nA static interviewer asks question 3 after question 2, regardless of what the candidate just said. A *real* interviewer adapts: the candidate mumbles a confusing answer, so the interviewer asks a clarifying follow-up; they confidently say \"I don't know,\" so the interviewer moves on. That adaptation is the whole product, and it forces the system to be **fast and stateful at the same time**, which is a hard combo to pull off.\n\n## Problem 1: The 5-Second Pause\n\nAnyone who's talked to a voice assistant knows the awkward gap before it replies. In an interview, a 5-second gap after every sentence *breaks the illusion*. The candidate stops talking, the silence drags, and the flow dies.\n\nThe fix is to stop waiting for the candidate to finish a full sentence. Instead, stream the audio and start transcribing before they're done:\n\n```text\nMicrophone\n   |\n   +--> streaming ASR (word by word, as they speak)\n   |\n   +--> the interviewer model gets partial text in real time\n   |\n   +--> it can start formulating a response while the\n         candidate is still finishing\n```\n\nThe latency budget that makes it feel live is tight:\n\n| Stage | Budget |\n|-------|--------|\n| Audio chunked and sent | ~100 ms |\n| Streaming transcription | ~200–400 ms |\n| LLM response started | first token < ~600 ms |\n| TTS begins speaking | ~1 s from end of their sentence |\n\nThe trick is that the expensive model work *starts early*. You don't transcribe the full sentence, then think, then speak. You transcribe as-you-go and pipeline it.\n\n## Problem 2: Messy Out-Loud Thinking\n\nCandidates don't answer in clean sentences. They say \"um, well, I think you'd probably...\", correct themselves, trail off, then restart. A naive system that treats the transcript as a finished statement will misunderstand constantly.\n\nTwo things help:\n\n- **Wait for a silence window, not punctuation.** A period is not a signal they're done. A short pause (say 700 ms of silence) is. Use that to delimit a turn.\n- **Give the model the correction.** When a candidate backtracks (\"actually, no, wait, I meant...\"), feed the whole thing including the backtrack. The correction *is* the answer.\n\n## Problem 3: Grading Fairly (The \"Panel of Judges\")\n\nThe biggest design decision. One big model grading \"how good was this answer?\" produces a mushy number — it weights fluency and substance and confidence all together, and you can't tell which one moved the score.\n\nWe split it into a **panel of specialized judges**, each looking at one thing:\n\n- **Correctness judge** — is the technical content right?\n- **Communication judge** — can you actually follow their reasoning?\n- **Honesty / cheat judge** — did they recite an answer, or do they genuinely understand it?\n\nEach judge returns its own score *and a short reason*. The panel's outputs are combined into a report, and — critically — the candidate sees the reasons, not just a grade. \"You said the answer but couldn't explain why it works\" is actionable. \"Score: 6.2\" is not.\n\n## The Architecture, End to End\n\n```text\nCandidate's mic\n   |\n   +-->(streaming ASR)--> partial transcript\n   |\n   +--> Interviewer model  <--- (conversation state, question plan)\n   |\n   +--> TTS --> back to the candidate\n   |\n   +--> when the interview ends:\n          panel of judges --> per-dimension scores + reasons\n                              --> structured report\n```\n\nThe interviewer model holds **conversation state** (what's been covered, what's left in the question plan), so it can steer back to unaddressed areas instead of rambling.\n\n## What We'd Get Wrong On Purpose Next Time\n\n- **Over-engineering the judges.** Three focused judges beat one grand \"evaluate everything\" model that's hard to debug.\n- **Grading from the transcript alone.** Tone and hesitation carry signal. The audio track matters for the honesty judge, and throwing it away loses that.\n- **Forgetting the report.** The score is the easy part. The *explainable* breakdown is what makes a candidate actually learn something from the mock.\n\n## Key Takeaways\n\n- Live feels live only if expensive work starts *early* — pipeline transcription, thinking, and speech instead of chaining them.\n- Delimit turns on **silence**, not punctuation, and keep the backtrack — it's part of the answer.\n- Split grading into a **panel of single-minded judges**, each with a reason, and show the reasons to the candidate.\n- The conversation state that steers unasked areas is the difference between an interviewer and a Q&A bot.\n",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg",
+        "brandColor": "#61DAFB",
+        "tags": [
+          "AI Systems",
+          "Real-Time",
+          "Architecture",
+          "LLM"
+        ],
+        "difficulty": "Advanced",
+        "lastUpdated": "2026-09-16",
+        "version": "1.0",
+        "priority": {
+          "general": 7,
+          "data-engineer": 7,
+          "ai-engineer": 4
+        }
+      },
+      {
+        "id": "google-cloud-run",
+        "title": "Scaling Python from Zero to Hero on Cloud Run",
+        "excerpt": "Cloud Run flips the server cost model: your app scales to zero when idle, and clones itself when traffic spikes.",
+        "readTime": "4 min read",
+        "category": "Cloud",
+        "date": "2026-06-18",
+        "url": "#",
+        "content": "# Scaling Python from Zero to Hero on Cloud Run\n\nDeploying a backend used to mean a decision: rent a machine, keep it awake 24/7, and pay for it whether anyone visits or not. Cloud Run changes the math by making the \"always-on\" part optional. If your app has traffic, it's running. If it doesn't, it's gone, and so is the bill.\n\n## The Old Way\n\nThe pre-serverless world was simple: `ssh` into a box, install Python, run the server, open a port, keep it up. That box costs money every single hour of the month. A demo site that gets visited twice a day is still paying for 24/7.\n\n## How Cloud Run Changes the Shape\n\nInstead of \"a server I manage,\" you hand Cloud Run **a container**. The container is just a standardized box: your Python code, its dependencies, and a `Dockerfile` telling it how to start. That's the whole artifact.\n\nCloud Run does the rest:\n\n1. **It listens** for requests pointed at your URL.\n2. **The first request** after a quiet period starts a container (cold start, a few hundred ms to a couple of seconds).\n3. **While traffic is flowing**, it keeps containers running.\n4. **When traffic stops**, it scales to zero. No idle cost.\n\nThe \"zero\" is the point. Scale down to zero means your portfolio project, an API that gets hit rarely, or a tool you only use on weekends costs you nothing at rest.\n\n## The Scaling That Actually Scalet\n\nThe same service that scales to zero will also scale *up* automatically. Cloud Run adds one container per concurrent request (by default), so if your app gets 200 concurrent requests, you get up to 200 containers. No load balancer config, no horizontal-autoscaling group, no \"how many instances should I set?\"\n\n```text\n0 requests    ->  0 containers   ->  $0\n1 request     ->  1 container\n50 requests   ->  50 containers\n(requests go away) -> scale back to 0\n```\n\nThe thing that trips people up: each container is still a *Python process*, so a single request that blocks the whole process (say, a synchronous network call that holds the event loop) blocks that container's other work. Keep your handlers fast and `async`-friendly, or raise your per-container concurrency.\n\n## What You Still Own\n\nCloud Run removes the infra layer, not the code layer. You're still responsible for:\n\n- **Writing a container that starts in under 10 seconds.** Cold start latency is your container build time plus your app's startup. Ship a small image, warm up fast.\n- **Healthy HTTP responses.** Cloud Run uses your app's responses to decide if a container is working. A container that hangs on startup gets recycled.\n- **Secrets and config.** Use the secret manager, not a `.env` baked into the image.\n- **Observability.** You don't run a server anymore, so you don't get a terminal to log into. Structure your logs so the cloud logging view is actually useful.\n\n## The Practical Recipe\n\n```text\nDockerfile\n   |  -- your python app + deps\n   |\nCloud Build (or your CI)\n   |  -- build the image, push to a registry\n   |\nCloud Run\n   |  -- deploy the image, set service account, scale 0..N\n   |\nHTTPS endpoint\n      -- your API or app is live\n```\n\nThat's the entire deployment path. No VM to patch, no firewall to babysit, no \"is the cron job to restart the service still running.\"\n\n## When It Doesn't Fit\n\nHonest counterexamples:\n\n- **Long-running work.** A job that runs 45 minutes will keep a container (and the bill) alive. Split \"start the job\" (fast, serverless) from \"run the job\" (a queue or a batch service).\n- **Stateful connections.** If your app holds a persistent database connection, watch for the connection pool getting closed when a container idles. Open connections lazily per request, or manage a pool carefully.\n- **Real-time sockets.** WebSockets and server-sent events need a bit more thought under scale-to-zero, because the \"no traffic = no container\" model has edges.\n\n## Why It's a Game Changer\n\nFor the 90% of projects that aren't high-load production systems, Cloud Run is the right default. You get HTTPS, autoscaling, and scale-to-zero without buying infrastructure. The mental model shift is real: instead of \"how many boxes do I run?\", the question is \"what should one request do?\" — and that's a much simpler question to answer.\n\n> [!TIP]\n> **If your app gets visited more like \"sometimes\" than \"constantly,\" scale-to-zero is the single biggest cost and complexity win you can get.**\n",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/googlecloud/googlecloud-original.svg",
+        "brandColor": "#4285F4",
+        "tags": [
+          "Cloud",
+          "Serverless",
+          "Python",
+          "GCP"
+        ],
+        "difficulty": "Beginner",
+        "lastUpdated": "2026-09-16",
+        "version": "1.0",
+        "priority": {
+          "general": 8,
+          "data-engineer": 6,
+          "ai-engineer": 6
+        }
+      },
+      {
+        "id": "vector-search",
+        "title": "Searching by Meaning, Not Just Keywords",
+        "excerpt": "Traditional databases match words. Vector databases match meaning. Here is how Pgvector and Pinecone power modern search and RAG.",
+        "readTime": "5 min read",
+        "category": "Databases",
+        "date": "2026-06-02",
+        "url": "#",
+        "content": "# Searching by Meaning, Not Just Keywords\n\nTraditional databases have one big weakness that only shows up when your data starts being *real* instead of *tidy*. Ask a regular database for \"shoes\" and it gives you every row with the word \"shoes\" — but the row labeled \"sneakers\" or \"footwear\" is invisible to it. It matches **tokens**, not **meaning**. Vector search is the fix, and it's quietly the reason the newest generation of search and AI apps feel like they actually understand you.\n\n## The Core Idea\n\nA vector database doesn't store words. It stores **meaning as numbers**.\n\nThe trick is an **embedding**: a model converts any text (or image, or audio) into a list of numbers — a point in a high-dimensional space. The beautiful property of that space is that *things with similar meaning end up close together*. So \"shoes\" and \"sneakers\" live right next to each other, and both sit far away from \"shoelace\" (which a keyword search would happily treat as the same word).\n\n```text\n        \"sneakers\"  ●\n                    ●  \"shoes\"\n        \"footwear\"  ●\n                    .\n   .\n \"shoelace\"          .\n .\n```\n\nNow when you search, you don't ask \"find the word X.\" You ask \"find what's *near this meaning*.\" The database finds your query's neighbors, and it finds related words it's never seen.\n\n## Why Keyword Search Feels Stupid to Us\n\nWe never actually search by exact tokens. Ask Google for a \"reset my password\" and it returns \"can't log in\" results, because it *understands* the intent. A pure keyword engine can't do that — it's a phone-book lookup, not a comprehension. Every \"I can't find things I'm sure are there\" frustration you've had with a database search box is this problem.\n\nEmbeddings are how you give a search system comprehension. The model sees \"reset password\" and \"can't log in\" and maps them to nearly the same neighborhood, because they *are* nearly the same intent.\n\n## How the Pipeline Actually Works\n\nIt's not magic; it's three steps and a clever index:\n\n```text\n  1. EMBED each document\n     \"How to claim a refund\"  ->  [0.2, -0.1, 0.7, ...]\n  2. STORE the vectors in an index that's fast to search\n     (a few thousand dimensions, billions of points)\n  3. QUERY: embed the user's question, find the nearest neighbors\n     \"how do I get my money back\"  ->  same neighborhood as #1\n```\n\nStep 2 is where the real engineering lives. A brute-force \"compare against every vector\" search is fine for a few thousand documents and useless for a few million — that's **O(n) every query**. The databases that made this practical (like `pgvector` in Postgres, or Pinecone, Weaviate, Qdrant) use **approximate nearest-neighbor (ANN)** indexes that skip most of the space and get you the right answer in milliseconds, at a tiny recall cost.\n\n```text\nBrute force:  compare query vs ALL vectors      -> slow, exact\nANN index:    hop through a graph / buckets      -> fast, ~99% of the right answer\n```\n\nYou trade a fraction of perfect accuracy for a hundred times the speed. For search, that's an obvious win.\n\n## Where It's Already Everywhere\n\nYou've used vector search without knowing it:\n\n- **RAG (retrieval-augmented generation)** — the AI chatbot that answers from *your* docs. It embeds your documents, retrieves the nearest few to the question, and hands them to the model. No retrieval, it hallucinates. Retrieval is what grounds it.\n- **Recommendation \"because you looked at X\"** — find the things in the same neighborhood as what you clicked.\n- **Image search** — \"find images like this one\" is just \"find the vectors near this image's vector.\"\n- **Semantic search** in any app where \"near-miss\" should count as a hit.\n\nThe common thread: **the query and the content are in the same meaning-space**, so relevance is distance.\n\n## The Part People Get Wrong\n\nThree habits that make or break it in practice:\n\n- **Pick the embedding model to fit your content.** A model trained on general English text is different from one tuned for code, for legal, for your own domain. Worst embeddings are rarely \"bad vectors\" — they're the *wrong* vectors for your data.\n- **Keep the chunks sensible.** The embedding model has a limit on how much text it can turn into one vector. Over-stuff it and you blur the meaning; chunk too small and you lose context. The sweet spot is \"one clear idea per chunk.\"\n- **Store the text next to the vector.** Always. When a search returns a hit, you want the actual content, not just \"some number\" — and when your model changes, you'll need to re-embed and you can't do that without the source.\n\n## The Bottom Line\n\nKeyword search answered \"does this word appear?\" Vector search answers \"does this *mean* the same thing?\" For anything where the user types what they *want* instead of what's *written* — and that's most of real search — meaning is the only query that works. That's the engine underneath the modern \"it just gets it\" apps, and it's why the whole stack — from the chatbot to the image search — now routes through a vector database first.\n\n> [!TIP]\n> **The first time your users type a query and get nothing, even though the answer clearly exists in your data, that's the moment to reach for a vector index.**\n",
+        "logoUrl": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg",
+        "brandColor": "#4169E1",
+        "tags": [
+          "Vector DB",
+          "Databases",
+          "RAG",
+          "Search"
+        ],
+        "difficulty": "Intermediate",
+        "lastUpdated": "2026-09-16",
+        "version": "1.0",
+        "priority": {
+          "general": 9,
+          "data-engineer": 5,
+          "ai-engineer": 2
         }
       }
     ],
