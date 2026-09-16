@@ -302,6 +302,212 @@ async def change_credentials(payload: ChangeCredentialsPayload, request: Request
         
     return {"success": True, "message": "Credentials updated successfully."}
 
+# ── Admin password reset via email OTP ────────────────────────────────────────
+# Unauthenticated endpoints (by design — you're locked out when you need them).
+# The OTP is delivered to the admin's registered email via the Lark mail provider.
+# Stored in admin_credentials.json under the "email" key.
+
+import string
+from email_engine.provider_factory import get_email_provider
+
+OTP_TTL_SECONDS = 900          # 15-minute expiry
+OTP_MAX_ATTEMPTS = 5
+OTP_RATE_LIMIT_SECONDS = 60    # one OTP request per 60 seconds per IP
+
+_otp_store: dict = {}          # ip -> {otp, attempts, created_at, last_request}
+
+
+def _admin_email() -> str:
+    """Return the admin's registered email for OTP delivery."""
+    creds = {}
+    if os.path.exists(CREDENTIALS_JSON):
+        try:
+            creds = json.load(open(CREDENTIALS_JSON, "r", encoding="utf-8"))
+        except Exception:
+            creds = {}
+    email = creds.get("email", "")
+    if email:
+        return email
+    # Fall back to the SMTP recipient used for alerts
+    if os.path.exists(SMTP_CONFIG_FILE):
+        try:
+            smtp = json.load(open(SMTP_CONFIG_FILE, "r", encoding="utf-8"))
+            return smtp.get("SMTP_TO", "")
+        except Exception:
+            return ""
+    return ""
+
+
+class ForgotPasswordPayload(BaseModel):
+    email: str
+
+
+class VerifyOtpPayload(BaseModel):
+    otp: str
+    new_password: str
+    email: str
+
+
+@app.post("/api/v1/portfolio/admin/forgot-password")
+async def admin_forgot_password(payload: ForgotPasswordPayload, request: Request):
+    """
+    Send a 6-digit OTP to the admin's registered email.
+
+    Unauthenticated. Rate-limited to 1 request per 60s per client IP.
+    If the email doesn't match the registered admin email, returns a
+    generic success message to avoid account-enumeration.
+    """
+    client_ip = request.client.host if request.client else "unknown"
+
+    # Rate-limit check
+    now = time.time()
+    entry = _otp_store.get(client_ip, {})
+    last_request = entry.get("last_request", 0)
+    if now - last_request < OTP_RATE_LIMIT_SECONDS:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many reset requests. Please wait a minute and try again.",
+        )
+
+    registered_email = _admin_email()
+    supplied_email = (payload.email or "").strip().lower()
+
+    # Generate the OTP (always, to avoid timing-oracle leaks)
+    otp = "".join(secrets.choice(string.digits) for _ in range(6))
+    _otp_store[client_ip] = {
+        "otp": otp,
+        "attempts": 0,
+        "created_at": now,
+        "last_request": now,
+        "email": supplied_email,
+    }
+
+    # Only actually send if the email matches the registered one
+    if registered_email and supplied_email == registered_email.lower():
+        try:
+            provider = get_email_provider()
+            html_body = (
+                "<div style=\"font-family:sans-serif;max-width:480px;margin:0 auto;"
+                "padding:32px;background:#0A0A0F;color:#e2e8f0;border-radius:16px;\">"
+                "<h2 style=\"color:#00E5FF;margin-bottom:8px;\">Portfolio Admin — Password Reset</h2>"
+                "<p>Your OTP code is:</p>"
+                f"<div style=\"font-size:32px;font-weight:bold;letter-spacing:6px;"
+                f"color:#00E5FF;text-align:center;margin:24px 0;background:#1e293b;"
+                f"border-radius:8px;padding:16px;\">{otp}</div>"
+                "<p style=\"font-size:12px;color:#64748b;\">This code expires in 15 minutes. "
+                "If you didn't request this, you can safely ignore this email.</p>"
+                "</div>"
+            )
+            await provider.send_message(
+                to=[registered_email],
+                subject="[Portfolio] Admin Password Reset OTP",
+                body_html=html_body,
+                body_text=f"Your portfolio admin password reset OTP is: {otp}",
+            )
+            return {"success": True, "message": "OTP sent. Check your email."}
+        except Exception as exc:
+            print(f"OTP email send failed: {exc}")
+            return {"success": True, "message": "OTP sent. Check your email."}
+    else:
+        # Generic response — no leak of whether the email is registered
+        return {"success": True, "message": "OTP sent. Check your email."}
+
+
+@app.post("/api/v1/portfolio/admin/verify-otp")
+async def admin_verify_otp(payload: VerifyOtpPayload, request: Request):
+    """
+    Verify the OTP and set the new admin password.
+
+    Unauthenticated. Limited to 5 attempts per OTP issue.
+    """
+    client_ip = request.client.host if request.client else "unknown"
+    entry = _otp_store.get(client_ip)
+    if not entry:
+        raise HTTPException(status_code=400, detail="No reset request found. Please request a new OTP.")
+
+    # TTL check
+    if time.time() - entry.get("created_at", 0) > OTP_TTL_SECONDS:
+        del _otp_store[client_ip]
+        raise HTTPException(status_code=400, detail="OTP expired. Please request a new one.")
+
+    # Attempts check
+    entry["attempts"] = entry.get("attempts", 0) + 1
+    if entry["attempts"] > OTP_MAX_ATTEMPTS:
+        del _otp_store[client_ip]
+        raise HTTPException(status_code=429, detail="Too many failed attempts. Please request a new OTP.")
+
+    # Email must match the registered admin email
+    registered_email = _admin_email()
+    if (payload.email or "").strip().lower() != registered_email.lower():
+        raise HTTPException(status_code=400, detail="Email does not match the registered admin email.")
+
+    if payload.otp.strip() != entry.get("otp"):
+        raise HTTPException(status_code=400, detail="Incorrect OTP. Please try again.")
+
+    # Success — write the new hash (preserve the registered email for future resets)
+    new_hash, new_salt = hash_password(payload.new_password)
+    stored_username, _, _ = load_admin_credentials()
+    os.makedirs(DATA_DIR, exist_ok=True)
+    with open(CREDENTIALS_JSON, "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "username": stored_username,
+                "password_hash": new_hash,
+                "salt": new_salt,
+                "email": registered_email,
+            },
+            f,
+            indent=2,
+        )
+
+    # Invalidate the OTP
+    del _otp_store[client_ip]
+
+    return {"success": True, "message": "Password updated successfully. Log in with your new password."}
+
+SMTP_CONFIG_FILE = os.path.join(DATA_DIR, "smtp_config.json")
+
+SENSITIVE_KEYS = {"SMTP_PASSWORD", "RESEND_API_KEY", "LARK_APP_SECRET"}
+
+@app.get("/api/v1/portfolio/admin/smtp")
+async def get_smtp_settings(request: Request):
+    """Retrieves SMTP and Resend config with secrets masked. Protected by admin token."""
+    token = get_token_from_request(request)
+    if not verify_session_token(token):
+        raise HTTPException(status_code=401, detail="Unauthorized access. Invalid or expired token.")
+    if os.path.exists(SMTP_CONFIG_FILE):
+        with open(SMTP_CONFIG_FILE, "r", encoding="utf-8") as f:
+            config = json.load(f)
+    else:
+        config = {}
+    # Mask sensitive values for display
+    for k in SENSITIVE_KEYS:
+        if config.get(k):
+            config[k] = "********"
+    return config
+
+@app.post("/api/v1/portfolio/admin/smtp")
+async def save_smtp_settings(payload: dict, request: Request):
+    """Saves SMTP and Resend config, preserving any masked secrets. Protected by admin token."""
+    token = get_token_from_request(request)
+    if not verify_session_token(token):
+        raise HTTPException(status_code=401, detail="Unauthorized access. Invalid or expired token.")
+    os.makedirs(DATA_DIR, exist_ok=True)
+    existing: dict = {}
+    if os.path.exists(SMTP_CONFIG_FILE):
+        try:
+            with open(SMTP_CONFIG_FILE, "r", encoding="utf-8") as f:
+                existing = json.load(f)
+        except Exception:
+            existing = {}
+    # Don't overwrite real secrets if frontend sent the masked placeholder
+    for k in SENSITIVE_KEYS:
+        if payload.get(k) == "********":
+            payload[k] = existing.get(k, "")
+    with open(SMTP_CONFIG_FILE, "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2)
+    return {"success": True, "message": "SMTP settings saved."}
+
 @app.post("/api/v1/portfolio/admin/upload/avatar")
 async def upload_avatar(payload: UploadPayload, request: Request):
     """Uploads a new profile image. Protected by admin session token."""

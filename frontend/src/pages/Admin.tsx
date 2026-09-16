@@ -27,7 +27,8 @@ import {
   BookOpen,
   Award,
   AlertCircle,
-  Edit
+  Edit,
+  MailOpen
 } from 'lucide-react';
 import PortfolioService from '../services/api';
 import { ProfileMode, ProfileData, RoleDefinition } from '../types';
@@ -50,6 +51,12 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
   const [token, setToken] = useState<string | null>(null);
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [loginError, setLoginError] = useState(false);
+  const [view, setView] = useState<'login' | 'forgot'>('login');
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [newOtpPassword, setNewOtpPassword] = useState('');
 
   // Data States
   const [unanswered, setUnanswered] = useState<any[]>([]);
@@ -164,6 +171,41 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
       setLoginError(true);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotLoading(true);
+    setOtpSent(false);
+    try {
+      const res = await PortfolioService.forgotPassword(forgotEmail);
+      if (res.success) {
+        setOtpSent(true);
+      }
+    } catch (err: any) {
+      console.error('Forgot password failed:', err);
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotLoading(true);
+    try {
+      const res = await PortfolioService.verifyOtp(otpCode, newOtpPassword, forgotEmail);
+      if (res.success) {
+        alert('Password updated successfully. Log in with your new password.');
+        setView('login');
+        setOtpSent(false);
+        setOtpCode('');
+        setNewOtpPassword('');
+      }
+    } catch (err: any) {
+      alert(err.detail || 'OTP verification failed.');
+    } finally {
+      setForgotLoading(false);
     }
   };
 
@@ -387,6 +429,109 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
   };
 
   if (!isUnlocked) {
+    if (view === 'forgot') {
+      return (
+        <div className={`min-h-screen flex items-center justify-center py-24 px-6 transition-colors duration-200 ${
+          isDark ? 'bg-[#121212] text-white' : 'bg-[#FDFBF7] text-neutral-900'
+        }`}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`w-full max-w-md p-8 rounded-[32px] border backdrop-blur-xl ${
+              isDark ? 'bg-neutral-950/60 border-white/10 shadow-2xl' : 'bg-white border-slate-200 shadow-xl'
+            }`}
+          >
+            <div className="flex flex-col items-center mb-6 text-center">
+              <div className="w-12 h-12 rounded-full bg-[#007AFF]/10 flex items-center justify-center text-[#007AFF] mb-4">
+                <MailOpen className="w-5 h-5" />
+              </div>
+              <h1 className="text-xl font-bold font-sans tracking-tight">Reset Admin Password</h1>
+              <p className="text-xs text-slate-500 mt-1">A 6-digit code will be sent to your registered admin email.</p>
+            </div>
+
+            <form onSubmit={handleForgotPassword} className="flex flex-col gap-4">
+              <div>
+                <label className="block text-[10px] uppercase font-mono tracking-wider text-slate-400 mb-1">Admin Email</label>
+                <input
+                  type="email"
+                  required
+                  placeholder="you@example.com"
+                  value={forgotEmail}
+                  onChange={e => setForgotEmail(e.target.value)}
+                  className={`w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] ${
+                    isDark ? 'border-neutral-800' : 'border-slate-200'
+                  }`}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={forgotLoading}
+                className="w-full py-3 bg-[#007AFF] hover:bg-[#007AFF]/90 disabled:opacity-60 text-white rounded-xl flex items-center justify-center gap-2 text-xs font-semibold shadow-glow cursor-pointer transition-colors"
+              >
+                {forgotLoading ? <Loader2 className="w-4.5 h-4.5 animate-spin" /> : <MailOpen className="w-4.5 h-4.5" />}
+                <span>Send OTP Code</span>
+              </button>
+
+              {otpSent && (
+                <div className="border-t border-neutral-800/50 pt-4 space-y-3">
+                  <p className="text-[11px] text-slate-500">
+                    A 6-digit code has been sent to <strong className="text-slate-400">{forgotEmail}</strong>. Enter it below along with your new password.
+                  </p>
+                  <div>
+                    <label className="block text-[10px] uppercase font-mono tracking-wider text-slate-400 mb-1">OTP Code</label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={6}
+                      required
+                      placeholder="••••••"
+                      value={otpCode}
+                      onChange={e => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                      className={`w-full px-4 py-2.5 rounded-xl border bg-transparent text-center text-lg font-mono tracking-[0.5em] focus:outline-none focus:border-[#007AFF] ${
+                        isDark ? 'border-neutral-800' : 'border-slate-200'
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase font-mono tracking-wider text-slate-400 mb-1">New Password</label>
+                    <input
+                      type="password"
+                      required
+                      minLength={8}
+                      placeholder="Minimum 8 characters"
+                      value={newOtpPassword}
+                      onChange={e => setNewOtpPassword(e.target.value)}
+                      className={`w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] ${
+                        isDark ? 'border-neutral-800' : 'border-slate-200'
+                      }`}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleVerifyOtp}
+                    disabled={forgotLoading || otpCode.length < 6 || newOtpPassword.length < 8}
+                    className="w-full py-3 bg-[#007AFF] hover:bg-[#007AFF]/90 disabled:opacity-60 text-white rounded-xl flex items-center justify-center gap-2 text-xs font-semibold shadow-glow cursor-pointer transition-colors"
+                  >
+                    {forgotLoading ? <Loader2 className="w-4.5 h-4.5 animate-spin" /> : <Unlock className="w-4.5 h-4.5" />}
+                    <span>Set New Password</span>
+                  </button>
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={() => { setView('login'); setOtpSent(false); }}
+                className="text-[10px] font-mono uppercase tracking-wider text-slate-500 hover:text-[#007AFF] transition-colors cursor-pointer text-center"
+              >
+                ← Back to login
+              </button>
+            </form>
+          </motion.div>
+        </div>
+      );
+    }
+
     return (
       <div className={`min-h-screen flex items-center justify-center py-24 px-6 transition-colors duration-200 ${
         isDark ? 'bg-[#121212] text-white' : 'bg-[#FDFBF7] text-neutral-900'
@@ -444,6 +589,17 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
               {loading ? <Loader2 className="w-4.5 h-4.5 animate-spin" /> : <Unlock className="w-4.5 h-4.5" />}
               <span>Verify Access Credentials</span>
             </button>
+
+            {/* Forgot password via email OTP */}
+            <div className="border-t border-neutral-800/50 pt-4 mt-2">
+              <button
+                type="button"
+                onClick={() => setView('forgot')}
+                className="text-[10px] font-mono uppercase tracking-wider text-slate-500 hover:text-[#007AFF] transition-colors cursor-pointer"
+              >
+                Forgot password? Reset via email OTP
+              </button>
+            </div>
           </form>
         </motion.div>
       </div>

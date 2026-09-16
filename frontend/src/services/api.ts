@@ -396,6 +396,38 @@ export class PortfolioService {
   }
 
   /**
+   * Request an admin password-reset OTP to the registered admin email.
+   */
+  public static async forgotPassword(email: string): Promise<{ success: boolean; message?: string }> {
+    const response = await fetch(`${this.apiBaseUrl}/admin/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    if (!response.ok) {
+      const detail = await response.json().catch(() => ({}));
+      throw new Error(detail.detail || 'Failed to send OTP.');
+    }
+    return await response.json();
+  }
+
+  /**
+   * Verify the OTP and set a new admin password.
+   */
+  public static async verifyOtp(otp: string, newPassword: string, email: string): Promise<{ success: boolean; message?: string }> {
+    const response = await fetch(`${this.apiBaseUrl}/admin/verify-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ otp, new_password: newPassword, email }),
+    });
+    if (!response.ok) {
+      const detail = await response.json().catch(() => ({}));
+      throw new Error(detail.detail || 'OTP verification failed.');
+    }
+    return await response.json();
+  }
+
+  /**
    * Fetches full configuration (profile.json structure).
    */
   public static async getAdminConfig(token: string): Promise<Record<ProfileMode, ProfileData>> {

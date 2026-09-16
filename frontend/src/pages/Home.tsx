@@ -228,7 +228,7 @@ export default function Home({ config, homeCards = [], projects = [], currentMod
       }`}>
         <div className="max-w-7xl mx-auto px-6 md:px-12">
             <a
-              href="https://api.adarshsingh.in"
+              href="https://addy.adarshsingh.in"
               target="_blank"
               rel="noopener noreferrer"
             className={`group block p-6 md:p-8 rounded-[24px] border transition-all duration-300 hover:shadow-lg ${
