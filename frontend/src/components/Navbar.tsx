@@ -96,7 +96,7 @@ export default function Navbar({ isDark, toggleTheme, currentMode, onModeChange,
                 Adarsh Singh
               </span>
               <span className={`text-[9px] block font-mono tracking-wider transition-colors duration-500 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                {currentMode === 'data-engineer' ? 'DATA ENGINE' : 'AI & DATA'}
+                {rolesList.find(r => r.id === currentMode)?.label?.toUpperCase() || (currentMode === 'data-engineer' ? 'DATA ENGINE' : 'AI & DATA')}
               </span>
             </div>
           </Link>
@@ -120,11 +120,10 @@ export default function Navbar({ isDark, toggleTheme, currentMode, onModeChange,
               <span>Resume</span>
             </Link>
 
-            {/* Desktop Navigation Links (Collapsed under a single Menu dropdown on the right) */}
+            {/* Desktop Navigation Links (collapsed under a click-to-open Menu dropdown;
+                outside-click closes it — no hover dependence, so it works on touch too) */}
             <div 
               ref={menuContainerRef}
-              onMouseEnter={() => setMenuDropdownOpen(true)}
-              onMouseLeave={() => setMenuDropdownOpen(false)}
               className="relative"
               id="desktop-nav-menu"
             >
@@ -135,6 +134,8 @@ export default function Navbar({ isDark, toggleTheme, currentMode, onModeChange,
                     ? 'bg-black/60 border-white/10 hover:border-[#007AFF]/45 text-slate-300 hover:text-white shadow-[0_4px_12px_rgba(0,0,0,0.5)]' 
                     : 'bg-white border-slate-200 hover:border-[#007AFF]/35 text-slate-700 hover:text-neutral-950 shadow-sm'
                 }`}
+                aria-expanded={menuDropdownOpen}
+                aria-haspopup="true"
               >
                 <Menu className="w-3.5 h-3.5" />
                 <span className="font-display tracking-widest uppercase">Menu</span>
