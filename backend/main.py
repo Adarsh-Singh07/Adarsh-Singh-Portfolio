@@ -573,6 +573,8 @@ def load_profiles():
     try:
         content_str = r2.read_text("profile.json")
         if content_str:
+            with open(PROFILE_JSON, "w", encoding="utf-8") as f:
+                f.write(content_str)
             db.save_file_backup("profile.json", content_str, source="startup_sync")
             return json.loads(content_str)
     except Exception as e:
