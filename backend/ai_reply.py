@@ -9,10 +9,6 @@ from google import genai
 from google.genai import types
 
 MODELS_TO_TRY = [
-    "gemini-2.5-flash-lite",
-    "gemini-2.0-flash",
-    "gemini-2.0-flash-lite",
-    "gemini-1.5-flash",
     "gemini-2.5-flash",
 ]
 
@@ -30,7 +26,7 @@ async def generate_reply(name: str, message: str, source: str, extra_context: st
     """Generates a single AI response as Adarsh and returns the text."""
     api_key = os.getenv("GEMINI_API_KEY", "")
     backup_key = os.getenv("BACKUP_GEMINI_API_KEY", "")
-    groq_key = os.getenv("GROQ_API_KEY", "")
+    agnes_key = os.getenv("AGNES_API_KEY", "")
 
     system_instruction = f"""You are Adarsh Singh (18, Indian full-stack + GenAI developer) personally replying to someone who reached out on your portfolio.
 
@@ -63,81 +59,83 @@ Extra context (use ONLY if directly relevant):
     ]
 
     now = time.time()
+    
+    # 1. Primary Model: Gemini models in order, with backup key fallback
+    if api_key or backup_key:
+        for key, key_label in ((api_key, "primary"), (backup_key, "backup")):
+            if not key:
+                continue
+            client = genai.Client(api_key=key)
+            key_hash = _key_hash(key)
+            for model in MODELS_TO_TRY:
+                if EXHAUSTED_MODELS.get((key_hash, model), 0) > now:
+                    continue
+                try:
+                    resp = await client.aio.models.generate_content(
+                        model=model,
+                        contents=contents,
+                        config=types.GenerateContentConfig(
+                            system_instruction=system_instruction,
+                            temperature=0.75,
+                        ),
+                    )
+                    text = resp.text or ""
+                    if text:
+                        print(f"AI reply generated via {key_label} Gemini {model}")
+                        return _finalize(text)
+                except Exception as err:
+                    err_s = str(err).lower()
+                    if "429" in err_s or "quota exceeded" in err_s or "resource_exhausted" in err_s:
+                        EXHAUSTED_MODELS[(key_hash, model)] = now + 7200
+                        break
+                    if "503" in err_s or "overloaded" in err_s:
+                        await asyncio.sleep(1.5)
+                        continue
+                    break
 
-    # 1. Groq fallback (non-critical if it fails)
-    if groq_key:
+    # 2. Fallback: Agnes API
+    if agnes_key:
         try:
             import urllib.request
             import json as _json
-            messages = [
-                {"role": "system", "content": system_instruction},
-                {"role": "user", "content": message},
-            ]
-            payload = _json.dumps(
-                {
-                    "model": "llama-3.1-8b-instant",
-                    "messages": messages,
-                    "temperature": 0.75,
-                    "max_tokens": 900,
-                }
-            ).encode("utf-8")
-            req = urllib.request.Request(
-                "https://api.groq.com/openai/v1/chat/completions",
-                data=payload,
-                headers={
-                    "Authorization": f"Bearer {groq_key}",
-                    "Content-Type": "application/json",
-                },
-            )
-            with urllib.request.urlopen(req, timeout=12) as resp:
-                body = resp.read().decode("utf-8")
-                data = _json.loads(body)
-                text = data["choices"][0]["message"]["content"]
-                if text:
-                    print("AI reply generated via Groq llama-3.1-8b-instant")
-                    return _finalize(text)
-        except Exception as e:
-            print(f"Groq reply generation skipped: {e}")
-
-    if not api_key and not backup_key:
-        return _finalize(
-            f"Thanks {name or 'there'} — I got your message from {source}. "
-            "I'll review it and get back to you as soon as possible."
-        )
-
-    # 2. Gemini models in order, with backup key fallback
-    for key, key_label in ((api_key, "primary"), (backup_key, "backup")):
-        if not key:
-            continue
-        client = genai.Client(api_key=key)
-        key_hash = _key_hash(key)
-        for model in MODELS_TO_TRY:
-            if EXHAUSTED_MODELS.get((key_hash, model), 0) > now:
-                continue
-            try:
-                resp = await client.aio.models.generate_content(
-                    model=model,
-                    contents=contents,
-                    config=types.GenerateContentConfig(
-                        system_instruction=system_instruction,
-                        temperature=0.75,
-                    ),
+            agnes_model = "agnes-3.0-flash"
+            agnes_key_hash = _key_hash(agnes_key)
+            
+            if EXHAUSTED_MODELS.get((agnes_key_hash, agnes_model), 0) <= now:
+                messages = [
+                    {"role": "system", "content": system_instruction},
+                    {"role": "user", "content": message},
+                ]
+                payload = _json.dumps(
+                    {
+                        "model": agnes_model,
+                        "messages": messages,
+                        "temperature": 0.75,
+                        "max_tokens": 900,
+                    }
+                ).encode("utf-8")
+                req = urllib.request.Request(
+                    "https://apihub.agnes-ai.com/v1/chat/completions",
+                    data=payload,
+                    headers={
+                        "Authorization": f"Bearer {agnes_key}",
+                        "Content-Type": "application/json",
+                    },
                 )
-                text = resp.text or ""
-                if text:
-                    print(f"AI reply generated via {key_label} Gemini {model}")
-                    return _finalize(text)
-            except Exception as err:
-                err_s = str(err).lower()
-                if "429" in err_s or "quota exceeded" in err_s or "resource_exhausted" in err_s:
-                    EXHAUSTED_MODELS[(key_hash, model)] = now + 7200
-                    break
-                if "503" in err_s or "overloaded" in err_s:
-                    await asyncio.sleep(1.5)
-                    continue
-                break
+                with urllib.request.urlopen(req, timeout=12) as resp:
+                    body = resp.read().decode("utf-8")
+                    data = _json.loads(body)
+                    text = data["choices"][0]["message"]["content"]
+                    if text:
+                        print(f"AI reply generated via Agnes {agnes_model}")
+                        return _finalize(text)
+        except Exception as e:
+            print(f"Agnes reply generation skipped: {e}")
+            err_s = str(e).lower()
+            if "429" in err_s or "quota" in err_s or "rate limit" in err_s or "exhausted" in err_s:
+                EXHAUSTED_MODELS[(agnes_key_hash, agnes_model)] = now + 14400
 
-    # 3. Last resort no-Gemini fallback
+    # 3. Last resort no-AI fallback
     return _finalize(
         f"Thanks {name or 'there'} — I received your message from {source}. "
         "I'll take a look and get back to you shortly."

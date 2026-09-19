@@ -1,7 +1,7 @@
 """
 Database schema extensions for the email engine.
 
-Reuses the existing portfolio.db (SQLite). Adds new tables for email
+Reuses the existing PostgreSQL database. Adds new tables for email
 processing, classification, leads, threads, and attachments. Idempotency is
 enforced via unique provider_message_id.
 
@@ -9,21 +9,15 @@ Run `init_email_db()` at startup to create tables if missing.
 """
 
 import os
-import sqlite3
-
-DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
-DB_PATH = os.path.join(DATA_DIR, "portfolio.db")
-
+import psycopg2
+import psycopg2.extras
 
 def get_db_connection():
-    os.makedirs(DATA_DIR, exist_ok=True)
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    try:
-        conn.execute("PRAGMA journal_mode=MEMORY")
-        conn.execute("PRAGMA synchronous=OFF")
-    except Exception:
-        pass
+    conn = psycopg2.connect(
+        os.getenv("DATABASE_URL"),
+        sslmode='require',
+        cursor_factory=psycopg2.extras.RealDictCursor
+    )
     return conn
 
 
@@ -35,7 +29,7 @@ def init_email_db():
     cur.execute(
         """
         CREATE TABLE IF NOT EXISTS emails (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             provider_message_id TEXT UNIQUE NOT NULL,
             thread_id TEXT,
             provider TEXT DEFAULT 'lark',
@@ -44,12 +38,12 @@ def init_email_db():
             subject TEXT,
             body_text TEXT,
             body_html TEXT,
-            received_at TEXT,
+            received_at TIMESTAMP,
             recipient_alias TEXT,
             classification_json TEXT,
             processing_status TEXT DEFAULT 'pending',
             reply_status TEXT DEFAULT 'not_sent',
-            created_at TEXT DEFAULT (datetime('now'))
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         """
     )
@@ -58,12 +52,12 @@ def init_email_db():
     cur.execute(
         """
         CREATE TABLE IF NOT EXISTS email_threads (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             thread_id TEXT UNIQUE,
             provider TEXT DEFAULT 'lark',
             subject TEXT,
             participant_emails TEXT,
-            created_at TEXT DEFAULT (datetime('now'))
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         """
     )
@@ -72,7 +66,7 @@ def init_email_db():
     cur.execute(
         """
         CREATE TABLE IF NOT EXISTS classifications (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             email_id INTEGER,
             category TEXT,
             priority TEXT,
@@ -91,7 +85,7 @@ def init_email_db():
     cur.execute(
         """
         CREATE TABLE IF NOT EXISTS leads (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             email_id INTEGER,
             name TEXT,
             company TEXT,
@@ -105,7 +99,7 @@ def init_email_db():
             location TEXT,
             lead_source TEXT,
             urgency TEXT,
-            created_at TEXT DEFAULT (datetime('now'))
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         """
     )
@@ -114,12 +108,12 @@ def init_email_db():
     cur.execute(
         """
         CREATE TABLE IF NOT EXISTS email_actions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             email_id INTEGER,
             action_type TEXT,
             status TEXT,
             detail TEXT,
-            created_at TEXT DEFAULT (datetime('now'))
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         """
     )
@@ -128,14 +122,14 @@ def init_email_db():
     cur.execute(
         """
         CREATE TABLE IF NOT EXISTS email_attachments (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             email_id INTEGER,
             filename TEXT,
             mime_type TEXT,
             size INTEGER,
             provider_attachment_id TEXT,
             storage_location TEXT,
-            created_at TEXT DEFAULT (datetime('now'))
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         """
     )

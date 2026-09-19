@@ -165,7 +165,7 @@ def generate_embeddings_batch(client, texts):
     for text in texts:
         try:
             response = client.models.embed_content(
-                model="gemini-embedding-2",
+                model="text-embedding-004",
                 contents=text
             )
             if hasattr(response, 'embedding') and response.embedding:
@@ -199,7 +199,9 @@ def check_cache_validity():
         
         # Verify db has records
         conn = get_db_connection()
-        count = conn.execute("SELECT COUNT(*) FROM rag_chunks").fetchone()[0]
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) as count FROM rag_chunks")
+        count = cursor.fetchone()['count']
         conn.close()
         return count > 0
         
@@ -245,13 +247,14 @@ def index_knowledge_base(api_key: str):
     # Insert into DB
     conn = get_db_connection()
     try:
-        conn.execute("DELETE FROM rag_chunks") # Clear old index
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM rag_chunks") # Clear old index
         
         for chunk, emb in zip(chunks, all_embeddings):
-            conn.execute(
+            cursor.execute(
                 """
                 INSERT INTO rag_chunks (source_file, chunk_title, content, embedding_json)
-                VALUES (?, ?, ?, ?)
+                VALUES (%s, %s, %s, %s)
                 """,
                 (chunk["source_file"], chunk["chunk_title"], chunk["content"], json.dumps(emb))
             )
@@ -282,7 +285,7 @@ def retrieve_context(api_key: str, query: str, top_k: int = 4):
     # 1. Generate query embedding
     try:
         response = client.models.embed_content(
-            model="gemini-embedding-2",
+            model="text-embedding-004",
             contents=query
         )
         if hasattr(response, 'embeddings') and response.embeddings:
@@ -298,7 +301,9 @@ def retrieve_context(api_key: str, query: str, top_k: int = 4):
 
     # 2. Retrieve all chunks from SQLite
     conn = get_db_connection()
-    rows = conn.execute("SELECT source_file, chunk_title, content, embedding_json FROM rag_chunks").fetchall()
+    cursor = conn.cursor()
+    cursor.execute("SELECT source_file, chunk_title, content, embedding_json FROM rag_chunks")
+    rows = cursor.fetchall()
     conn.close()
     
     # 3. Calculate similarities

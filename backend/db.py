@@ -1,24 +1,19 @@
 import os
-import sqlite3
+import psycopg2
+import psycopg2.extras
 import json
 from datetime import datetime
+import hashlib
 
 from timezone_ist import now_ist_iso
 
-DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
-DB_PATH = os.path.join(DATA_DIR, "portfolio.db")
-
 def get_db_connection():
-    """Returns a SQLite connection object with row factory enabled."""
-    os.makedirs(DATA_DIR, exist_ok=True)
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    # Optimize SQLite for GCS FUSE to avoid journal file conflicts on object storage
-    try:
-        conn.execute("PRAGMA journal_mode=MEMORY")
-        conn.execute("PRAGMA synchronous=OFF")
-    except Exception as e:
-        print(f"Error configuring SQLite PRAGMA: {e}")
+    """Returns a PostgreSQL connection object with dict cursor enabled."""
+    conn = psycopg2.connect(
+        os.getenv("DATABASE_URL"),
+        sslmode='require',
+        cursor_factory=psycopg2.extras.RealDictCursor
+    )
     return conn
 
 def init_db():
@@ -29,7 +24,7 @@ def init_db():
     # 1. RAG Chunks table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS rag_chunks (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         source_file TEXT NOT NULL,
         chunk_title TEXT NOT NULL,
         content TEXT NOT NULL,
@@ -41,7 +36,7 @@ def init_db():
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS chat_sessions (
         id TEXT PRIMARY KEY,
-        created_at TEXT NOT NULL,
+        created_at TIMESTAMP NOT NULL,
         role_mode TEXT NOT NULL
     )
     """)
@@ -53,7 +48,7 @@ def init_db():
         session_id TEXT NOT NULL,
         role TEXT NOT NULL,
         content TEXT NOT NULL,
-        created_at TEXT NOT NULL,
+        created_at TIMESTAMP NOT NULL,
         retrieved_chunks_json TEXT,
         prompt_template TEXT,
         latency_ms INTEGER,
@@ -67,11 +62,11 @@ def init_db():
     # 4. Visitor Feedback table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS visitor_feedback (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         message_id TEXT NOT NULL,
         rating INTEGER NOT NULL,
         comment TEXT,
-        created_at TEXT NOT NULL,
+        created_at TIMESTAMP NOT NULL,
         FOREIGN KEY (message_id) REFERENCES chat_messages(id) ON DELETE CASCADE
     )
     """)
@@ -79,12 +74,12 @@ def init_db():
     # 5. Contact Messages table (outreach leads)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS contact_messages (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
         email TEXT NOT NULL,
         subject TEXT NOT NULL,
         message TEXT NOT NULL,
-        created_at TEXT NOT NULL,
+        created_at TIMESTAMP NOT NULL,
         intent_category TEXT
     )
     """)
@@ -92,10 +87,10 @@ def init_db():
     # 6. Unanswered Questions table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS unanswered_questions (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         session_id TEXT,
         question TEXT NOT NULL,
-        created_at TEXT NOT NULL,
+        created_at TIMESTAMP NOT NULL,
         resolved INTEGER DEFAULT 0
     )
     """)
@@ -103,19 +98,19 @@ def init_db():
     # 7. File Backups Table (Audit & Version History for profile.json, cv.txt, cv.pdf)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS file_backups (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         filename TEXT NOT NULL,
         content_text TEXT,
-        content_blob BLOB,
+        content_blob BYTEA,
         file_hash TEXT NOT NULL,
         source TEXT DEFAULT 'system',
-        created_at TEXT NOT NULL
+        created_at TIMESTAMP NOT NULL
     )
     """)
     
     conn.commit()
     conn.close()
-    print("SQLite Database initialized successfully.")
+    print("PostgreSQL Database initialized successfully.")
 
 # --- HELPER FUNCTIONS ---
 
@@ -123,8 +118,9 @@ def save_chat_session(session_id: str, role_mode: str):
     """Saves a new chat session if it does not already exist."""
     conn = get_db_connection()
     try:
-        conn.execute(
-            "INSERT OR IGNORE INTO chat_sessions (id, created_at, role_mode) VALUES (?, ?, ?)",
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO chat_sessions (id, created_at, role_mode) VALUES (%s, %s, %s) ON CONFLICT (id) DO NOTHING",
             (session_id, now_ist_iso(), role_mode)
         )
         conn.commit()
@@ -148,14 +144,15 @@ def save_chat_message(
     """Saves a chat message with its operational metadata."""
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         chunks_json = json.dumps(retrieved_chunks) if retrieved_chunks else None
-        conn.execute(
+        cursor.execute(
             """
             INSERT INTO chat_messages (
                 id, session_id, role, content, created_at, 
                 retrieved_chunks_json, prompt_template, latency_ms, 
                 tokens_input, tokens_output, cost_est
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """,
             (
                 msg_id, session_id, role, content, now_ist_iso(),
@@ -173,19 +170,18 @@ def save_feedback(message_id: str, rating: int, comment: str = None):
     """Saves thumbs feedback for a message."""
     conn = get_db_connection()
     try:
-        # Check if feedback already exists for this message to prevent duplicates
         cursor = conn.cursor()
-        cursor.execute("SELECT id FROM visitor_feedback WHERE message_id = ?", (message_id,))
+        cursor.execute("SELECT id FROM visitor_feedback WHERE message_id = %s", (message_id,))
         row = cursor.fetchone()
         
         if row:
-            conn.execute(
-                "UPDATE visitor_feedback SET rating = ?, comment = ?, created_at = ? WHERE message_id = ?",
+            cursor.execute(
+                "UPDATE visitor_feedback SET rating = %s, comment = %s, created_at = %s WHERE message_id = %s",
                 (rating, comment, now_ist_iso(), message_id)
             )
         else:
-            conn.execute(
-                "INSERT INTO visitor_feedback (message_id, rating, comment, created_at) VALUES (?, ?, ?, ?)",
+            cursor.execute(
+                "INSERT INTO visitor_feedback (message_id, rating, comment, created_at) VALUES (%s, %s, %s, %s)",
                 (message_id, rating, comment, now_ist_iso())
             )
         conn.commit()
@@ -198,15 +194,16 @@ def save_contact_message(name: str, email: str, subject: str, message: str, inte
     """Saves outreach message and its AI-determined intent category."""
     conn = get_db_connection()
     try:
-        cursor = conn.execute(
+        cursor = conn.cursor()
+        cursor.execute(
             """
             INSERT INTO contact_messages (name, email, subject, message, created_at, intent_category)
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s, %s, %s) RETURNING id
             """,
             (name, email, subject, message, now_ist_iso(), intent_category),
         )
         conn.commit()
-        return cursor.lastrowid
+        return cursor.fetchone()['id']
     except Exception as e:
         print(f"Error saving contact message to DB: {e}")
         return None
@@ -217,10 +214,11 @@ def save_unanswered_question(session_id: str, question: str):
     """Saves a question that the chatbot was unable to answer."""
     conn = get_db_connection()
     try:
-        conn.execute(
+        cursor = conn.cursor()
+        cursor.execute(
             """
             INSERT INTO unanswered_questions (session_id, question, created_at, resolved)
-            VALUES (?, ?, ?, 0)
+            VALUES (%s, %s, %s, 0)
             """,
             (session_id, question, now_ist_iso())
         )
@@ -234,8 +232,9 @@ def resolve_unanswered_question(question_id: int):
     """Marks a previously unanswered question as resolved."""
     conn = get_db_connection()
     try:
-        conn.execute(
-            "UPDATE unanswered_questions SET resolved = 1 WHERE id = ?",
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE unanswered_questions SET resolved = 1 WHERE id = %s",
             (question_id,)
         )
         conn.commit()
@@ -244,11 +243,9 @@ def resolve_unanswered_question(question_id: int):
     finally:
         conn.close()
 
-import hashlib
-
 def save_file_backup(filename: str, content: str | bytes, source: str = "system"):
     """
-    Saves a versioned backup snapshot of profile.json, cv.txt, or cv.pdf to SQLite.
+    Saves a versioned backup snapshot of profile.json, cv.txt, or cv.pdf to PostgreSQL.
     Skips insertion if the latest backup for filename has the exact same SHA-256 hash.
     """
     conn = get_db_connection()
@@ -262,24 +259,25 @@ def save_file_backup(filename: str, content: str | bytes, source: str = "system"
             
         file_hash = hashlib.sha256(content_bytes).hexdigest()
         
-        # Check latest backup for this filename
-        latest = conn.execute(
-            "SELECT file_hash FROM file_backups WHERE filename = ? ORDER BY id DESC LIMIT 1",
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT file_hash FROM file_backups WHERE filename = %s ORDER BY id DESC LIMIT 1",
             (filename,)
-        ).fetchone()
+        )
+        latest = cursor.fetchone()
         
         if latest and latest["file_hash"] == file_hash:
             return  # No changes detected, skip duplicate insertion
             
         now_str = now_ist_iso()
         if is_text:
-            conn.execute(
-                "INSERT INTO file_backups (filename, content_text, file_hash, source, created_at) VALUES (?, ?, ?, ?, ?)",
+            cursor.execute(
+                "INSERT INTO file_backups (filename, content_text, file_hash, source, created_at) VALUES (%s, %s, %s, %s, %s)",
                 (filename, content, file_hash, source, now_str)
             )
         else:
-            conn.execute(
-                "INSERT INTO file_backups (filename, content_blob, file_hash, source, created_at) VALUES (?, ?, ?, ?, ?)",
+            cursor.execute(
+                "INSERT INTO file_backups (filename, content_blob, file_hash, source, created_at) VALUES (%s, %s, %s, %s, %s)",
                 (filename, content, file_hash, source, now_str)
             )
         conn.commit()
@@ -290,20 +288,22 @@ def save_file_backup(filename: str, content: str | bytes, source: str = "system"
         conn.close()
 
 def get_file_backups(filename: str = None, limit: int = 50):
-    """Retrieves list of file backup versions from SQLite."""
+    """Retrieves list of file backup versions from PostgreSQL."""
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         if filename:
-            rows = conn.execute(
-                "SELECT id, filename, file_hash, source, created_at, LENGTH(COALESCE(content_text, '')) as text_len, LENGTH(COALESCE(content_blob, '')) as blob_len FROM file_backups WHERE filename = ? ORDER BY id DESC LIMIT ?",
+            cursor.execute(
+                "SELECT id, filename, file_hash, source, created_at, LENGTH(COALESCE(content_text, '')) as text_len, LENGTH(COALESCE(content_blob, ''::bytea)) as blob_len FROM file_backups WHERE filename = %s ORDER BY id DESC LIMIT %s",
                 (filename, limit)
-            ).fetchall()
+            )
         else:
-            rows = conn.execute(
-                "SELECT id, filename, file_hash, source, created_at, LENGTH(COALESCE(content_text, '')) as text_len, LENGTH(COALESCE(content_blob, '')) as blob_len FROM file_backups ORDER BY id DESC LIMIT ?",
+            cursor.execute(
+                "SELECT id, filename, file_hash, source, created_at, LENGTH(COALESCE(content_text, '')) as text_len, LENGTH(COALESCE(content_blob, ''::bytea)) as blob_len FROM file_backups ORDER BY id DESC LIMIT %s",
                 (limit,)
-            ).fetchall()
-        return [dict(r) for r in rows]
+            )
+        rows = cursor.fetchall()
+        return rows
     except Exception as e:
         print(f"Error getting file backups: {e}")
         return []
@@ -314,10 +314,11 @@ def save_email_action(contact_id: int, action_type: str, status: str, detail: st
     """Records an action status for a contact/email for auditability."""
     conn = get_db_connection()
     try:
-        conn.execute(
+        cursor = conn.cursor()
+        cursor.execute(
             """
             INSERT INTO email_actions (email_id, action_type, status, detail, created_at)
-            VALUES (?, ?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s, %s)
             """,
             (
                 contact_id,
@@ -337,17 +338,19 @@ def get_email_actions(contact_id: int = None, limit: int = 50):
     """Retrieves action status records, optionally filtered by contact/email id."""
     conn = get_db_connection()
     try:
+        cursor = conn.cursor()
         if contact_id:
-            rows = conn.execute(
-                "SELECT * FROM email_actions WHERE email_id = ? ORDER BY id DESC LIMIT ?",
+            cursor.execute(
+                "SELECT * FROM email_actions WHERE email_id = %s ORDER BY id DESC LIMIT %s",
                 (contact_id, limit),
-            ).fetchall()
+            )
         else:
-            rows = conn.execute(
-                "SELECT * FROM email_actions ORDER BY id DESC LIMIT ?",
+            cursor.execute(
+                "SELECT * FROM email_actions ORDER BY id DESC LIMIT %s",
                 (limit,),
-            ).fetchall()
-        return [dict(r) for r in rows]
+            )
+        rows = cursor.fetchall()
+        return rows
     except Exception as e:
         print(f"Error getting email actions: {e}")
         return []
@@ -358,8 +361,10 @@ def get_backup_by_id(backup_id: int):
     """Retrieves a single backup record by ID."""
     conn = get_db_connection()
     try:
-        row = conn.execute("SELECT * FROM file_backups WHERE id = ?", (backup_id,)).fetchone()
-        return dict(row) if row else None
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM file_backups WHERE id = %s", (backup_id,))
+        row = cursor.fetchone()
+        return row
     except Exception as e:
         print(f"Error getting backup by id: {e}")
         return None

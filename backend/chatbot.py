@@ -54,7 +54,7 @@ def check_chat_rate_limit(client_ip: str, limit: int = 15, window: int = 60) -> 
     return True
 
 
-async def call_groq_llm(groq_key: str, model_name: str, history: list, user_message: str, system_instruction: str):
+async def call_agnes_llm(api_key: str, model_name: str, history: list, user_message: str, system_instruction: str):
     import urllib.request
     import json
     messages = [{"role": "system", "content": system_instruction}]
@@ -71,12 +71,12 @@ async def call_groq_llm(groq_key: str, model_name: str, history: list, user_mess
     }).encode("utf-8")
 
     req = urllib.request.Request(
-        "https://api.groq.com/openai/v1/chat/completions",
+        "https://apihub.agnes-ai.com/v1/chat/completions",
         data=payload,
         headers={
-            "Authorization": f"Bearer {groq_key}",
+            "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
-            "User-Agent": "FastAPI-Groq-Client"
+            "User-Agent": "FastAPI-Agnes-Client"
         }
     )
 
@@ -155,24 +155,36 @@ Here is my official CV & Portfolio Knowledge Base context:
         tokens_input = 0
         tokens_output = 0
 
-        # Try Groq API first (Ultra-Fast <400ms Response)
-        if groq_api_key:
-            groq_models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
-            for g_model in groq_models:
+        agnes_api_key = os.environ.get("AGNES_API_KEY")
+
+        # Try Agnes API first
+        if agnes_api_key:
+            agnes_models = ["agnes-3.0-flash", "agnes-2.5-flash"]
+            agnes_key_hash = get_key_hash(agnes_api_key)
+            now = time.time()
+            for a_model in agnes_models:
+                blacklist_until = EXHAUSTED_MODELS.get((agnes_key_hash, a_model), 0)
+                if now < blacklist_until:
+                    continue
                 try:
-                    print(f"Calling Groq ultra-fast API with model {g_model}...")
-                    g_res = await call_groq_llm(groq_api_key, g_model, request.history, request.message, system_instruction)
-                    response_text = g_res["choices"][0]["message"]["content"]
-                    model_used_name = f"groq/{g_model}"
-                    usage = g_res.get("usage", {})
+                    print(f"Calling Agnes API with model {a_model}...")
+                    a_res = await call_agnes_llm(agnes_api_key, a_model, request.history, request.message, system_instruction)
+                    response_text = a_res["choices"][0]["message"]["content"]
+                    model_used_name = f"agnes/{a_model}"
+                    usage = a_res.get("usage", {})
                     tokens_input = usage.get("prompt_tokens", 0)
                     tokens_output = usage.get("completion_tokens", 0)
-                    print(f"Groq API succeeded using {g_model}!")
+                    print(f"Agnes API succeeded using {a_model}!")
                     break
-                except Exception as g_err:
-                    print(f"Groq model {g_model} failed: {g_err}")
+                except Exception as a_err:
+                    print(f"Agnes model {a_model} failed: {a_err}")
+                    err_str = str(a_err).lower()
+                    if "429" in err_str or "quota" in err_str or "rate limit" in err_str or "exhausted" in err_str:
+                        EXHAUSTED_MODELS[(agnes_key_hash, a_model)] = time.time() + 14400
+                    elif "503" in err_str or "overloaded" in err_str or "timeout" in err_str:
+                        pass # Just fallback to next model
 
-        # Fallback to Gemini if Groq was not used or failed
+        # Fallback to Gemini if Agnes was not used or failed
         if not response_text:
             client = genai.Client(api_key=api_key)
             
@@ -198,13 +210,6 @@ Here is my official CV & Portfolio Knowledge Base context:
             response = None
             last_error = None
             models_to_try = [
-                'gemini-2.5-flash',
-                'gemini-2.5-flash-lite',
-                'gemini-2.0-flash',
-                'gemini-2.0-flash-lite',
-                'gemini-1.5-flash',
-                'gemini-flash-latest',
-                'gemini-flash-lite-latest',
                 'gemini-3.5-flash'
             ]
             
@@ -439,31 +444,33 @@ async def get_chat_models_status():
     now = time.time()
     
     models_list = [
-        'gemini-2.5-flash',
-        'gemini-2.5-flash-lite',
-        'gemini-2.0-flash',
-        'gemini-2.0-flash-lite',
-        'gemini-1.5-flash',
-        'gemini-flash-latest',
-        'gemini-flash-lite-latest',
-        'gemini-3.5-flash'
+        'agnes-3.0-flash',
+        'agnes-2.5-flash',
+        'gemini-3.5-flash',
+        'gemini-1.5-flash'
     ]
     
     results = []
+    agnes_hash = get_key_hash(os.getenv("AGNES_API_KEY"))
     for m in models_list:
-        # Check if exhausted on primary key
-        p_blacklist = EXHAUSTED_MODELS.get((primary_hash, m), 0)
-        
-        # Check if exhausted on backup key (if set)
-        b_blacklist = 0
-        if backup_hash:
-            b_blacklist = EXHAUSTED_MODELS.get((backup_hash, m), 0)
+        if m.startswith("agnes-"):
+            # Check if exhausted on agnes key
+            a_blacklist = EXHAUSTED_MODELS.get((agnes_hash, m), 0)
+            status = "exhausted" if now < a_blacklist else "available"
+        else:
+            # Check if exhausted on primary key
+            p_blacklist = EXHAUSTED_MODELS.get((primary_hash, m), 0)
             
-        # Model is exhausted only if it is blacklisted on BOTH configured keys
-        is_p_exhausted = now < p_blacklist
-        is_b_exhausted = now < b_blacklist if backup_hash else True
-        
-        status = "exhausted" if (is_p_exhausted and is_b_exhausted) else "available"
+            # Check if exhausted on backup key (if set)
+            b_blacklist = 0
+            if backup_hash:
+                b_blacklist = EXHAUSTED_MODELS.get((backup_hash, m), 0)
+                
+            # Model is exhausted only if it is blacklisted on BOTH configured keys
+            is_p_exhausted = now < p_blacklist
+            is_b_exhausted = now < b_blacklist if backup_hash else True
+            
+            status = "exhausted" if (is_p_exhausted and is_b_exhausted) else "available"
         
         results.append({
             "id": m,

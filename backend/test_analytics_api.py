@@ -82,11 +82,14 @@ def test_chat_interaction_and_feedback():
     
     # Verify records were created in SQLite
     conn = db.get_db_connection()
-    session_row = conn.execute("SELECT * FROM chat_sessions WHERE id = ?", (session_id,)).fetchone()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM chat_sessions WHERE id = %s", (session_id,))
+    session_row = cursor.fetchone()
     assert session_row is not None
     assert session_row["role_mode"] == "data-engineer"
     
-    msg_rows = conn.execute("SELECT * FROM chat_messages WHERE session_id = ?", (session_id,)).fetchall()
+    cursor.execute("SELECT * FROM chat_messages WHERE session_id = %s", (session_id,))
+    msg_rows = cursor.fetchall()
     assert len(msg_rows) >= 2 # 1 user + 1 model message
     print(f"SQLite verification: Logged {len(msg_rows)} messages in chat session.")
     conn.close()
@@ -106,7 +109,9 @@ def test_chat_interaction_and_feedback():
     
     # Verify feedback was stored
     conn = db.get_db_connection()
-    fb_row = conn.execute("SELECT * FROM visitor_feedback WHERE message_id = ?", (message_id,)).fetchone()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM visitor_feedback WHERE message_id = %s", (message_id,))
+    fb_row = cursor.fetchone()
     assert fb_row is not None
     assert fb_row["rating"] == 1
     assert fb_row["comment"] == "Perfect answer!"
@@ -130,7 +135,9 @@ def test_contact_intent_classification():
     
     # Verify lead logging and intent classification in SQLite
     conn = db.get_db_connection()
-    lead = conn.execute("SELECT * FROM contact_messages ORDER BY id DESC LIMIT 1").fetchone()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM contact_messages ORDER BY id DESC LIMIT 1")
+    lead = cursor.fetchone()
     assert lead is not None
     assert lead["name"] == "Alex Recruiter"
     print(f"Logged outreach lead in SQLite. AI intent classification: '{lead['intent_category']}'")

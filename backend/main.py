@@ -17,10 +17,12 @@ if os.path.exists(dotenv_path):
     dotenv.load_dotenv(dotenv_path)
 
 import db
+import r2
 import rag
 from chatbot import router as chatbot_router
 from email_engine.router import router as email_router
-from email_engine import db as email_db
+from email_engine import db
+import r2 as email_db
 
 app = FastAPI(title="Adarsh Singh Portfolio Core API", version="1.0.0")
 app.include_router(chatbot_router)
@@ -524,6 +526,8 @@ async def upload_avatar(payload: UploadPayload, request: Request):
         avatar_path = os.path.join(DATA_DIR, "avatar.jpg")
         with open(avatar_path, "wb") as f:
             f.write(binary_data)
+            
+        r2.upload_file(avatar_path, "avatar.jpg", content_type="image/jpeg")
         return {"success": True, "message": "Avatar image uploaded successfully."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to process image: {str(e)}")
@@ -544,6 +548,8 @@ async def upload_cv(payload: UploadPayload, request: Request):
         cv_path = os.path.join(DATA_DIR, "cv.pdf")
         with open(cv_path, "wb") as f:
             f.write(binary_data)
+            
+        r2.upload_file(cv_path, "cv.pdf", content_type="application/pdf")
         db.save_file_backup("cv.pdf", binary_data, source="admin_cv_upload")
         return {"success": True, "message": "CV PDF uploaded successfully."}
     except Exception as e:
@@ -551,11 +557,8 @@ async def upload_cv(payload: UploadPayload, request: Request):
 
 @app.get("/api/v1/portfolio/assets/avatar.jpg")
 async def get_avatar():
-    """Serves the custom avatar.jpg from GCS mount, falls back to default avatar.jpg."""
-    avatar_path = os.path.join(DATA_DIR, "avatar.jpg")
-    if os.path.exists(avatar_path):
-        return FileResponse(avatar_path)
-    return RedirectResponse(url="/avatar.jpg")
+    """Redirects to custom avatar.jpg on R2, falls back to default avatar.jpg."""
+    return RedirectResponse(url="https://media.adarshsingh.in/avatar.jpg")
 
 @app.get("/api/v1/portfolio/assets/cv.pdf")
 async def get_cv():
@@ -566,24 +569,32 @@ async def get_cv():
     return RedirectResponse(url="https://adarshsingh.in/Adarsh_Singh_CV.pdf")
 
 def load_profiles():
-    """Loads consolidated profile roles from local JSON database and logs version backup in SQLite."""
+    """Loads consolidated profile roles from R2, falls back to local JSON database."""
+    try:
+        content_str = r2.read_text("profile.json")
+        if content_str:
+            db.save_file_backup("profile.json", content_str, source="startup_sync")
+            return json.loads(content_str)
+    except Exception as e:
+        print(f"Error reading profile.json from R2: {e}")
+    
     if not os.path.exists(PROFILE_JSON):
         return {}
     try:
         with open(PROFILE_JSON, "r", encoding="utf-8") as f:
             content_str = f.read()
-            db.save_file_backup("profile.json", content_str, source="startup_sync")
             return json.loads(content_str)
     except Exception as e:
         print(f"Error loading profiles database: {e}")
         return {}
 
 def save_profiles(profiles):
-    """Saves consolidated profile roles to local JSON database and logs version backup in SQLite."""
+    """Saves consolidated profile roles to R2 and local JSON database."""
     os.makedirs(DATA_DIR, exist_ok=True)
     content_str = json.dumps(profiles, indent=2, ensure_ascii=False)
     with open(PROFILE_JSON, "w", encoding="utf-8") as f:
         f.write(content_str)
+    r2.write_text("profile.json", content_str, content_type="application/json")
     db.save_file_backup("profile.json", content_str, source="admin_api_save")
 
 class ContactPayload(BaseModel):
@@ -890,38 +901,49 @@ async def get_analytics_stats():
     """Aggregates chatbot interactions and outreach lead analytics from database."""
     conn = db.get_db_connection()
     try:
+        cursor = conn.cursor()
+        
         # Total counts
-        sessions_count = conn.execute("SELECT COUNT(*) FROM chat_sessions").fetchone()[0]
-        messages_count = conn.execute("SELECT COUNT(*) FROM chat_messages").fetchone()[0]
-        leads_count = conn.execute("SELECT COUNT(*) FROM contact_messages").fetchone()[0]
+        cursor.execute("SELECT COUNT(*) as count FROM chat_sessions")
+        sessions_count = cursor.fetchone()['count']
+        
+        cursor.execute("SELECT COUNT(*) as count FROM chat_messages")
+        messages_count = cursor.fetchone()['count']
+        
+        cursor.execute("SELECT COUNT(*) as count FROM contact_messages")
+        leads_count = cursor.fetchone()['count']
         
         # Feedback aggregates
-        feedback = conn.execute("SELECT rating, COUNT(*) FROM visitor_feedback GROUP BY rating").fetchall()
-        feedback_map = {r[0]: r[1] for r in feedback}
+        cursor.execute("SELECT rating, COUNT(*) as count FROM visitor_feedback GROUP BY rating")
+        feedback = cursor.fetchall()
+        feedback_map = {r['rating']: r['count'] for r in feedback}
         pos_feedback = feedback_map.get(1, 0)
         neg_feedback = feedback_map.get(-1, 0)
         total_feedback = pos_feedback + neg_feedback
         helpful_pct = int((pos_feedback / total_feedback * 100)) if total_feedback > 0 else 100
         
         # LLM operational telemetry
-        metrics = conn.execute(
+        cursor.execute(
             """
-            SELECT AVG(latency_ms), SUM(tokens_input), SUM(tokens_output), SUM(cost_est)
+            SELECT AVG(latency_ms) as avg_latency, SUM(tokens_input) as sum_in, SUM(tokens_output) as sum_out, SUM(cost_est) as sum_cost
             FROM chat_messages WHERE role = 'model'
             """
-        ).fetchone()
+        )
+        metrics = cursor.fetchone()
         
-        avg_latency = int(metrics[0]) if metrics[0] is not None else 0
-        total_input = metrics[1] if metrics[1] is not None else 0
-        total_output = metrics[2] if metrics[2] is not None else 0
-        total_cost = float(metrics[3]) if metrics[3] is not None else 0.0
+        avg_latency = int(metrics['avg_latency']) if metrics and metrics['avg_latency'] is not None else 0
+        total_input = metrics['sum_in'] if metrics and metrics['sum_in'] is not None else 0
+        total_output = metrics['sum_out'] if metrics and metrics['sum_out'] is not None else 0
+        total_cost = float(metrics['sum_cost']) if metrics and metrics['sum_cost'] is not None else 0.0
         
         # Distributions
-        modes = conn.execute("SELECT role_mode, COUNT(*) FROM chat_sessions GROUP BY role_mode").fetchall()
-        mode_dist = {r[0]: r[1] for r in modes}
+        cursor.execute("SELECT role_mode, COUNT(*) as count FROM chat_sessions GROUP BY role_mode")
+        modes = cursor.fetchall()
+        mode_dist = {r['role_mode']: r['count'] for r in modes}
         
-        intents = conn.execute("SELECT intent_category, COUNT(*) FROM contact_messages GROUP BY intent_category").fetchall()
-        intent_dist = {r[0]: r[1] for r in intents}
+        cursor.execute("SELECT intent_category, COUNT(*) as count FROM contact_messages GROUP BY intent_category")
+        intents = cursor.fetchall()
+        intent_dist = {r['intent_category']: r['count'] for r in intents}
         
         return {
             "total_sessions": sessions_count,
@@ -987,21 +1009,24 @@ async def get_analytics_logs(request: Request, passcode: str = Query(default=Non
     
     conn = db.get_db_connection()
     try:
+        cursor = conn.cursor()
         # Get chat sessions and messages
-        sessions = conn.execute("SELECT * FROM chat_sessions ORDER BY created_at DESC LIMIT 50").fetchall()
+        cursor.execute("SELECT * FROM chat_sessions ORDER BY created_at DESC LIMIT 50")
+        sessions = cursor.fetchall()
         sessions_list = []
         
         for s in sessions:
-            messages = conn.execute(
+            cursor.execute(
                 """
                 SELECT m.*, f.rating 
                 FROM chat_messages m 
                 LEFT JOIN visitor_feedback f ON m.id = f.message_id 
-                WHERE m.session_id = ? 
+                WHERE m.session_id = %s 
                 ORDER BY m.created_at ASC
                 """,
                 (s["id"],)
-            ).fetchall()
+            )
+            messages = cursor.fetchall()
             
             messages_list = []
             for m in messages:
@@ -1027,7 +1052,8 @@ async def get_analytics_logs(request: Request, passcode: str = Query(default=Non
             })
             
         # Get outreach leads
-        leads = conn.execute("SELECT * FROM contact_messages ORDER BY created_at DESC LIMIT 50").fetchall()
+        cursor.execute("SELECT * FROM contact_messages ORDER BY created_at DESC LIMIT 50")
+        leads = cursor.fetchall()
         leads_list = []
         
         for l in leads:
@@ -1100,9 +1126,11 @@ async def get_unanswered_questions(request: Request, passcode: str = Query(defau
         
     conn = db.get_db_connection()
     try:
-        rows = conn.execute(
+        cursor = conn.cursor()
+        cursor.execute(
             "SELECT * FROM unanswered_questions WHERE resolved = 0 ORDER BY created_at DESC"
-        ).fetchall()
+        )
+        rows = cursor.fetchall()
         return [
             {
                 "id": r["id"],
