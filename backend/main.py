@@ -21,8 +21,7 @@ import r2
 import rag
 from chatbot import router as chatbot_router
 from email_engine.router import router as email_router
-from email_engine import db
-import r2 as email_db
+from email_engine import db as email_db
 
 app = FastAPI(title="Adarsh Singh Portfolio Core API", version="1.0.0")
 app.include_router(chatbot_router)
