@@ -1,4 +1,5 @@
 import os
+import re
 # CI/CD pipeline trigger comment
 import json
 import time
@@ -113,6 +114,15 @@ async def on_startup():
     import asyncio
     db.init_db()
     email_db.init_email_db()
+    # One-time migration: rename auto-generated 'blog-<timestamp>' ids to title slugs.
+    # Idempotent — no-ops once no timestamp ids remain.
+    try:
+        _profiles = load_profiles()
+        if _profiles and normalize_blog_slugs(_profiles):
+            save_profiles(_profiles)
+            print("[Migration] Blog ids normalized to title slugs.")
+    except Exception as e:
+        print(f"[Migration] Blog slug migration skipped: {e}")
     api_key = os.environ.get("GEMINI_API_KEY")
     if api_key:
         try:
@@ -295,16 +305,6 @@ def _summarize_store(content):
         return {"present": False, "error": str(e)}
 
 
-def _read_r2_config():
-    if r2 is None:
-        return None
-    try:
-        text = r2.read_text("profile.json")
-        return json.loads(text) if text else None
-    except Exception:
-        return None
-
-
 def _read_local_config():
     try:
         if os.path.exists(PROFILE_JSON):
@@ -317,7 +317,7 @@ def _read_local_config():
 
 @app.get("/api/v1/portfolio/admin/storage-status")
 async def storage_status(request: Request):
-    """Read-only diagnostics: compares Supabase canonical vs R2 mirror vs local file."""
+    """Read-only diagnostics: compares Supabase canonical vs local file mirror."""
     token = request.headers.get("X-Admin-Token") or ""
     if not verify_session_token(token):
         raise HTTPException(status_code=401, detail="Unauthorized access. Invalid or expired token.")
@@ -329,7 +329,7 @@ async def storage_status(request: Request):
         sup_error = str(e)
     result = {
         "supabase": _summarize_store(sup_content),
-        "r2": _summarize_store(_read_r2_config()),
+        "note": "R2 is used for image/file uploads only, not profile data.",
         "local": _summarize_store(_read_local_config()),
     }
     result["supabase"]["updated_at"] = sup_updated
@@ -376,20 +376,19 @@ def _merge_configs(base, others):
 @app.post("/api/v1/portfolio/admin/reconcile")
 async def reconcile_storage(request: Request):
     """
-    One-time merge across Supabase / R2 / local copies.
-    Base = R2 (what the public site serves); unions in any blog ids found
-    only in other copies. Writes the merged result everywhere via save_profiles.
+    One-time merge across Supabase / local copies.
+    Base = Supabase canonical (fall back to local); unions in any blog ids found
+    only in the other copy. Writes the merged result via save_profiles.
     """
     token = request.headers.get("X-Admin-Token") or ""
     if not verify_session_token(token):
         raise HTTPException(status_code=401, detail="Unauthorized access. Invalid or expired token.")
     sup_content, _ = db.get_profile_config()
-    r2_content = _read_r2_config()
     local_content = _read_local_config()
-    base = r2_content or local_content or sup_content
+    base = sup_content or local_content
     if not base:
         raise HTTPException(status_code=404, detail="No config found in any store.")
-    others = [c for c in (sup_content, local_content) if c and c is not base]
+    others = [c for c in (local_content,) if c and c is not base]
     merged, added = _merge_configs(base, others)
     save_profiles(merged)
     return {"success": True, "merged_blogs_added": added,
@@ -701,25 +700,15 @@ async def get_cv():
     return RedirectResponse(url="https://adarshsingh.in/Adarsh_Singh_CV.pdf")
 
 def load_profiles():
-    """Loads consolidated profile roles. Source-of-truth order: Supabase -> R2 -> local JSON."""
+    """Loads consolidated profile roles. Source-of-truth order: Supabase -> local JSON file."""
     # 1. Supabase canonical store
     try:
         content, _updated_at = db.get_profile_config()
         if content:
             return content
     except Exception as e:
-        print(f"Supabase profile_config read failed, falling back to R2: {e}")
-    # 2. R2 (legacy primary, now optional mirror)
-    try:
-        content_str = r2.read_text("profile.json") if r2 is not None else None
-        if content_str:
-            with open(PROFILE_JSON, "w", encoding="utf-8") as f:
-                f.write(content_str)
-            db.save_file_backup("profile.json", content_str, source="startup_sync")
-            return json.loads(content_str)
-    except Exception as e:
-        print(f"Error reading profile.json from R2: {e}")
-
+        print(f"Supabase profile_config read failed, falling back to local file: {e}")
+    # 2. Local file mirror (GCS-backed volume on Cloud Run)
     if not os.path.exists(PROFILE_JSON):
         return {}
     try:
@@ -730,21 +719,53 @@ def load_profiles():
         print(f"Error loading profiles database: {e}")
         return {}
 
+def slugify_blog_title(title: str) -> str:
+    """URL-safe slug from a blog title."""
+    slug = (title or "").lower()
+    slug = re.sub(r"[^a-z0-9\s-]", "", slug)
+    slug = re.sub(r"[\s_]+", "-", slug)
+    slug = re.sub(r"-{2,}", "-", slug).strip("-")
+    return slug[:80]
+
+
+def normalize_blog_slugs(profiles: dict) -> bool:
+    """
+    Replaces auto-generated 'blog-<timestamp>' ids with title slugs, ensuring
+    uniqueness per profile. Returns True when anything changed. Idempotent.
+    """
+    changed = False
+    ts_pattern = re.compile(r"^blog-\d+$")
+    for key, val in profiles.items():
+        if not (isinstance(val, dict) and isinstance(val.get("blogs"), list)):
+            continue
+        seen = {b.get("id") for b in val["blogs"] if isinstance(b, dict) and b.get("id")}
+        for b in val["blogs"]:
+            if not (isinstance(b, dict) and b.get("id") and ts_pattern.match(b["id"])):
+                continue
+            base = slugify_blog_title(b.get("title", "")) or b["id"]
+            slug, i = base, 2
+            while slug in seen:
+                slug = f"{base}-{i}"
+                i += 1
+            seen.discard(b["id"])
+            seen.add(slug)
+            b["id"] = slug
+            changed = True
+    return changed
+
+
 def save_profiles(profiles):
     """
     Persists consolidated profile roles.
     Source of truth: Supabase (profile_config) — MUST succeed, raises otherwise.
-    Mirrors (best effort): R2, local JSON file, versioned backup.
+    Mirrors (best effort): local JSON file, versioned backup.
+    (R2 is used for image/file uploads only — avatar.jpg, cv.pdf.)
     """
+    # Normalize auto-generated blog ids to title slugs (automatic, idempotent).
+    normalize_blog_slugs(profiles)
     content_str = json.dumps(profiles, indent=2, ensure_ascii=False)
     # 1. Canonical store — if this fails we must NOT report success.
     db.save_profile_config(profiles)
-    # 2. R2 mirror (kept for redundancy when the module is available)
-    if r2 is not None:
-        try:
-            r2.write_text("profile.json", content_str, content_type="application/json")
-        except Exception as e:
-            print(f"[WARN] R2 mirror write failed (Supabase canonical already saved): {e}")
     # 3. Local mirror
     try:
         os.makedirs(DATA_DIR, exist_ok=True)
