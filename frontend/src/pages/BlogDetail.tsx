@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ArrowLeft, Calendar, Clock, Edit } from 'lucide-react';
@@ -34,6 +34,16 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
   const { blogId } = useParams<{ blogId: string }>();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Legacy numeric-id redirects (preserves external links after slug migration).
+  const LEGACY_REDIRECTS: Record<string, string> = {
+    'blog-1791640323148': 'the-agent-wars-go-corporate-7-ai-launches-that-actually-matter',
+  };
+  useEffect(() => {
+    if (blogId && LEGACY_REDIRECTS[blogId]) {
+      navigate(`/blog/${LEGACY_REDIRECTS[blogId]}`, { replace: true });
+    }
+  }, [blogId]);
 
   // Resolve the active article from the backend-provided blog list (single source of truth).
   const activeBlog: BlogNote | null = (Array.isArray(blogs) ? blogs : []).find(b => b.id === blogId) || null;
