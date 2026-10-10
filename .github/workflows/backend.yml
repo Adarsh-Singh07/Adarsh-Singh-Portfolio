@@ -1,4 +1,9 @@
-name: Deploy Backend to Oracle VPS
+name: Deploy Backend to Google Cloud Run
+
+# Production backend (api.adarshsingh.in) runs on Cloud Run service `portfolio-backend`
+# (project portfolio2049, us-central1). Pushes to main with backend changes auto-deploy.
+# Existing service config (env vars, GCS volume mount, traffic) is preserved —
+# only the container image is rebuilt and rolled out.
 
 on:
   push:
@@ -6,24 +11,63 @@ on:
     paths:
       - 'backend/**'
       - '.github/workflows/backend.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
   deploy-backend:
-    name: Deploy Backend to Oracle VPS
+    name: Deploy Backend to Cloud Run
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Deploy to Oracle VPS via SSH
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            cd /home/ubuntu/portfolio
-            git pull origin main || true
-            source /home/ubuntu/portfolio/backend/venv/bin/activate
-            pip install -r /home/ubuntu/portfolio/backend/requirements.txt
-            sudo systemctl restart portfolio
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+
+      - name: Deploy to Cloud Run (portfolio-backend)
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: portfolio-backend
+          region: us-central1
+          source: backend/
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+# ── Legacy Oracle VPS deploy — COMMENTED OUT (VPS unreachable, do not re-enable
+#    without fixing VPS SSH access). Kept for reference. ─────────────────────
+#
+# name: Deploy Backend to Oracle VPS
+#
+# on:
+#   push:
+#     branches: [ main ]
+#     paths:
+#       - 'backend/**'
+#       - '.github/workflows/backend.yml'
+#
+# jobs:
+#   deploy-backend:
+#     name: Deploy Backend to Oracle VPS
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v4
+#
+#       - name: Deploy to Oracle VPS via SSH
+#         uses: appleboy/ssh-action@v1.0.3
+#         with:
+#           host: ${{ secrets.VPS_HOST }}
+#           username: ${{ secrets.VPS_USERNAME }}
+#           key: ${{ secrets.VPS_SSH_KEY }}
+#           script: |
+#             cd /home/ubuntu/portfolio
+#             git pull origin main || true
+#             source /home/ubuntu/portfolio/backend/venv/bin/activate
+#             pip install -r /home/ubuntu/portfolio/backend/requirements.txt
+#             sudo systemctl restart portfolio

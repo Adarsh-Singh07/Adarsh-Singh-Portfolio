@@ -1,16 +1,30 @@
-name: Verify & Deploy Frontend to Firebase
+name: Verify & Deploy Frontend to Firebase (Staging only)
+
+# Firebase Hosting deploys ONLY the staging branch -> portfolio-staging target.
+# Production frontend (main branch, adarshsingh.in) is NOT auto-deployed;
+# ship it manually via deploy_prod.ps1 or the workflow_dispatch below.
 
 on:
   push:
-    branches: [ main ]
+    branches: [ staging ]
     paths:
       - 'frontend/**'
       - 'firebase.json'
       - '.github/workflows/frontend.yml'
   pull_request:
-    branches: [ main ]
+    branches: [ main, staging ]
     paths:
       - 'frontend/**'
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Firebase hosting target to deploy'
+        required: true
+        default: 'portfolio-staging'
+        type: choice
+        options:
+          - portfolio-staging
+          - portfolio-main
 
 permissions:
   id-token: write
@@ -18,7 +32,7 @@ permissions:
 
 jobs:
   validate-and-deploy:
-    name: Verify and Deploy
+    name: Verify and Deploy Frontend
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -43,6 +57,14 @@ jobs:
           npm run build
 
       - name: Deploy Frontend to Firebase Hosting
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        # Auto-deploy ONLY on pushes to staging (never on main).
+        # Manual runs (workflow_dispatch) can target staging or production.
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: |
-          npx firebase-tools deploy --only hosting --token "${{ secrets.FIREBASE_TOKEN }}" --project portfolio2049
+          if [ "${{ github.event_name }}" = "push" ]; then
+            TARGET="portfolio-staging"
+          else
+            TARGET="${{ github.event.inputs.target }}"
+          fi
+          echo "Deploying to Firebase hosting target: $TARGET"
+          npx firebase-tools deploy --only hosting:$TARGET --token "${{ secrets.FIREBASE_TOKEN }}" --project portfolio2049
