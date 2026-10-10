@@ -95,7 +95,16 @@ def init_db():
     )
     """)
 
-    # 7. File Backups Table (Audit & Version History for profile.json, cv.txt, cv.pdf)
+    # 7. Canonical Profile Config (single-row source of truth for all text/profile data)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS profile_config (
+        id INTEGER PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+        content JSONB NOT NULL,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+    """)
+
+    # 8. File Backups Table (Audit & Version History for profile.json, cv.txt, cv.pdf)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS file_backups (
         id SERIAL PRIMARY KEY,
@@ -286,6 +295,51 @@ def save_file_backup(filename: str, content: str | bytes, source: str = "system"
         print(f"Error saving file backup for {filename}: {e}")
     finally:
         conn.close()
+
+def get_profile_config():
+    """
+    Returns (content_dict, updated_at_iso) from the canonical Supabase row,
+    or (None, None) when no canonical config exists yet.
+    Read-only; never raises for missing data (returns Nones), raises only on DB errors.
+    """
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT content, updated_at FROM profile_config WHERE id = 1")
+        row = cursor.fetchone()
+        if not row:
+            return None, None
+        content = row["content"]
+        if isinstance(content, str):
+            content = json.loads(content)
+        updated_at = row["updated_at"]
+        updated_iso = updated_at.isoformat() if hasattr(updated_at, "isoformat") else str(updated_at)
+        return content, updated_iso
+    finally:
+        conn.close()
+
+
+def save_profile_config(content: dict):
+    """
+    Upserts the single canonical profile-config row in Supabase.
+    This is the source of truth for all text/profile data — it MUST succeed.
+    Raises on any failure so callers never report a phantom success.
+    """
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO profile_config (id, content, updated_at)
+            VALUES (1, %s, NOW())
+            ON CONFLICT (id) DO UPDATE SET content = EXCLUDED.content, updated_at = NOW()
+            """,
+            (json.dumps(content),),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
 
 def get_file_backups(filename: str = None, limit: int = 50):
     """Retrieves list of file backup versions from PostgreSQL."""

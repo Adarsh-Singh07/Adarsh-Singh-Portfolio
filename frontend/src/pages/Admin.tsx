@@ -62,6 +62,17 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
   const [unanswered, setUnanswered] = useState<any[]>([]);
   const [logs, setLogs] = useState<any>({ sessions: [], leads: [] });
   const [adminConfig, setAdminConfig] = useState<any>(null);
+  // Hash of the server config as loaded — guards PUBLISH CHANGES against
+  // silently overwriting newer data saved elsewhere (e.g. the blog editor).
+  const [loadedConfigHash, setLoadedConfigHash] = useState<string | null>(null);
+  const hashConfig = (cfg: any): string => {
+    try {
+      const str = JSON.stringify(cfg);
+      let h = 0;
+      for (let i = 0; i < str.length; i++) { h = (h * 31 + str.charCodeAt(i)) | 0; }
+      return `${str.length}:${h}`;
+    } catch { return 'unhashable'; }
+  };
   const [selectedHeroMode, setSelectedHeroMode] = useState<ProfileMode>('general');
   const [roles, setRoles] = useState<RoleDefinition[]>([]);
 
@@ -129,6 +140,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
       // 4. Fetch editable JSON configuration
       const configData = await PortfolioService.getAdminConfig(adminToken);
       setAdminConfig(configData);
+      setLoadedConfigHash(hashConfig(configData));
 
       // 5. Fetch SMTP settings
       const smtpData = await PortfolioService.getSmtpSettings(adminToken);
@@ -226,9 +238,22 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
     setPublishing(true);
     setPublishSuccess(false);
     try {
+      // Foolproofing: refuse to overwrite data that changed since this page loaded
+      // (e.g. a blog post saved from the blog editor in another tab/route).
+      const fresh = await PortfolioService.getAdminConfig(token);
+      if (loadedConfigHash && hashConfig(fresh) !== loadedConfigHash) {
+        alert('The data changed since you loaded this page (for example, a blog post was saved elsewhere). Refresh the page to load the latest data before publishing, otherwise your publish would overwrite those changes.');
+        return;
+      }
       const res = await PortfolioService.saveAdminConfig(token, adminConfig);
       if (res.success) {
         setPublishSuccess(true);
+        // Re-hash from a fresh read so the next publish compares against
+        // exactly what the server stored (avoids false mismatch warnings).
+        try {
+          const verify = await PortfolioService.getAdminConfig(token);
+          setLoadedConfigHash(hashConfig(verify));
+        } catch { setLoadedConfigHash(hashConfig(adminConfig)); }
         if (onRefreshData) onRefreshData();
         setTimeout(() => setPublishSuccess(false), 3000);
       }
@@ -335,6 +360,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
         // Refresh admin config
         const configData = await PortfolioService.getAdminConfig(token);
         setAdminConfig(configData);
+        setLoadedConfigHash(hashConfig(configData));
         
         // Reset form
         setNewRoleId('');

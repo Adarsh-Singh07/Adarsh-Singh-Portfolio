@@ -256,10 +256,12 @@ async def save_admin_config(payload: dict, request: Request, background_tasks: B
     if not verify_session_token(token):
         raise HTTPException(status_code=401, detail="Unauthorized access. Invalid or expired token.")
         
-    os.makedirs(DATA_DIR, exist_ok=True)
     try:
-        with open(PROFILE_JSON, "w", encoding="utf-8") as f:
-            json.dump(payload, f, indent=2, ensure_ascii=False)
+        # Supabase is the source of truth; R2 + local file are mirrors.
+        # save_profiles raises on canonical-store failure so we never report phantom success.
+        save_profiles(payload)
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to write configuration: {str(e)}")
         
@@ -269,6 +271,123 @@ async def save_admin_config(payload: dict, request: Request, background_tasks: B
         background_tasks.add_task(rag.index_knowledge_base, api_key)
         
     return {"success": True, "message": "Configuration saved. RAG re-indexing triggered."}
+
+def _summarize_store(content):
+    """Hash + blog counts for one config copy. Never raises."""
+    try:
+        if not content or not isinstance(content, dict):
+            return {"present": False}
+        blogs_total = 0
+        per_profile = {}
+        for key, val in content.items():
+            if isinstance(val, dict) and isinstance(val.get("blogs"), list):
+                n = len(val["blogs"])
+                per_profile[key] = n
+                blogs_total += n
+        h = hashlib.sha256(json.dumps(content, sort_keys=True).encode("utf-8")).hexdigest()[:12]
+        return {"present": True, "hash": h, "blogs_total": blogs_total,
+                "per_profile_blogs": per_profile, "top_keys": sorted(content.keys())[:12]}
+    except Exception as e:
+        return {"present": False, "error": str(e)}
+
+
+def _read_r2_config():
+    try:
+        text = r2.read_text("profile.json")
+        return json.loads(text) if text else None
+    except Exception:
+        return None
+
+
+def _read_local_config():
+    try:
+        if os.path.exists(PROFILE_JSON):
+            with open(PROFILE_JSON, "r", encoding="utf-8") as f:
+                return json.load(f)
+    except Exception:
+        pass
+    return None
+
+
+@app.get("/api/v1/portfolio/admin/storage-status")
+async def storage_status(request: Request):
+    """Read-only diagnostics: compares Supabase canonical vs R2 mirror vs local file."""
+    token = request.headers.get("X-Admin-Token") or ""
+    if not verify_session_token(token):
+        raise HTTPException(status_code=401, detail="Unauthorized access. Invalid or expired token.")
+    sup_content, sup_updated = None, None
+    sup_error = None
+    try:
+        sup_content, sup_updated = db.get_profile_config()
+    except Exception as e:
+        sup_error = str(e)
+    result = {
+        "supabase": _summarize_store(sup_content),
+        "r2": _summarize_store(_read_r2_config()),
+        "local": _summarize_store(_read_local_config()),
+    }
+    result["supabase"]["updated_at"] = sup_updated
+    if sup_error:
+        result["supabase"]["error"] = sup_error
+    try:
+        backups = db.get_file_backups("profile.json", limit=8) or []
+        result["recent_backups"] = [
+            {"created_at": b.get("created_at"), "source": b.get("source"),
+             "hash": (b.get("file_hash") or "")[:12]} for b in backups
+        ]
+    except Exception as e:
+        result["recent_backups_error"] = str(e)
+    return result
+
+
+def _merge_configs(base, others):
+    """Union blogs by id across config copies; non-blog content comes from base."""
+    import copy
+    merged = copy.deepcopy(base) if isinstance(base, dict) else {}
+    seen = {}
+    for key, val in merged.items():
+        if isinstance(val, dict) and isinstance(val.get("blogs"), list):
+            for b in val["blogs"]:
+                if isinstance(b, dict) and b.get("id"):
+                    seen[(key, b["id"])] = True
+    added = {}
+    for other in others:
+        if not isinstance(other, dict):
+            continue
+        for key, val in other.items():
+            if not (isinstance(val, dict) and isinstance(val.get("blogs"), list)):
+                continue
+            target = merged.setdefault(key, {})
+            blist = target.setdefault("blogs", [])
+            for b in val["blogs"]:
+                if isinstance(b, dict) and b.get("id") and (key, b["id"]) not in seen:
+                    seen[(key, b["id"])] = True
+                    blist.append(copy.deepcopy(b))
+                    added[key] = added.get(key, 0) + 1
+    return merged, added
+
+
+@app.post("/api/v1/portfolio/admin/reconcile")
+async def reconcile_storage(request: Request):
+    """
+    One-time merge across Supabase / R2 / local copies.
+    Base = R2 (what the public site serves); unions in any blog ids found
+    only in other copies. Writes the merged result everywhere via save_profiles.
+    """
+    token = request.headers.get("X-Admin-Token") or ""
+    if not verify_session_token(token):
+        raise HTTPException(status_code=401, detail="Unauthorized access. Invalid or expired token.")
+    sup_content, _ = db.get_profile_config()
+    r2_content = _read_r2_config()
+    local_content = _read_local_config()
+    base = r2_content or local_content or sup_content
+    if not base:
+        raise HTTPException(status_code=404, detail="No config found in any store.")
+    others = [c for c in (sup_content, local_content) if c and c is not base]
+    merged, added = _merge_configs(base, others)
+    save_profiles(merged)
+    return {"success": True, "merged_blogs_added": added,
+            "final": _summarize_store(merged)}
 
 @app.post("/api/v1/portfolio/admin/change-credentials")
 async def change_credentials(payload: ChangeCredentialsPayload, request: Request):
@@ -568,7 +687,15 @@ async def get_cv():
     return RedirectResponse(url="https://adarshsingh.in/Adarsh_Singh_CV.pdf")
 
 def load_profiles():
-    """Loads consolidated profile roles from R2, falls back to local JSON database."""
+    """Loads consolidated profile roles. Source-of-truth order: Supabase -> R2 -> local JSON."""
+    # 1. Supabase canonical store
+    try:
+        content, _updated_at = db.get_profile_config()
+        if content:
+            return content
+    except Exception as e:
+        print(f"Supabase profile_config read failed, falling back to R2: {e}")
+    # 2. R2 (legacy primary, now mirror)
     try:
         content_str = r2.read_text("profile.json")
         if content_str:
@@ -578,7 +705,7 @@ def load_profiles():
             return json.loads(content_str)
     except Exception as e:
         print(f"Error reading profile.json from R2: {e}")
-    
+
     if not os.path.exists(PROFILE_JSON):
         return {}
     try:
@@ -590,13 +717,31 @@ def load_profiles():
         return {}
 
 def save_profiles(profiles):
-    """Saves consolidated profile roles to R2 and local JSON database."""
-    os.makedirs(DATA_DIR, exist_ok=True)
+    """
+    Persists consolidated profile roles.
+    Source of truth: Supabase (profile_config) — MUST succeed, raises otherwise.
+    Mirrors (best effort): R2, local JSON file, versioned backup.
+    """
     content_str = json.dumps(profiles, indent=2, ensure_ascii=False)
-    with open(PROFILE_JSON, "w", encoding="utf-8") as f:
-        f.write(content_str)
-    r2.write_text("profile.json", content_str, content_type="application/json")
-    db.save_file_backup("profile.json", content_str, source="admin_api_save")
+    # 1. Canonical store — if this fails we must NOT report success.
+    db.save_profile_config(profiles)
+    # 2. R2 mirror (kept for redundancy; reads prefer Supabase now)
+    try:
+        r2.write_text("profile.json", content_str, content_type="application/json")
+    except Exception as e:
+        print(f"[WARN] R2 mirror write failed (Supabase canonical already saved): {e}")
+    # 3. Local mirror
+    try:
+        os.makedirs(DATA_DIR, exist_ok=True)
+        with open(PROFILE_JSON, "w", encoding="utf-8") as f:
+            f.write(content_str)
+    except Exception as e:
+        print(f"[WARN] Local mirror write failed (Supabase canonical already saved): {e}")
+    # 4. Versioned backup (existing audit trail)
+    try:
+        db.save_file_backup("profile.json", content_str, source="admin_api_save")
+    except Exception as e:
+        print(f"[WARN] Versioned backup failed (Supabase canonical already saved): {e}")
 
 class ContactPayload(BaseModel):
     name: str
