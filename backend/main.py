@@ -17,7 +17,11 @@ if os.path.exists(dotenv_path):
     dotenv.load_dotenv(dotenv_path)
 
 import db
-import r2
+try:
+    import r2
+except ImportError:
+    r2 = None
+    print("[WARN] 'r2' module not available — R2 mirror disabled; using Supabase + local only.")
 import rag
 from chatbot import router as chatbot_router
 from email_engine.router import router as email_router
@@ -292,6 +296,8 @@ def _summarize_store(content):
 
 
 def _read_r2_config():
+    if r2 is None:
+        return None
     try:
         text = r2.read_text("profile.json")
         return json.loads(text) if text else None
@@ -645,7 +651,11 @@ async def upload_avatar(payload: UploadPayload, request: Request):
         with open(avatar_path, "wb") as f:
             f.write(binary_data)
             
-        r2.upload_file(avatar_path, "avatar.jpg", content_type="image/jpeg")
+        if r2 is not None:
+            try:
+                r2.upload_file(avatar_path, "avatar.jpg", content_type="image/jpeg")
+            except Exception as e:
+                print(f"[WARN] R2 avatar mirror failed: {e}")
         return {"success": True, "message": "Avatar image uploaded successfully."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to process image: {str(e)}")
@@ -667,7 +677,11 @@ async def upload_cv(payload: UploadPayload, request: Request):
         with open(cv_path, "wb") as f:
             f.write(binary_data)
             
-        r2.upload_file(cv_path, "cv.pdf", content_type="application/pdf")
+        if r2 is not None:
+            try:
+                r2.upload_file(cv_path, "cv.pdf", content_type="application/pdf")
+            except Exception as e:
+                print(f"[WARN] R2 CV mirror failed: {e}")
         db.save_file_backup("cv.pdf", binary_data, source="admin_cv_upload")
         return {"success": True, "message": "CV PDF uploaded successfully."}
     except Exception as e:
@@ -695,9 +709,9 @@ def load_profiles():
             return content
     except Exception as e:
         print(f"Supabase profile_config read failed, falling back to R2: {e}")
-    # 2. R2 (legacy primary, now mirror)
+    # 2. R2 (legacy primary, now optional mirror)
     try:
-        content_str = r2.read_text("profile.json")
+        content_str = r2.read_text("profile.json") if r2 is not None else None
         if content_str:
             with open(PROFILE_JSON, "w", encoding="utf-8") as f:
                 f.write(content_str)
@@ -725,11 +739,12 @@ def save_profiles(profiles):
     content_str = json.dumps(profiles, indent=2, ensure_ascii=False)
     # 1. Canonical store — if this fails we must NOT report success.
     db.save_profile_config(profiles)
-    # 2. R2 mirror (kept for redundancy; reads prefer Supabase now)
-    try:
-        r2.write_text("profile.json", content_str, content_type="application/json")
-    except Exception as e:
-        print(f"[WARN] R2 mirror write failed (Supabase canonical already saved): {e}")
+    # 2. R2 mirror (kept for redundancy when the module is available)
+    if r2 is not None:
+        try:
+            r2.write_text("profile.json", content_str, content_type="application/json")
+        except Exception as e:
+            print(f"[WARN] R2 mirror write failed (Supabase canonical already saved): {e}")
     # 3. Local mirror
     try:
         os.makedirs(DATA_DIR, exist_ok=True)
