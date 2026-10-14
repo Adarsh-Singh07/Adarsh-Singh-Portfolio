@@ -149,6 +149,12 @@ const getIssuerTheme = (issuer: string, isDark: boolean) => {
   };
 };
 
+// Issuer options for the certification form. The issuer is stored as free
+// text on the backend (no validation), so the "Add new issuer…" option lets
+// admins enter any new issuer once without another code change.
+const ISSUER_OPTIONS = ['Microsoft', 'AWS', 'Google Cloud', 'Coursera', 'Anthropic'];
+const ISSUER_CUSTOM_VALUE = '__custom';
+
 export default function DetailEditModal({
   isOpen,
   onClose,
@@ -165,6 +171,9 @@ export default function DetailEditModal({
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<any>({});
   const [copied, setCopied] = useState(false);
+  // True when the certification form should show the custom issuer text input
+  // (either a non-preset issuer on an existing item, or the "Add new issuer…" choice).
+  const [issuerCustom, setIssuerCustom] = useState(false);
 
   const handleHomeCardAction = () => {
     if (!item) return;
@@ -262,6 +271,9 @@ export default function DetailEditModal({
       }
       setIsEditing(true);
     }
+    // Show the custom issuer input when editing an item whose issuer is not
+    // one of the preset options; reset it when creating a new item.
+    setIssuerCustom(item ? (Boolean(item.issuer) && !ISSUER_OPTIONS.includes(item.issuer)) : false);
     setCopied(false);
   }, [item, type, isOpen]);
 
@@ -526,16 +538,34 @@ export default function DetailEditModal({
                       <div>
                         <label className="block text-[10px] uppercase tracking-wider font-semibold mb-1 text-slate-400">Issuer Institution</label>
                         <select
-                          value={formData.issuer || ''}
-                          onChange={e => setFormData({ ...formData, issuer: e.target.value })}
+                          value={issuerCustom ? ISSUER_CUSTOM_VALUE : (formData.issuer || '')}
+                          onChange={e => {
+                            const v = e.target.value;
+                            if (v === ISSUER_CUSTOM_VALUE) {
+                              setIssuerCustom(true);
+                              setFormData({ ...formData, issuer: '' });
+                            } else {
+                              setIssuerCustom(false);
+                              setFormData({ ...formData, issuer: v });
+                            }
+                          }}
                           className="w-full px-4 py-2.5 rounded-xl border bg-neutral-900 text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800 text-white"
                         >
                           <option value="">Select Issuer</option>
-                          <option value="Microsoft">Microsoft</option>
-                          <option value="AWS">AWS</option>
-                          <option value="Google Cloud">Google Cloud</option>
-                          <option value="Coursera">Coursera</option>
+                          {ISSUER_OPTIONS.map(opt => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                          <option value={ISSUER_CUSTOM_VALUE}>Add new issuer…</option>
                         </select>
+                        {issuerCustom && (
+                          <input
+                            type="text"
+                            placeholder="Enter issuer name (e.g. Anthropic)"
+                            value={formData.issuer || ''}
+                            onChange={e => setFormData({ ...formData, issuer: e.target.value })}
+                            className="mt-2 w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                          />
+                        )}
                       </div>
                     </div>
 
