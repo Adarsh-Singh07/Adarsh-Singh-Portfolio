@@ -18,6 +18,13 @@ HASH_PATH = os.path.join(DATA_DIR, "files_hash.json")
 EMBEDDING_MODEL = "gemini-embedding-001"
 EMBEDDING_DIMS = 3072
 
+# Cache schema version. Bump this to force exactly one fresh rebuild of the
+# RAG index on the next startup (e.g. after the embedding model changed or a
+# poisoned all-zero index was committed). The version is recorded in both the
+# local hash file and the Supabase rag_index_cache row; any container whose
+# recorded version differs rebuilds once, then persists the new version.
+INDEX_CACHE_VERSION = 2
+
 def _resolve_role_doc(raw):
     """Unwraps the role-keyed profile store ({'general': {...}, ...}) to the general role doc."""
     if isinstance(raw, dict) and isinstance(raw.get("general"), dict):
@@ -361,6 +368,11 @@ def check_cache_validity(current_profile_hash):
     except Exception:
         return False
 
+    # A stale cache schema can never be trusted (e.g. an index poisoned with
+    # zero vectors under an older version). Old files lack the key entirely.
+    if saved_hashes.get("cache_version", 1) != INDEX_CACHE_VERSION:
+        return False
+
     if saved_hashes.get("cv_hash") != calculate_file_hash(CV_PATH):
         return False
     if saved_hashes.get("profile_hash") != current_profile_hash:
@@ -387,6 +399,7 @@ def check_cache_validity(current_profile_hash):
 def save_hashes(profile_hash):
     """Saves the current source hashes to file."""
     hashes = {
+        "cache_version": INDEX_CACHE_VERSION,
         "cv_hash": calculate_file_hash(CV_PATH),
         "profile_hash": profile_hash,
         "embedding_model": EMBEDDING_MODEL
@@ -414,6 +427,9 @@ def _ensure_index_cache_table(conn):
             updated_at TIMESTAMPTZ DEFAULT NOW()
         )
     """)
+    # The cache_version column was added after the table first shipped; make
+    # sure older tables get it without a manual migration.
+    cursor.execute("ALTER TABLE rag_index_cache ADD COLUMN IF NOT EXISTS cache_version INTEGER")
     conn.commit()
 
 
@@ -430,11 +446,15 @@ def _db_cache_valid(current_profile_hash):
             _ensure_index_cache_table(conn)
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT profile_hash, cv_hash, embedding_model, chunk_count "
+                "SELECT profile_hash, cv_hash, embedding_model, chunk_count, cache_version "
                 "FROM rag_index_cache WHERE id = 1"
             )
             row = cursor.fetchone()
             if row is None:
+                return False, 0
+            # A stale cache schema can never be trusted. Rows written before
+            # the column existed read back as NULL.
+            if (row.get("cache_version") or 1) != INDEX_CACHE_VERSION:
                 return False, 0
             if row["profile_hash"] != current_profile_hash:
                 return False, 0
@@ -462,16 +482,17 @@ def _db_cache_save(profile_hash, chunk_count):
             cursor = conn.cursor()
             cursor.execute(
                 """
-                INSERT INTO rag_index_cache (id, profile_hash, cv_hash, embedding_model, chunk_count, updated_at)
-                VALUES (1, %s, %s, %s, %s, NOW())
+                INSERT INTO rag_index_cache (id, profile_hash, cv_hash, embedding_model, chunk_count, cache_version, updated_at)
+                VALUES (1, %s, %s, %s, %s, %s, NOW())
                 ON CONFLICT (id) DO UPDATE SET
                     profile_hash = EXCLUDED.profile_hash,
                     cv_hash = EXCLUDED.cv_hash,
                     embedding_model = EXCLUDED.embedding_model,
                     chunk_count = EXCLUDED.chunk_count,
+                    cache_version = EXCLUDED.cache_version,
                     updated_at = NOW()
                 """,
-                (profile_hash, calculate_file_hash(CV_PATH), EMBEDDING_MODEL, chunk_count),
+                (profile_hash, calculate_file_hash(CV_PATH), EMBEDDING_MODEL, chunk_count, INDEX_CACHE_VERSION),
             )
             conn.commit()
         finally:
@@ -523,6 +544,19 @@ def index_knowledge_base(api_key: str):
         print(f"Generating embeddings for chunks {i+1} to {min(i+batch_size, len(chunk_texts))}...")
         embeddings = generate_embeddings_batch(client, batch)
         all_embeddings.extend(embeddings)
+
+    # Validate BEFORE touching the stored index. generate_embeddings_batch
+    # silently substitutes zero vectors when the API fails; committing those
+    # poisons the cache (every similarity becomes 0.0) while the cache still
+    # looks "valid" to all the checks above. Never overwrite a working index
+    # with garbage — keep the old rows and try again on the next startup.
+    zero_count = sum(1 for emb in all_embeddings if not any(emb))
+    if all_embeddings and zero_count == len(all_embeddings):
+        print(f"RAG rebuild ABORTED: all {len(all_embeddings)} embeddings are zero vectors "
+              f"(embedding API failure?). Keeping the existing index untouched.")
+        return
+    if zero_count:
+        print(f"RAG rebuild warning: {zero_count}/{len(all_embeddings)} embeddings are zero vectors.")
 
     # Insert into DB
     conn = db.get_db_connection()
