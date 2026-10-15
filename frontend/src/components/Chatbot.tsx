@@ -179,7 +179,16 @@ interface Message {
   id?: string;
   trace?: any;
   feedback?: number; // 1 for up, -1 for down, undefined for none
+  streaming?: boolean; // true while the answer is streaming in
+  stage?: string; // current stream stage: 'thinking' | 'retrieving' | 'writing'
 }
+
+// Stage labels in Addy's product voice for the pending assistant bubble
+const STAGE_LABELS: Record<string, string> = {
+  thinking: 'Addy is thinking…',
+  retrieving: 'Checking my portfolio…',
+  writing: 'Writing…',
+};
 
 const QUICK_STARTS = [
   "Tell me about your projects",
@@ -274,9 +283,21 @@ export default function Chatbot({ isDark, currentMode = 'general' }: { isDark: b
     if (!textToSend.trim() || isLoading) return;
 
     const userMsg: Message = { role: 'user', content: textToSend };
-    setMessages(prev => [...prev, userMsg]);
+    // Index the assistant placeholder occupies once both messages are appended.
+    const assistantIndex = messages.length + 1;
+    setMessages(prev => [...prev, userMsg, { role: 'model', content: '', streaming: true, stage: 'thinking' }]);
     setInput('');
     setIsLoading(true);
+
+    const patchAssistant = (patch: Partial<Message>) => {
+      setMessages(prev => {
+        const next = [...prev];
+        if (next[assistantIndex] && next[assistantIndex].role === 'model') {
+          next[assistantIndex] = { ...next[assistantIndex], ...patch };
+        }
+        return next;
+      });
+    };
 
     try {
       // Map history to backend format
@@ -285,25 +306,55 @@ export default function Chatbot({ isDark, currentMode = 'general' }: { isDark: b
         content: msg.content
       }));
 
-      const res = await PortfolioService.chatWithAI(textToSend, historyPayload, sessionId, currentMode as any, selectedModel);
-      
-      const assistantMsg: Message = { 
-        role: 'model', 
-        content: res.response,
-        id: res.message_id,
-        trace: res.trace
-      };
-      
-      setMessages(prev => [...prev, assistantMsg]);
+      // 1. Try the streaming endpoint first (fetch + ReadableStream; EventSource can't POST).
+      let streamedToCompletion = false;
+      try {
+        let accumulated = '';
+        for await (const ev of PortfolioService.chatStreamWithAI(
+          textToSend, historyPayload, sessionId, currentMode as any, selectedModel
+        )) {
+          if (ev.type === 'status') {
+            patchAssistant({ stage: ev.stage });
+          } else if (ev.type === 'token') {
+            accumulated += ev.text;
+            patchAssistant({ content: accumulated, stage: 'writing' });
+          } else if (ev.type === 'done') {
+            // Backend is authoritative on the final text (tags stripped).
+            patchAssistant({
+              content: ev.response,
+              id: ev.message_id,
+              trace: ev.trace,
+              streaming: false,
+              stage: undefined,
+            });
+            streamedToCompletion = true;
+            break;
+          } else if (ev.type === 'error') {
+            throw new Error(ev.message || 'stream error');
+          }
+        }
+        if (!streamedToCompletion) {
+          throw new Error('stream ended without a done event');
+        }
+      } catch (streamErr) {
+        // 2. Silent fallback to the classic non-streaming endpoint.
+        console.warn('Chat stream unavailable, falling back to /chat:', streamErr);
+        const res = await PortfolioService.chatWithAI(textToSend, historyPayload, sessionId, currentMode as any, selectedModel);
+        patchAssistant({
+          content: res.response,
+          id: res.message_id,
+          trace: res.trace,
+          streaming: false,
+          stage: undefined,
+        });
+      }
     } catch (error) {
       console.error("Chatbot API failed:", error);
-      setMessages(prev => [
-        ...prev, 
-        { 
-          role: 'model', 
-          content: "Addy, my AI Twin, is temporarily experiencing connection issues with Google's Gemini services (due to high demand). If you have an urgent inquiry, please feel free to email me directly at hello@adarshsingh.in or submit a message through the Contact Page. A diagnostics report has been auto-sent to my email to resolve this issue." 
-        }
-      ]);
+      patchAssistant({
+        content: "Addy, my AI Twin, is temporarily experiencing connection issues with Google's Gemini services (due to high demand). If you have an urgent inquiry, please feel free to email me directly at hello@adarshsingh.in or submit a message through the Contact Page. A diagnostics report has been auto-sent to my email to resolve this issue.",
+        streaming: false,
+        stage: undefined,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -388,7 +439,7 @@ export default function Chatbot({ isDark, currentMode = 'general' }: { isDark: b
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className={`fixed bottom-24 right-6 w-[360px] md:w-[400px] h-[550px] z-50 rounded-2xl flex flex-col shadow-2xl border overflow-hidden backdrop-blur-xl transition-all duration-300 ${
+            className={`fixed bottom-24 right-3 md:right-6 w-[min(360px,calc(100vw-1.5rem))] md:w-[400px] h-[min(550px,calc(100dvh-7rem))] z-50 rounded-2xl flex flex-col shadow-2xl border overflow-hidden backdrop-blur-xl transition-all duration-300 ${
               isFocusMode ? 'scale-0 opacity-0 pointer-events-none' : ''
             } ${
               isDark 
@@ -495,7 +546,18 @@ export default function Chatbot({ isDark, currentMode = 'general' }: { isDark: b
                                 : 'bg-slate-100/80 border border-slate-200/60 text-slate-900 rounded-tl-none'
                           }`}
                         >
-                          <FormattedMessage text={msg.content} isDark={isDark} />
+                          {msg.role !== 'user' && msg.streaming && !msg.content ? (
+                            <div className="flex items-center gap-2 text-xs opacity-60">
+                              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce [animation-delay:-0.3s]" />
+                              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce [animation-delay:-0.15s]" />
+                              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" />
+                              <span className="ml-1 text-[9px] uppercase tracking-wider font-semibold animate-pulse text-cyan-400">
+                                {STAGE_LABELS[msg.stage || 'thinking'] || STAGE_LABELS.thinking}
+                              </span>
+                            </div>
+                          ) : (
+                            <FormattedMessage text={msg.content} isDark={isDark} />
+                          )}
                         </div>
                         {msg.role === 'user' && (
                           <div className="w-7 h-7 rounded-lg bg-indigo-500/10 border border-indigo-500/25 flex items-center justify-center shrink-0 mt-0.5">
@@ -548,7 +610,7 @@ export default function Chatbot({ isDark, currentMode = 'general' }: { isDark: b
                     </div>
                   ))}
 
-                  {isLoading && (
+                  {isLoading && !messages.some(m => m.streaming) && (
                     <div className="flex gap-2.5 justify-start">
                       <div className="w-7 h-7 rounded-lg bg-sky-500/10 border border-sky-500/25 flex items-center justify-center shrink-0">
                         <Loader2 className="w-4 h-4 text-cyan-400 animate-spin" />

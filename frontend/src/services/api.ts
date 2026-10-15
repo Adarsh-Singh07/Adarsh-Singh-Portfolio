@@ -1,6 +1,26 @@
 import { ProfileData, ProfileMode, RoleDefinition } from '../types';
 import { generalProfile, dataEngineerProfile } from '../data/profileModes';
 
+/** Events emitted by the /chat/stream SSE endpoint. */
+export type ChatStreamEvent =
+  | { type: 'status'; stage: 'thinking' | 'retrieving' | 'writing' }
+  | { type: 'token'; text: string }
+  | {
+      type: 'done';
+      response: string;
+      session_id: string;
+      message_id: string;
+      trace?: {
+        model_used?: string;
+        latency_ms: number;
+        tokens_input: number;
+        tokens_output: number;
+        cost_est: number;
+        chunks: Array<{ title: string; source: string; similarity: number }>;
+      };
+    }
+  | { type: 'error'; message: string };
+
 /**
  * Service to abstract data fetching for the portfolio.
  * Designed to connect to a legacy or future Python backend (FastAPI, Django, Flask, etc.)
@@ -148,6 +168,57 @@ export class PortfolioService {
     }
 
     return await response.json() as any;
+  }
+
+  /**
+   * Streams a chatbot answer as Server-Sent Events from /chat/stream.
+   * Yields staged status events, token deltas, and a final done event.
+   * EventSource can't POST, so this uses fetch + ReadableStream instead.
+   */
+  public static async *chatStreamWithAI(
+    message: string,
+    history: Array<{ role: string; content: string }>,
+    session_id?: string,
+    mode: ProfileMode = 'general',
+    model_override?: string
+  ): AsyncGenerator<ChatStreamEvent, void, unknown> {
+    const response = await fetch(`${this.apiBaseUrl}/chat/stream`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message, history, session_id, mode, model_override }),
+    });
+
+    if (!response.ok || !response.body) {
+      throw new Error(`Chat stream failed: ${response.status} ${response.statusText}`);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        let boundary = buffer.indexOf('\n\n');
+        while (boundary !== -1) {
+          const rawEvent = buffer.slice(0, boundary);
+          buffer = buffer.slice(boundary + 2);
+          for (const line of rawEvent.split('\n')) {
+            const trimmed = line.trim();
+            if (trimmed.startsWith('data:')) {
+              const payload = trimmed.slice(5).trim();
+              if (payload) {
+                yield JSON.parse(payload) as ChatStreamEvent;
+              }
+            }
+          }
+          boundary = buffer.indexOf('\n\n');
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
   }
 
   /**
