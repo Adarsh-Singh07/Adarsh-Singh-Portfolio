@@ -394,17 +394,115 @@ def save_hashes(profile_hash):
     with open(HASH_PATH, "w") as f:
         json.dump(hashes, f, indent=2)
 
+
+# Supabase-backed index cache metadata. The local files_hash.json lives on the
+# container's ephemeral disk, so every fresh instance would otherwise re-embed
+# every chunk on every cold start (~19s of embedding API calls). This
+# single-row table records which profile/cv hashes and embedding model the
+# persisted rag_chunks rows were built from, letting cold instances reuse the
+# stored index without any embedding API calls.
+def _ensure_index_cache_table(conn):
+    """Creates the index-cache metadata table if it doesn't exist (idempotent)."""
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS rag_index_cache (
+            id INTEGER PRIMARY KEY,
+            profile_hash TEXT NOT NULL,
+            cv_hash TEXT NOT NULL,
+            embedding_model TEXT NOT NULL,
+            chunk_count INTEGER NOT NULL,
+            updated_at TIMESTAMPTZ DEFAULT NOW()
+        )
+    """)
+    conn.commit()
+
+
+def _db_cache_valid(current_profile_hash):
+    """
+    Checks whether Supabase already holds a usable index for the current
+    profile + embedding model, without relying on the ephemeral local hash
+    file. Returns (valid, chunk_count). Never raises — any DB error means
+    "rebuild", not "crash".
+    """
+    try:
+        conn = db.get_db_connection()
+        try:
+            _ensure_index_cache_table(conn)
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT profile_hash, cv_hash, embedding_model, chunk_count "
+                "FROM rag_index_cache WHERE id = 1"
+            )
+            row = cursor.fetchone()
+            if row is None:
+                return False, 0
+            if row["profile_hash"] != current_profile_hash:
+                return False, 0
+            if row["cv_hash"] != calculate_file_hash(CV_PATH):
+                return False, 0
+            # Embeddings written with a different model are garbage — never reuse.
+            if row["embedding_model"] != EMBEDDING_MODEL:
+                return False, 0
+            cursor.execute("SELECT COUNT(*) as count FROM rag_chunks")
+            count = cursor.fetchone()["count"]
+            return count > 0, count
+        finally:
+            conn.close()
+    except Exception as e:
+        print(f"RAG index DB cache check failed (will rebuild): {e}")
+        return False, 0
+
+
+def _db_cache_save(profile_hash, chunk_count):
+    """Records the freshly built index's metadata in Supabase. Non-fatal on error."""
+    try:
+        conn = db.get_db_connection()
+        try:
+            _ensure_index_cache_table(conn)
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                INSERT INTO rag_index_cache (id, profile_hash, cv_hash, embedding_model, chunk_count, updated_at)
+                VALUES (1, %s, %s, %s, %s, NOW())
+                ON CONFLICT (id) DO UPDATE SET
+                    profile_hash = EXCLUDED.profile_hash,
+                    cv_hash = EXCLUDED.cv_hash,
+                    embedding_model = EXCLUDED.embedding_model,
+                    chunk_count = EXCLUDED.chunk_count,
+                    updated_at = NOW()
+                """,
+                (profile_hash, calculate_file_hash(CV_PATH), EMBEDDING_MODEL, chunk_count),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+    except Exception as e:
+        print(f"RAG index DB cache save failed (local cache still valid): {e}")
+
 def index_knowledge_base(api_key: str):
     """
     Chunks cv.txt and the LIVE profile document (Supabase; static file
     fallback), generates embeddings via Gemini, and inserts records into the
     database. Caches to avoid redundant runs; re-indexes whenever the live
-    document changes.
+    document changes. On a fresh container the local hash file is gone, so the
+    Supabase-backed rag_index_cache row is consulted before paying for
+    embedding regeneration.
     """
     profile_hash, live_doc = _current_profile_source()
 
     if check_cache_validity(profile_hash):
         print("RAG database cache is valid. Skipping embedding generation.")
+        return
+
+    # Fresh container: the local hash file doesn't exist, but Supabase may
+    # already hold an index built from this exact profile + embedding model
+    # (the rag_chunks rows persist across instances). Reuse it — no embedding
+    # API calls needed.
+    db_valid, db_count = _db_cache_valid(profile_hash)
+    if db_valid:
+        print(f"RAG index cache found in Supabase ({db_count} chunks, model {EMBEDDING_MODEL}). "
+              "Skipping embedding regeneration.")
+        save_hashes(profile_hash)
         return
 
     print("Index stale or missing. Rebuilding RAG database...")
@@ -442,6 +540,7 @@ def index_knowledge_base(api_key: str):
             )
         conn.commit()
         save_hashes(profile_hash)
+        _db_cache_save(profile_hash, len(chunks))
         print(f"Successfully indexed {len(chunks)} chunks.")
     except Exception as e:
         print(f"Failed to save indexed chunks to database: {e}")

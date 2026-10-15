@@ -6,6 +6,7 @@ import time
 import html
 import hmac
 import secrets
+import asyncio
 from fastapi import FastAPI, Query, HTTPException, BackgroundTasks, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
@@ -108,12 +109,14 @@ async def token_lifecycle_loop():
         # Check every 2 minutes
         await asyncio.sleep(120)
 
-@app.on_event("startup")
-async def on_startup():
-    """Initializes SQLite database and triggers RAG semantic index generation on launch."""
-    import asyncio
-    db.init_db()
-    email_db.init_email_db()
+async def _background_startup_warmup():
+    """
+    Non-critical startup work that must never delay readiness or fail startup.
+    Runs as a background task: the (idempotent) blog-slug migration plus the
+    RAG index build/refresh. The index build is blocking sync work (~19s of
+    embedding API calls on a cold cache), so it goes through asyncio.to_thread
+    to keep the event loop serving requests.
+    """
     # One-time migration: rename auto-generated 'blog-<timestamp>' ids to title slugs.
     # Idempotent — no-ops once no timestamp ids remain.
     try:
@@ -126,14 +129,24 @@ async def on_startup():
     api_key = os.environ.get("GEMINI_API_KEY")
     if api_key:
         try:
-            rag.index_knowledge_base(api_key)
+            await asyncio.to_thread(rag.index_knowledge_base, api_key)
         except Exception as e:
             print(f"Database indexing on startup failed: {e}")
     else:
         print("GEMINI_API_KEY is not defined in environment. RAG indexing skipped.")
-    
+
+
+@app.on_event("startup")
+async def on_startup():
+    """Initializes local databases. Heavy warmup (migration, RAG index) runs in background."""
+    db.init_db()
+    email_db.init_email_db()
+
     # Start the token lifecycle background task
     asyncio.create_task(token_lifecycle_loop())
+    # Heavy, non-blocking warmup: blog-slug migration + RAG index build/refresh.
+    # The server becomes ready immediately; indexing must never block or fail startup.
+    asyncio.create_task(_background_startup_warmup())
 
 # Admin credentials resolving & hashing
 ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
