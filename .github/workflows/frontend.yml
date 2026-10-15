@@ -1,8 +1,12 @@
 name: Verify & Deploy Frontend to Firebase (Staging only)
 
-# Firebase Hosting deploys ONLY the staging branch -> portfolio-staging target.
-# Production frontend (main branch, adarshsingh.in) is NOT auto-deployed;
-# ship it manually via deploy_prod.ps1 or the workflow_dispatch below.
+# ⚠️ LEGACY WORKFLOW — this is NOT how production deploys (updated 2026-10-15).
+# Production frontend (adarshsingh.in) is hosted on Vercel (project: adarsh-singh-portfolio,
+# Adarsh's account) and AUTO-DEPLOYS on every push to `main`. No manual step is needed.
+# This workflow only maintains the legacy Firebase Hosting copy: pushes to `staging`
+# deploy the portfolio-staging target. Running it manually with target=portfolio-main
+# deploys ONLY to Firebase (adarshsingh-portfolio.web.app) and does NOT affect the live site.
+# Kept for reference/rollback only. Backend deploys separately: backend.yml -> Cloud Run on push to main.
 
 on:
   push:
