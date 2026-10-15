@@ -14,6 +14,10 @@ import 'react-medium-image-zoom/dist/styles.css';
 import { Copy, Check, Info, AlertTriangle, XCircle, Lightbulb, Link as LinkIcon } from 'lucide-react';
 import { useState } from 'react';
 import mermaid from 'mermaid';
+// Blog-only styles, imported here so they land in the blog lazy chunk instead
+// of the global CSS that blocks the initial page load.
+import 'katex/dist/katex.min.css';
+import 'highlight.js/styles/github-dark-dimmed.css';
 
 interface MarkdownRendererProps {
   content: string;

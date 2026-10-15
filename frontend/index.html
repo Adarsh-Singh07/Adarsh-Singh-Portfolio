@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#007AFF" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -21,6 +21,11 @@
     <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
     <link rel="dns-prefetch" href="https://www.google-analytics.com" />
     <link rel="dns-prefetch" href="https://api.adarshsingh.in" />
+
+    <!-- Preload the font stylesheet early (same URL the bundled CSS @imports;
+         the browser dedupes it, so first paint isn't blocked on CSS download).
+         display=swap keeps text visible while fonts load. -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@1,500;1,600;1,700&family=JetBrains+Mono:wght@400;500&display=swap" />
     
     <!-- Primary SEO Meta Tags -->
     <meta name="description" content="Portfolio of Adarsh Singh, an AI & Data Engineer specializing in distributed computing, Large Language Models (LLMs), RAG pipelines, and cloud database architectures." />

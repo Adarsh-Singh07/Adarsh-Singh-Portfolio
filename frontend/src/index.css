@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@1,500;1,600;1,700&family=JetBrains+Mono:wght@400;500&display=swap');
-@import url('https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css');
-@import url('https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark-dimmed.min.css');
+/* NOTE: katex + highlight.js styles are imported inside MarkdownRenderer.tsx so
+   they ship in the blog lazy chunk instead of blocking the initial page load. */
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
@@ -224,3 +224,31 @@ html.lenis, html.lenis body {
   pointer-events: none;
 }
 
+
+/* ==========================================================================
+   Mobile + PWA hardening (added 2026-10-15)
+   Desktop layouts are untouched — everything below is scoped to small screens.
+   NOTE: the chat widget's own FAB/panel styling lives in Chatbot.tsx and is
+   intentionally not overridden here (owned by a parallel workstream).
+   ========================================================================== */
+
+/* Prevent long URLs / inline code in blog posts from forcing horizontal scroll */
+.markdown-content a,
+.markdown-content code {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  /* iOS Safari zooms on focus for inputs under 16px — keep the zoom out.
+     !important is required to beat Tailwind's text-sm on these fields. */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+
+  /* Remove the gray tap highlight for a native-app feel */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}

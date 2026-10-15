@@ -28,6 +28,26 @@ export type ChatStreamEvent =
 export class PortfolioService {
   private static useMock = false;
   private static apiBaseUrl = '/api/v1/portfolio';
+  /** Hard ceiling for any backend fetch — a hanging request must never trap the UI. */
+  private static readonly FETCH_TIMEOUT_MS = 12000;
+
+  /**
+   * fetch() with an abort timeout. Rejects with an AbortError if the backend
+   * doesn't respond in time; callers fall back to bundled local data.
+   */
+  private static async fetchWithTimeout(
+    input: RequestInfo | URL,
+    init: RequestInit = {},
+    ms: number = PortfolioService.FETCH_TIMEOUT_MS
+  ): Promise<Response> {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), ms);
+    try {
+      return await fetch(input, { ...init, signal: controller.signal });
+    } finally {
+      clearTimeout(timer);
+    }
+  }
 
   /**
    * Retrieves profile data based on state or active mode.
@@ -44,7 +64,7 @@ export class PortfolioService {
     }
 
     try {
-      const response = await fetch(`${this.apiBaseUrl}/profile?mode=${mode}`);
+      const response = await PortfolioService.fetchWithTimeout(`${this.apiBaseUrl}/profile?mode=${mode}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch and integrate backend profile stats: ${response.statusText}`);
       }
@@ -67,7 +87,7 @@ export class PortfolioService {
     }
 
     try {
-      const response = await fetch(`${this.apiBaseUrl}/roles`);
+      const response = await PortfolioService.fetchWithTimeout(`${this.apiBaseUrl}/roles`);
       if (!response.ok) {
         throw new Error(`Failed to fetch roles metadata: ${response.statusText}`);
       }

@@ -3,17 +3,22 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion, MotionConfig } from 'motion/react';
 import { ProfileMode, ProfileData, RoleDefinition } from './types';
 import PortfolioService from './services/api';
+import { generalProfile } from './data/profileModes';
 import Navbar from './components/Navbar';
 import Breadcrumbs from './components/Breadcrumbs';
 import ErrorBoundary from './components/ErrorBoundary';
 import { Loader2 } from 'lucide-react';
-import Chatbot from './components/Chatbot';
+import BootLoader from './components/BootLoader';
 import SmoothScroll from './components/SmoothScroll';
+
+// The chat widget is deferred off the critical path — it renders after first
+// paint via Suspense and is not needed for the initial portfolio view.
+const Chatbot = lazy(() => import('./components/Chatbot'));
 
 // Lazy load route pages for performance & LCP bundles optimizations
 const Home = lazy(() => import('./pages/Home'));
@@ -102,10 +107,23 @@ export default function App() {
   
   // Signature role toggle state
   const [currentMode, setCurrentMode] = useState<ProfileMode>('general');
-  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  // Local-first rendering: the app paints instantly from the bundled profile
+  // and upgrades to live backend data in the background (stale-while-revalidate).
+  // No page ever sits on a loader waiting for the network — /contact's form
+  // included. The backend fetch has a hard timeout and always falls back.
+  const [profileData, setProfileData] = useState<ProfileData>(generalProfile);
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState<RoleDefinition[]>([]);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // Boot-loader state: the branded overlay shows only during the very first
+  // boot, while the app shell is already interactive underneath. Steps advance
+  // on real fetch signals with a timed fallback (~800ms) so they never look
+  // stuck; dismissal is readiness-based with a sane max cap (10s) — the app
+  // underneath is usable either way.
+  const bootedRef = useRef(false);
+  const [bootStep, setBootStep] = useState(0);
+  const [bootPhase, setBootPhase] = useState<'loading' | 'leaving' | 'done'>('loading');
 
   // Load roles dynamically from the backend on startup
   useEffect(() => {
@@ -143,27 +161,68 @@ export default function App() {
     }
   }, [isDark]);
 
-  // Fetch / load data whenever the active profile mode toggles
+  // Fetch / refresh data in the background whenever the active profile mode
+  // toggles. The UI never blocks on this — local data renders immediately and
+  // live data swaps in when it lands.
   useEffect(() => {
     let active = true;
+    let stepTimer: ReturnType<typeof setInterval> | null = null;
+    let capTimer: ReturnType<typeof setTimeout> | null = null;
+    const isFirstBoot = !bootedRef.current;
+
+    const finishBoot = () => {
+      if (!active || bootedRef.current) return;
+      bootedRef.current = true;
+      // Land on the final step, hold briefly so it reads as "done", fade out.
+      setBootStep(3);
+      setTimeout(() => {
+        if (active) setBootPhase('leaving');
+      }, 450);
+      // Unmount the overlay after its fade completes.
+      setTimeout(() => {
+        if (active) setBootPhase('done');
+      }, 1100);
+    };
+
     const loadModeData = async () => {
       setLoading(true);
+      if (isFirstBoot) {
+        setBootStep(0);
+        // Timed fallback advancement for the loader steps.
+        stepTimer = setInterval(() => {
+          setBootStep((s) => Math.min(s + 1, 3));
+        }, 800);
+        // Sane max cap: the loader can never trap the user. The app shell
+        // underneath is already interactive with local data.
+        capTimer = setTimeout(() => {
+          if (active) finishBoot();
+        }, 10000);
+      }
       try {
         const data = await PortfolioService.getProfileData(currentMode);
         if (active) {
           setProfileData(data);
         }
       } catch (err) {
+        // getProfileData already falls back to the bundled profile internally;
+        // keep rendering whatever we have.
         console.error('Failed to configure portfolio database details:', err);
       } finally {
         if (active) {
+          if (stepTimer) clearInterval(stepTimer);
+          if (capTimer) clearTimeout(capTimer);
+          if (isFirstBoot) finishBoot();
           setLoading(false);
         }
       }
     };
 
     loadModeData();
-    return () => { active = false; };
+    return () => {
+      active = false;
+      if (stepTimer) clearInterval(stepTimer);
+      if (capTimer) clearTimeout(capTimer);
+    };
   }, [currentMode, refreshTrigger]);
 
   const toggleTheme = () => {
@@ -194,49 +253,41 @@ export default function App() {
               rolesList={roles}
             />
 
-            {profileData ? (
-              <main className="relative flex-grow flex flex-col justify-start">
-                {loading && (
-                  <div className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#00E5FF] via-indigo-500 to-pink-500 animate-pulse z-[60]" />
-                )}
-                <Breadcrumbs isDark={isDark} />
-                <Suspense fallback={
-                  <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-                    <Loader2 className="w-8 h-8 animate-spin text-[#007AFF]" />
-                  </div>
-                }>
-                  {/* Wrap the routed content in an ErrorBoundary so any render
-                      crash shows a recoverable card instead of a blank screen. */}
-                  <ErrorBoundary isDark={isDark} key="routes">
-                    <AnimatedRoutes 
-                      profileData={profileData} 
-                      currentMode={currentMode} 
-                      isDark={isDark} 
-                      onRefreshData={() => setRefreshTrigger(prev => prev + 1)}
-                    />
-                  </ErrorBoundary>
-                </Suspense>
-              </main>
-            ) : loading ? (
-              <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#121212] text-white">
-                <Loader2 className="w-8 h-8 animate-spin text-sky-400 mb-4" />
-                <span className="font-display text-xs tracking-widest uppercase">Initializing Adarsh Singh Portfolio...</span>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center h-screen flex-grow">
-                <div className="text-center">
-                  <span className="font-display font-medium text-red-500 text-sm block mb-2">Architectural Loading Fault</span>
-                  <button 
-                    onClick={() => setCurrentMode('general')}
-                    className="px-4 py-2 border rounded-full text-xs hover:bg-neutral-800 hover:text-white"
-                  >
-                    Reset Core Engine State
-                  </button>
+            {/* The app shell renders immediately from local data; live backend
+                data swaps in in the background. The branded loader is an
+                overlay only during first boot — never a render gate. */}
+            <main className="relative flex-grow flex flex-col justify-start">
+              {loading && (
+                <div className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#00E5FF] via-indigo-500 to-pink-500 animate-pulse z-[60]" />
+              )}
+              <Breadcrumbs isDark={isDark} />
+              <Suspense fallback={
+                <div className="flex-grow flex items-center justify-center min-h-[50vh]">
+                  <Loader2 className="w-8 h-8 animate-spin text-[#007AFF]" />
                 </div>
-              </div>
+              }>
+                {/* Wrap the routed content in an ErrorBoundary so any render
+                    crash shows a recoverable card instead of a blank screen. */}
+                <ErrorBoundary isDark={isDark} key="routes">
+                  <AnimatedRoutes 
+                    profileData={profileData} 
+                    currentMode={currentMode} 
+                    isDark={isDark} 
+                    onRefreshData={() => setRefreshTrigger(prev => prev + 1)}
+                  />
+                </ErrorBoundary>
+              </Suspense>
+            </main>
+            {bootPhase !== 'done' && (
+              <BootLoader step={bootStep} leaving={bootPhase === 'leaving'} />
             )}
-            {/* Global Gen AI Chatbot representing Adarsh */}
-            <Chatbot isDark={isDark} currentMode={currentMode} />
+            {/* Global Gen AI Chatbot representing Adarsh (deferred off the
+                critical path via React.lazy above). */}
+            <div data-chatbot-host="true">
+              <Suspense fallback={null}>
+                <Chatbot isDark={isDark} currentMode={currentMode} />
+              </Suspense>
+            </div>
           </div>
         </SmoothScroll>
       </BrowserRouter>

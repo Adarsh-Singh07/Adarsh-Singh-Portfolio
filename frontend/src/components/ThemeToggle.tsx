@@ -14,7 +14,6 @@ interface ThemeToggleProps {
 export default function ThemeToggle({ isDark, toggleTheme }: ThemeToggleProps) {
   return (
     <button
-      id="theme-toggler"
       onClick={toggleTheme}
       className={`relative p-2.5 rounded-full overflow-hidden transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-offset-1 select-none cursor-pointer ${
         isDark 

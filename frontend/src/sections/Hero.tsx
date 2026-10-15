@@ -79,7 +79,7 @@ export default function Hero({ config, isDark }: HeroProps) {
 
             {/* Massive Keynote Headline */}
             <motion.div variants={itemVariants} className="space-y-2">
-              <h1 className={`text-[2.6rem] sm:text-5xl md:text-7xl font-sans font-semibold tracking-tight leading-[0.95] ${
+              <h1 className={`text-[2rem] min-[420px]:text-[2.6rem] sm:text-5xl md:text-7xl font-sans font-semibold tracking-tight leading-[0.95] ${
                 isDark ? 'text-white' : 'text-neutral-900'
               }`}>
                 Building<br />
