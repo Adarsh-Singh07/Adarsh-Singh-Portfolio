@@ -11,6 +11,13 @@ CV_PATH = os.path.join(DATA_DIR, "cv.txt")
 PROFILE_PATH = os.path.join(DATA_DIR, "profile.json")
 HASH_PATH = os.path.join(DATA_DIR, "files_hash.json")
 
+# Embedding model for RAG retrieval. Google retired text-embedding-004, so it
+# 404s on the Gemini API. gemini-embedding-001 is the current model; its
+# default output is 3072 dims. Keep both in one place so index, query, and
+# fallback vectors can never drift apart.
+EMBEDDING_MODEL = "gemini-embedding-001"
+EMBEDDING_DIMS = 3072
+
 def _resolve_role_doc(raw):
     """Unwraps the role-keyed profile store ({'general': {...}, ...}) to the general role doc."""
     if isinstance(raw, dict) and isinstance(raw.get("general"), dict):
@@ -323,7 +330,7 @@ def generate_embeddings_batch(client, texts):
     for text in texts:
         try:
             response = client.models.embed_content(
-                model="text-embedding-004",
+                model=EMBEDDING_MODEL,
                 contents=text
             )
             if hasattr(response, 'embedding') and response.embedding:
@@ -332,10 +339,10 @@ def generate_embeddings_batch(client, texts):
                 embeddings.append(response.embeddings[0].values)
             else:
                 print(f"Invalid embedding response format for text: {text[:30]}")
-                embeddings.append([0.0] * 3072)
+                embeddings.append([0.0] * EMBEDDING_DIMS)
         except Exception as e:
             print(f"Error calling embedding API for text: {e}")
-            embeddings.append([0.0] * 3072)
+            embeddings.append([0.0] * EMBEDDING_DIMS)
     return embeddings
 
 def check_cache_validity(current_profile_hash):
@@ -359,6 +366,12 @@ def check_cache_validity(current_profile_hash):
     if saved_hashes.get("profile_hash") != current_profile_hash:
         return False
 
+    # Force re-index whenever the embedding model changes: embeddings written
+    # with a retired/replaced model are garbage (e.g. zero vectors), so a
+    # cache saved under a different model can never be reused.
+    if saved_hashes.get("embedding_model") != EMBEDDING_MODEL:
+        return False
+
     # Verify db has records
     try:
         conn = db.get_db_connection()
@@ -375,7 +388,8 @@ def save_hashes(profile_hash):
     """Saves the current source hashes to file."""
     hashes = {
         "cv_hash": calculate_file_hash(CV_PATH),
-        "profile_hash": profile_hash
+        "profile_hash": profile_hash,
+        "embedding_model": EMBEDDING_MODEL
     }
     with open(HASH_PATH, "w") as f:
         json.dump(hashes, f, indent=2)
@@ -453,7 +467,7 @@ def retrieve_context(api_key: str, query: str, top_k: int = 4):
     # 1. Generate query embedding
     try:
         response = client.models.embed_content(
-            model="text-embedding-004",
+            model=EMBEDDING_MODEL,
             contents=query
         )
         if hasattr(response, 'embeddings') and response.embeddings:
