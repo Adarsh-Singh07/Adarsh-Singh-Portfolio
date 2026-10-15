@@ -111,14 +111,30 @@ async def chat(request: ChatRequest, client_request: Request, background_tasks: 
     groq_api_key = os.environ.get("GROQ_API_KEY")
 
     # 3. RAG Retrieval
-    knowledge_chunks = rag.retrieve_context(api_key, request.message, top_k=4) if api_key else []
+    # Retrieval needs an embedding key; fall back to the backup key so a
+    # missing/rotated primary key never silently disables grounding.
+    rag_api_key = api_key or os.environ.get("BACKUP_GEMINI_API_KEY")
+    knowledge_chunks = rag.retrieve_context(rag_api_key, request.message, top_k=4) if rag_api_key else []
     if knowledge_chunks:
-        context_str = "\n\n".join([
+        retrieved_str = "\n\n".join([
             f"Source: {c['chunk_title']} (Relevance Score: {c['similarity']:.2f})\n{c['content']}"
             for c in knowledge_chunks
         ])
     else:
-        context_str = "No specific profile context retrieved."
+        retrieved_str = ""
+
+    # 4. Live profile digest -- guaranteed grounding floor.
+    # Built from the canonical profile document on EVERY request, so broad
+    # questions are always answered from real data even when semantic
+    # retrieval returns nothing (key missing, empty index, API hiccup).
+    profile_digest = rag.get_profile_digest(mode=(request.mode or "general"))
+
+    context_parts = []
+    if profile_digest:
+        context_parts.append("LIVE PROFILE DIGEST (authoritative, current -- answer from this first):\n" + profile_digest)
+    if retrieved_str:
+        context_parts.append("RETRIEVED CONTEXT (semantic search over knowledge base):\n" + retrieved_str)
+    context_str = "\n\n".join(context_parts) if context_parts else "No profile context available."
     
     # 5. System Prompt Construction
     system_instruction = f"""
@@ -130,11 +146,11 @@ Your Guidelines:
    - Weaknesses Question: Answer in a persuasive, constructive engineering-focused style (e.g. "My main weakness is my relentless drive when hooked on a complex engineering problem. Once I get immersed in solving a difficult block or architecture, I find it hard to step away until it's completely solved, sometimes spending extra hours perfecting performance, polishing UI details, and testing edge cases before putting it down.").
    - Freelancing / Services Questions: Enthusiastically confirm that Adarsh is available for freelance projects and technical consulting! Adarsh provides full-stack web development with end-to-end cloud deployment (Vercel, AWS, Oracle VPS, GCP, Cloudflare), Autonomous AI Agent systems (LangGraph / LangChain), Custom Chatbot integrations with RAG, and Shopify / E-commerce custom development. Invite them to get in touch on the [Contact Page](/contact) or email hello@adarshsingh.in.
    - Projects, Demo Links & GitHub Repositories: Provide exact links when asked for project code or live demos (e.g. EMIVO live demo at https://emivo.vercel.app/, GitHub repos at https://github.com/Adarsh-Singh07).
-3. If a question is about me (my experience, projects, skills, or background) and you cannot find the answer in the provided knowledge base, you MUST start your response with the tag `[UNANSWERED]` followed by a polite explanation that you don't have that exact detail in your current portfolio knowledge base, but share relevant adjacent info or invite them to drop a message on the [Contact Page](/contact).
+3. The LIVE PROFILE DIGEST in the knowledge base above is the authoritative, current source: it contains my real projects (with tech stacks, descriptions, and links), skills, certifications, and career journey. Answer from it using actual names and specifics. Only when a question concerns something genuinely absent from everything provided (e.g. private contact details, topics never documented anywhere) should you start your response with the tag `[UNANSWERED]` followed by a polite explanation -- and even then, share the closest relevant facts from the digest first instead of deflecting.
 4. If the visitor wants to contact me (e.g. they say "send this mail to Adarsh", "tell Adarsh to call me", "ask Adarsh to contact me", "email Adarsh", etc.), you must collect their Name, Email Address, and Description/Message.
    - If they have not yet provided these details, politely ask them to provide them.
    - Once you have collected all three details (Name, Email, and Message), you MUST append this exact tag to the end of your response: `[SAVE_LEAD: name=<Name>|email=<Email>|message=<Message>]` (replacing the placeholders with the actual details they provided).
-5. When describing my projects, skills, certifications, or work experience, suggest navigating to specific pages on my website using standard markdown links:
+5. After giving a substantive answer from the knowledge base, you may add one or two relevant site links as a supplement using standard markdown links. Never substitute a link for an answer: when the digest contains the facts, lead with the facts.
    - To check projects: [Projects Section](/projects)
    - To see skills/certifications: [Skills Section](/skills)
    - To read about my career journey/timeline: [Journey Timeline](/timeline)
