@@ -20,8 +20,26 @@ export default function SkillsSection({ categories, certifications, currentMode,
     return a.priority[currentMode] - b.priority[currentMode];
   });
 
-  // Sort certifications
+  // Sort certifications by issue date, latest first (priority breaks ties)
+  // Month-precision dates ("Oct 2026", "2026-10") must tie within the same
+  // month, so normalise to the first of the month instead of Date.parse,
+  // which can shift month-year strings by a day across timezones.
+  const certDateMs = (date?: string) => {
+    if (!date) return 0;
+    const iso = date.match(/(\d{4})-(\d{2})(?:-(\d{2}))?/);
+    if (iso) return Date.UTC(Number(iso[1]), Number(iso[2]) - 1, iso[3] ? Number(iso[3]) : 1);
+    const monthNames = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    const named = date.match(/([A-Za-z]{3,9})\s+(\d{4})/);
+    if (named) {
+      const month = monthNames.indexOf(named[1].toLowerCase().slice(0, 3));
+      if (month >= 0) return Date.UTC(Number(named[2]), month, 1);
+    }
+    const parsed = Date.parse(date);
+    return Number.isNaN(parsed) ? 0 : parsed;
+  };
   const sortedCerts = [...certifications].sort((a, b) => {
+    const byDate = certDateMs(b.date) - certDateMs(a.date);
+    if (byDate !== 0) return byDate;
     return a.priority[currentMode] - b.priority[currentMode];
   });
 
