@@ -111,7 +111,7 @@ export default function ArticleSearch({ isDark, allArticles = [] }: ArticleSearc
                               isDark ? 'hover:bg-white/5' : 'hover:bg-[#FDFBF7]'
                             }`}
                           >
-                            <Hash className="w-4 h-4 text-[#007AFF] opacity-70" />
+                            <Hash className="w-4 h-4 text-[#ff3b1d] opacity-70" />
                             <span className="font-medium text-sm">{h.text}</span>
                           </button>
                         ))}

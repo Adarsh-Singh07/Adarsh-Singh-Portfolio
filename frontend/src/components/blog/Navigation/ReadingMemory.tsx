@@ -91,7 +91,7 @@ export default function ReadingMemory({ articleId, version }: ReadingMemoryProps
           <div className="flex items-center gap-2 ml-4">
             <button
               onClick={handleResume}
-              className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#007AFF] hover:bg-[#007AFF]/90 text-white text-xs font-semibold transition-colors"
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#ff3b1d] hover:bg-[#ff3b1d]/90 text-white text-xs font-semibold transition-colors"
             >
               <Play className="w-3 h-3 fill-current" /> Resume
             </button>

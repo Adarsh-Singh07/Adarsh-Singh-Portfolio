@@ -1,6 +1,11 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Github, ExternalLink, Cpu, Layers, Database, Calendar, Edit } from 'lucide-react';
+import { ArrowLeft, Github, ExternalLink, Edit } from 'lucide-react';
 import { Project, ProfileMode } from '../types';
 import SEO from '../components/SEO';
 import DetailEditModal from '../components/DetailEditModal';
@@ -25,15 +30,28 @@ export default function ProjectDetail({ projects, currentMode = 'general', isDar
 
   if (!project) {
     return (
-      <div className={`min-h-screen py-32 px-6 flex flex-col items-center justify-center text-center transition-colors duration-200 ${
-        isDark ? 'bg-[#121212] text-white' : 'bg-[#FDFBF7] text-neutral-900'
-      }`}>
-        <span className="text-sm font-mono text-red-500 mb-2">Error 404</span>
-        <h1 className="text-3xl font-bold font-sans mb-4">Case Study Not Found</h1>
-        <p className="text-sm opacity-60 mb-6 max-w-sm">The project you are looking for does not exist in the active portfolio configuration.</p>
+      <div className="min-h-screen py-32 px-6 flex flex-col items-center justify-center text-center bg-[var(--background)] text-[var(--foreground)]">
+        <span className="text-sm font-mono text-[var(--accent)] mb-2">Error 404</span>
+        <h1
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '3rem',
+            textTransform: 'uppercase',
+            marginBottom: '1rem',
+          }}
+        >
+          Case Study Not Found
+        </h1>
+        <p style={{ color: 'var(--muted)', marginBottom: '2rem', maxWidth: '28rem' }}>
+          The project specification you are looking for does not exist in the active configuration.
+        </p>
         <Link 
           to="/projects" 
-          className="px-5 py-2.5 bg-[#007AFF] hover:bg-[#007AFF]/90 text-white rounded-full flex items-center gap-2 text-xs font-semibold"
+          className="px-6 py-3 rounded-full flex items-center gap-2 text-xs font-bold uppercase tracking-widest transition-colors"
+          style={{
+            background: 'var(--accent)',
+            color: 'var(--background)',
+          }}
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Return to Projects</span>
@@ -56,12 +74,13 @@ export default function ProjectDetail({ projects, currentMode = 'general', isDar
       const existingIndex = activeProfile.projects.findIndex(p => p.id === updatedProject.id);
       if (existingIndex >= 0) {
         activeProfile.projects[existingIndex] = updatedProject;
+      } else {
+        activeProfile.projects.push(updatedProject);
       }
 
       await PortfolioService.saveAdminConfig(token, fullConfig);
       setIsModalOpen(false);
       if (onRefreshData) onRefreshData();
-      // Wait briefly for GCS sync, then refresh window state
       setTimeout(() => {
         window.location.reload();
       }, 500);
@@ -89,7 +108,6 @@ export default function ProjectDetail({ projects, currentMode = 'general', isDar
     }
   };
 
-  // Construct SoftwareApplication JSON-LD Schema for rich search snippet indexing
   const projectSchema = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -108,9 +126,7 @@ export default function ProjectDetail({ projects, currentMode = 'general', isDar
   };
 
   return (
-    <div className={`min-h-screen py-24 px-6 md:px-12 transition-colors duration-200 ${
-      isDark ? 'bg-[#121212] text-white' : 'bg-[#FDFBF7] text-neutral-900'
-    }`}>
+    <div className="min-h-screen py-28 px-6 md:px-12 bg-[var(--background)] text-[var(--foreground)]">
       <SEO 
         title={`${project.title} | Case Study | Adarsh Singh`}
         description={project.description.slice(0, 155) + '...'}
@@ -120,22 +136,24 @@ export default function ProjectDetail({ projects, currentMode = 'general', isDar
       />
 
       <div className="max-w-4xl mx-auto w-full">
-        {/* Navigation Breadcrumb Path */}
+        {/* Navigation Breadcrumb */}
         <div className="mb-12 flex justify-between items-center">
           <Link 
             to="/projects" 
-            className={`flex items-center gap-2 text-xs font-semibold cursor-pointer transition-colors ${
-              isDark ? 'text-slate-400 hover:text-white' : 'text-slate-655 hover:text-neutral-950'
-            }`}
+            className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider transition-colors"
+            style={{ color: 'var(--muted)' }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--foreground)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--muted)')}
           >
-            <ArrowLeft className="w-4 h-4 text-[#007AFF]" />
-            <span>Back to Bento Catalog</span>
+            <ArrowLeft className="w-4 h-4" style={{ color: 'var(--accent)' }} />
+            <span>Back to Projects Archive</span>
           </Link>
 
           {isAdmin && (
             <button
               onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full flex items-center gap-1.5 text-xs font-semibold shadow-glow cursor-pointer transition-colors"
+              className="px-4 py-2 text-white rounded-full flex items-center gap-1.5 text-xs font-semibold transition-colors"
+              style={{ background: 'var(--accent)' }}
             >
               <Edit className="w-3.5 h-3.5" />
               <span>Edit Case Study</span>
@@ -145,19 +163,32 @@ export default function ProjectDetail({ projects, currentMode = 'general', isDar
 
         {/* Hero Section */}
         <div className="text-left mb-12">
-          <div className="flex flex-wrap items-center gap-3 mb-4">
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#007AFF] px-2.5 py-1 rounded-md bg-[#007AFF]/10">
-              {project.status || 'Active'}
-            </span>
+          <div className="eyebrow" style={{ marginBottom: '1rem' }}>
+            System Spec · {project.status || 'Active'}
           </div>
 
-          <h1 className="text-3xl md:text-5xl font-sans font-bold tracking-tight mb-6 leading-tight">
+          <h1
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '3.5rem',
+              textTransform: 'uppercase',
+              lineHeight: 1,
+              color: 'var(--foreground)',
+              marginBottom: '1.5rem',
+            }}
+            className="sm:text-[4.5rem]"
+          >
             {project.title}
           </h1>
 
-          <p className={`text-base md:text-lg font-light leading-relaxed whitespace-pre-line ${
-            isDark ? 'text-slate-300' : 'text-slate-650'
-          }`}>
+          <p
+            style={{
+              fontSize: '1.25rem',
+              color: 'var(--muted)',
+              lineHeight: 1.5,
+              whiteSpace: 'pre-line',
+            }}
+          >
             {project.description}
           </p>
         </div>
@@ -169,9 +200,12 @@ export default function ProjectDetail({ projects, currentMode = 'general', isDar
               href={project.githubUrl} 
               target="_blank" 
               rel="noopener noreferrer" 
-              className={`px-5 py-3 rounded-full flex items-center gap-2 text-xs font-semibold transition-all duration-300 cursor-pointer ${
-                isDark ? 'bg-white/5 hover:bg-white/10 text-white border border-white/10' : 'bg-white hover:bg-[#FDFBF7] text-neutral-900 border border-slate-200'
-              }`}
+              className="px-6 py-3 rounded-sm flex items-center gap-2 text-xs font-semibold transition-colors border"
+              style={{
+                borderColor: 'var(--line-strong)',
+                color: 'var(--foreground)',
+                background: 'var(--surface)',
+              }}
             >
               <Github className="w-4 h-4" />
               <span>Source Repository</span>
@@ -183,10 +217,14 @@ export default function ProjectDetail({ projects, currentMode = 'general', isDar
               href={project.demoUrl} 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="px-5 py-3 bg-[#007AFF] hover:bg-[#007AFF]/90 text-white rounded-full flex items-center gap-2 text-xs font-semibold shadow-glow cursor-pointer transition-colors"
+              className="px-6 py-3 rounded-sm text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-colors"
+              style={{
+                background: 'var(--accent)',
+                color: 'var(--background)',
+              }}
             >
               <ExternalLink className="w-4 h-4" />
-              <span>Launch Live Deployment</span>
+              <span>Launch Live System</span>
             </a>
           )}
         </div>
@@ -194,23 +232,39 @@ export default function ProjectDetail({ projects, currentMode = 'general', isDar
         {/* Metrics Section */}
         {project.metrics && project.metrics.length > 0 && (
           <section className="mb-16">
-            <h2 className="text-lg font-bold font-sans tracking-tight mb-6 text-left border-b border-white/5 pb-3">
+            <h2
+              className="text-lg font-bold font-sans tracking-tight mb-6 text-left pb-3 uppercase"
+              style={{ borderBottom: '1px solid var(--line)', color: 'var(--foreground)' }}
+            >
               Performance Indicators &amp; Deliverables
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {project.metrics.map((metric, idx) => (
                 <div 
                   key={idx} 
-                  className={`p-6 rounded-2xl border text-center relative overflow-hidden ${
-                    isDark ? 'bg-[#007AFF05] border-[#007AFF15]' : 'bg-slate-100/50 border-slate-200'
-                  }`}
+                  className="p-6 rounded-[0.25rem] border text-center"
+                  style={{ background: 'var(--surface)', borderColor: 'var(--line)' }}
                 >
-                  <span className={`text-[10px] font-bold uppercase tracking-wider block mb-2 ${
-                    isDark ? 'text-slate-400' : 'text-slate-650'
-                  }`}>
+                  <span
+                    style={{
+                      fontSize: '0.75rem',
+                      fontFamily: 'var(--font-mono)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.14em',
+                      color: 'var(--muted)',
+                      display: 'block',
+                      marginBottom: '0.5rem',
+                    }}
+                  >
                     {metric.label}
                   </span>
-                  <span className="text-3xl font-bold font-sans text-[#007AFF]">
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: '2.5rem',
+                      color: 'var(--accent)',
+                    }}
+                  >
                     {metric.value}
                   </span>
                 </div>
@@ -221,16 +275,22 @@ export default function ProjectDetail({ projects, currentMode = 'general', isDar
 
         {/* Technical Stack Section */}
         <section className="mb-16">
-          <h2 className="text-lg font-bold font-sans tracking-tight mb-6 text-left border-b border-white/5 pb-3">
-            Core Technologies &amp; Libraries
+          <h2
+            className="text-lg font-bold font-sans tracking-tight mb-6 text-left pb-3 uppercase"
+            style={{ borderBottom: '1px solid var(--line)', color: 'var(--foreground)' }}
+          >
+            Core Technologies &amp; Architecture Libraries
           </h2>
           <div className="flex flex-wrap gap-2.5 justify-start">
             {project.technologies.map((tech, idx) => (
               <span 
                 key={idx} 
-                className={`text-xs px-3.5 py-1.5 rounded-xl border font-mono ${
-                  isDark ? 'bg-white/5 border-white/10 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
-                }`}
+                className="text-xs px-3.5 py-1.5 rounded-sm border font-mono"
+                style={{
+                  background: 'var(--surface)',
+                  borderColor: 'var(--line)',
+                  color: 'var(--foreground)',
+                }}
               >
                 {tech}
               </span>
@@ -238,68 +298,74 @@ export default function ProjectDetail({ projects, currentMode = 'general', isDar
           </div>
         </section>
 
-        {/* Case Study Detailed Breakdown */}
+        {/* Detailed Breakdown */}
         <section className="text-left space-y-10">
-          <h2 className="text-lg font-bold font-sans tracking-tight border-b border-white/5 pb-3">
+          <h2
+            className="text-lg font-bold font-sans tracking-tight pb-3 uppercase"
+            style={{ borderBottom: '1px solid var(--line)', color: 'var(--foreground)' }}
+          >
             Under the Hood: System Overview
           </h2>
           
           {project.title === "EMIVO" || project.id === "emivo" ? (
             <>
-              <div className="space-y-4">
-                <h3 className="font-semibold text-base text-cyan-400 flex items-center gap-2">
+              <div className="space-y-3">
+                <h3 className="font-semibold text-base flex items-center gap-2" style={{ color: 'var(--accent)' }}>
                   <span>1. Enterprise Architecture &amp; System Vision</span>
                 </h3>
-                <p className={`text-xs md:text-sm font-light leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                <p style={{ fontSize: '0.9375rem', color: 'var(--muted)', lineHeight: 1.6 }}>
                   <strong>EMIVO</strong> is an AI-native, enterprise-grade eCommerce SaaS platform engineered to streamline digital retail for startups, SMEs, and enterprise merchants. Built on a modular microservices pattern with FastAPI, PostgreSQL, and Supabase, EMIVO decouples storefront delivery from back-office management, combining instant checkout speeds with real-time inventory synchronization across multi-tenant deployments.
                 </p>
               </div>
 
-              <div className="space-y-4">
-                <h3 className="font-semibold text-base text-cyan-400 flex items-center gap-2">
+              <div className="space-y-3">
+                <h3 className="font-semibold text-base flex items-center gap-2" style={{ color: 'var(--accent)' }}>
                   <span>2. Intelligent Automation &amp; AI-Driven Features</span>
                 </h3>
-                <p className={`text-xs md:text-sm font-light leading-relaxed mb-3 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                  The platform embeds 10+ intelligent AI capabilities across store management and customer engagement:
-                </p>
-                <ul className={`list-disc pl-5 text-xs md:text-sm font-light leading-relaxed space-y-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                <ul className="list-disc pl-5 space-y-2 text-sm" style={{ color: 'var(--muted)', lineHeight: 1.6 }}>
                   <li><strong>Conversational Shopping Assistants:</strong> RAG-driven shopping co-pilots utilizing <strong>Qdrant</strong> vector embeddings for real-time natural language product discovery.</li>
-                  <li><strong>Automated Content &amp; Catalog Generation:</strong> Multi-LLM pipelines (OpenAI, Gemini, Groq) that generate high-converting product descriptions, tags, and marketing assets.</li>
-                  <li><strong>Smart Vector Search:</strong> Hybrid BM25 and vector semantic search powered by Qdrant to understand customer search intent, synonyms, and complex filters.</li>
+                  <li><strong>Automated Content &amp; Catalog Generation:</strong> Multi-LLM pipelines (OpenAI, Gemini, Groq) generating high-converting descriptions, tags, and SEO metadata.</li>
+                  <li><strong>Smart Vector Search:</strong> Hybrid BM25 and vector semantic search powered by Qdrant to understand customer intent, synonyms, and multi-parameter filters.</li>
                   <li><strong>Automated Order &amp; Inventory Management:</strong> Event-driven WebSocket streams monitoring stock thresholds, supplier orders, and payment webhooks via Stripe.</li>
                 </ul>
               </div>
 
-              <div className="space-y-4">
-                <h3 className="font-semibold text-base text-cyan-400 flex items-center gap-2">
+              <div className="space-y-3">
+                <h3 className="font-semibold text-base flex items-center gap-2" style={{ color: 'var(--accent)' }}>
                   <span>3. Cloud-Native Infrastructure &amp; Production Security</span>
                 </h3>
-                <ul className={`list-disc pl-5 text-xs md:text-sm font-light leading-relaxed space-y-2.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                  <li><strong>Containerized Microservices:</strong> Deployed with <strong>Docker Compose</strong> and reverse-proxied via <strong>Nginx</strong> for horizontal scalability and zero-downtime rolling updates.</li>
-                  <li><strong>High-Performance In-Memory Cache:</strong> Integrated <strong>Redis</strong> caching layer to guarantee sub-2-second AI response times under concurrent traffic.</li>
-                  <li><strong>Security &amp; Multi-Tenancy:</strong> Enterprise-grade security featuring JWT token authentication, Cloudflare DDoS shielding, and isolated tenant data partitions.</li>
+                <ul className="list-disc pl-5 space-y-2 text-sm" style={{ color: 'var(--muted)', lineHeight: 1.6 }}>
+                  <li><strong>Containerized Microservices:</strong> Deployed with <strong>Docker Compose</strong> and reverse-proxied via <strong>Nginx</strong> for horizontal scalability and zero-downtime updates.</li>
+                  <li><strong>High-Performance In-Memory Cache:</strong> Integrated <strong>Redis</strong> layer to guarantee sub-2-second AI responses under heavy concurrent loads.</li>
+                  <li><strong>Security &amp; Multi-Tenancy:</strong> Enterprise-grade security featuring JWT token authentication, Cloudflare DDoS shielding, and isolated tenant partitions.</li>
                 </ul>
               </div>
             </>
           ) : (
             <>
-              <div className="space-y-6">
-                <h3 className="font-semibold text-base text-[#007AFF]">1. Engineering Objective &amp; Problem Statement</h3>
-                <p className={`text-xs md:text-sm font-light leading-relaxed ${isDark ? 'text-slate-350' : 'text-slate-655'}`}>
+              <div className="space-y-3">
+                <h3 className="font-semibold text-base" style={{ color: 'var(--accent)' }}>
+                  1. Engineering Objective &amp; Problem Statement
+                </h3>
+                <p style={{ fontSize: '0.9375rem', color: 'var(--muted)', lineHeight: 1.6 }}>
                   The implementation addresses critical issues in distributed environments, such as high database transaction latency, data consistency errors during high concurrent spikes, and integration barriers when building AI agent systems. By using event-driven architectures, low-latency API layers, and intelligent orchestration models, this framework ensures production stability at scale.
                 </p>
               </div>
 
-              <div className="space-y-6">
-                <h3 className="font-semibold text-base text-[#007AFF]">2. Architecture Design</h3>
-                <p className={`text-xs md:text-sm font-light leading-relaxed ${isDark ? 'text-slate-350' : 'text-slate-655'}`}>
+              <div className="space-y-3">
+                <h3 className="font-semibold text-base" style={{ color: 'var(--accent)' }}>
+                  2. Architecture Design
+                </h3>
+                <p style={{ fontSize: '0.9375rem', color: 'var(--muted)', lineHeight: 1.6 }}>
                   The backend leverages a lightweight, asynchronous containerized architecture deployed on high-availability cloud platforms. WebSockets support bidirectional communication, and data streaming loops are processed in parallel configurations. RAG modules query high-dimensional vector databases, and indexing maps ensure near-instant metadata extraction.
                 </p>
               </div>
 
-              <div className="space-y-6">
-                <h3 className="font-semibold text-base text-[#007AFF]">3. Key Challenges &amp; Resolution</h3>
-                <ul className={`list-disc pl-5 text-xs md:text-sm font-light leading-relaxed space-y-2.5 ${isDark ? 'text-slate-350' : 'text-slate-655'}`}>
+              <div className="space-y-3">
+                <h3 className="font-semibold text-base" style={{ color: 'var(--accent)' }}>
+                  3. Key Challenges &amp; Resolution
+                </h3>
+                <ul className="list-disc pl-5 space-y-2 text-sm" style={{ color: 'var(--muted)', lineHeight: 1.6 }}>
                   <li><strong>Cold Start Latency:</strong> Optimized container scaling rules and memory boundaries to achieve faster boot responses.</li>
                   <li><strong>Database Lockups:</strong> Structured indices and query parameters to avoid full-table scans.</li>
                   <li><strong>Context Window Management:</strong> Built dynamic context token packing algorithms to limit processing costs in LLM retrieval tasks.</li>

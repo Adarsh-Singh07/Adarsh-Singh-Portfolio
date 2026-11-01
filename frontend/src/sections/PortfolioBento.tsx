@@ -50,8 +50,8 @@ export default function PortfolioBento({ projects, certifications, currentMode, 
         {/* Section Header */}
         <div className="mb-16 text-left max-w-3xl">
           <div className="flex items-center gap-2 mb-3">
-            <span className="w-8 h-[1px] bg-[#007AFF]" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#007AFF]">
+            <span className="w-8 h-[1px] bg-[#ff3b1d]" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#ff3b1d]">
               Curation & Engineering Systems
             </span>
           </div>
@@ -78,13 +78,13 @@ export default function PortfolioBento({ projects, certifications, currentMode, 
             }`}
           >
             {/* Soft decorative background asset */}
-            <div className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full filter blur-[100px] opacity-20 pointer-events-none bg-[#007AFF]/25" />
+            <div className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full filter blur-[100px] opacity-20 pointer-events-none bg-[#ff3b1d]/25" />
 
             <div className="flex flex-col h-full justify-between relative z-10">
               <div>
                 <div className="flex items-center justify-between gap-4 mb-5">
                   <span className={`px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase ${
-                    isDark ? 'bg-[#007AFF]/10 text-[#007AFF] border border-[#007AFF]/20' : 'bg-[#007AFF]/5 text-[#007AFF] border border-[#007AFF]/10'
+                    isDark ? 'bg-[#ff3b1d]/10 text-[#ff3b1d] border border-[#ff3b1d]/20' : 'bg-[#ff3b1d]/5 text-[#ff3b1d] border border-[#ff3b1d]/10'
                   }`}>
                     Spotlight Engineering System
                   </span>
@@ -143,7 +143,7 @@ export default function PortfolioBento({ projects, certifications, currentMode, 
                   target="_blank" 
                   rel="noreferrer"
                   className={`text-xs font-bold uppercase tracking-widest flex items-center gap-1.5 transform hover:scale-102 transition-transform duration-300 ${
-                    isDark ? 'text-white hover:text-[#007AFF]' : 'text-neutral-900 hover:text-[#007AFF]'
+                    isDark ? 'text-white hover:text-[#ff3b1d]' : 'text-neutral-900 hover:text-[#ff3b1d]'
                   }`}
                 >
                   <span>Build Architecture / Case Study</span>
@@ -165,7 +165,7 @@ export default function PortfolioBento({ projects, certifications, currentMode, 
             <div className="flex flex-col h-full justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <Layers className="w-4 h-4 text-[#007AFF]" />
+                  <Layers className="w-4 h-4 text-[#ff3b1d]" />
                   <span className={`text-[10px] uppercase font-sans tracking-widest font-bold ${
                     isDark ? 'text-white/40' : 'text-neutral-400'
                   }`}>
@@ -224,7 +224,7 @@ export default function PortfolioBento({ projects, certifications, currentMode, 
             <div className="flex flex-col h-full justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <Briefcase className="w-4 h-4 text-[#007AFF]" />
+                  <Briefcase className="w-4 h-4 text-[#ff3b1d]" />
                   <span className={`text-[10px] uppercase font-sans tracking-widest font-bold ${
                     isDark ? 'text-white/40' : 'text-neutral-400'
                   }`}>
@@ -234,7 +234,7 @@ export default function PortfolioBento({ projects, certifications, currentMode, 
 
                 <div className="mb-4">
                   <h4 className="text-lg font-bold font-sans tracking-tight">Capgemini</h4>
-                  <span className="text-xs block font-serif italic text-[#007AFF]">
+                  <span className="text-xs block font-serif italic text-[#ff3b1d]">
                     Analyst – AI & Data Engineering
                   </span>
                 </div>
@@ -263,7 +263,7 @@ export default function PortfolioBento({ projects, certifications, currentMode, 
             <div className="flex flex-col h-full justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <Award className="w-4 h-4 text-[#007AFF]" />
+                  <Award className="w-4 h-4 text-[#ff3b1d]" />
                   <span className={`text-[10px] uppercase font-sans tracking-widest font-bold ${
                     isDark ? 'text-white/40' : 'text-neutral-400'
                   }`}>
@@ -291,7 +291,7 @@ export default function PortfolioBento({ projects, certifications, currentMode, 
                       <div className="flex items-center justify-between mt-2 pt-2 border-t border-dashed border-white/5">
                         <span className={`text-[10px] font-serif italic ${isDark ? 'text-white/30' : 'text-neutral-400'}`}>{cert.issuer}</span>
                         <span className={`text-[10px] font-sans font-bold tracking-wider px-2 py-0.5 rounded ${
-                          isDark ? 'bg-white/10 text-[#007AFF]' : 'bg-slate-200 text-[#007AFF]'
+                          isDark ? 'bg-white/10 text-[#ff3b1d]' : 'bg-slate-200 text-[#ff3b1d]'
                         }`}>
                           {cert.date}
                         </span>
@@ -323,16 +323,16 @@ export default function PortfolioBento({ projects, certifications, currentMode, 
                 layout
                 className={`group p-6 md:p-7 rounded-[32px] border flex flex-col justify-between transition-all duration-500 transform hover:-translate-y-1 ${
                   isDark 
-                    ? 'bg-[#151515]/60 hover:bg-[#151515] border-white/5 hover:border-[#007AFF]/30 hover:shadow-[0_20px_40px_rgba(0,122,255,0.15)]' 
-                    : 'bg-white hover:bg-[#FDFBF7] border-neutral-200/60 hover:border-[#007AFF]/20 hover:shadow-lg'
+                    ? 'bg-[#151515]/60 hover:bg-[#151515] border-white/5 hover:border-[#ff3b1d]/30 hover:shadow-[0_20px_40px_rgba(255,59,29,0.15)]' 
+                    : 'bg-white hover:bg-[#FDFBF7] border-neutral-200/60 hover:border-[#ff3b1d]/20 hover:shadow-lg'
                 }`}
               >
                 <div>
                   <div className="flex items-center justify-between mb-5">
                     <span className={`text-[9px] uppercase font-sans tracking-widest px-2.5 py-1 rounded-full font-bold ${
                       isDark 
-                        ? proj.status === 'Deployed' ? 'bg-[#007AFF]/10 text-[#007AFF]' : 'bg-amber-500/10 text-amber-400'
-                        : proj.status === 'Deployed' ? 'bg-[#007AFF]/5 text-[#007AFF]' : 'bg-amber-50 text-amber-700'
+                        ? proj.status === 'Deployed' ? 'bg-[#ff3b1d]/10 text-[#ff3b1d]' : 'bg-amber-500/10 text-amber-400'
+                        : proj.status === 'Deployed' ? 'bg-[#ff3b1d]/5 text-[#ff3b1d]' : 'bg-amber-50 text-amber-700'
                     }`}>
                       {proj.status}
                     </span>
@@ -341,7 +341,7 @@ export default function PortfolioBento({ projects, certifications, currentMode, 
                     </span>
                   </div>
 
-                  <h4 className="text-xl font-semibold font-sans tracking-tight mb-2.5 transition-colors group-hover:text-[#007AFF]">
+                  <h4 className="text-xl font-semibold font-sans tracking-tight mb-2.5 transition-colors group-hover:text-[#ff3b1d]">
                     {proj.title}
                   </h4>
 
@@ -369,7 +369,7 @@ export default function PortfolioBento({ projects, certifications, currentMode, 
                   <div className="flex gap-4">
                     {proj.metrics.slice(0, 1).map((m) => (
                       <div key={m.label}>
-                        <span className="text-lg font-serif italic font-medium block text-[#007AFF] text-glow-blue">{m.value}</span>
+                        <span className="text-lg font-serif italic font-medium block text-[#ff3b1d] text-glow-blue">{m.value}</span>
                         <span className={`text-[9px] uppercase font-sans tracking-widest block ${isDark ? 'text-white/30' : 'text-neutral-400'}`}>{m.label}</span>
                       </div>
                     ))}
@@ -380,7 +380,7 @@ export default function PortfolioBento({ projects, certifications, currentMode, 
                     target="_blank"
                     rel="noreferrer"
                     className={`p-2.5 rounded-full cursor-pointer transition-colors ${
-                      isDark ? 'bg-white/5 text-white hover:bg-[#007AFF]/25' : 'bg-slate-100 text-slate-800 hover:bg-slate-200'
+                      isDark ? 'bg-white/5 text-white hover:bg-[#ff3b1d]/25' : 'bg-slate-100 text-slate-800 hover:bg-slate-200'
                     }`}
                   >
                     <ExternalLink className="w-3.5 h-3.5" />

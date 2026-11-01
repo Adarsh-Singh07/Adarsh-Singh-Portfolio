@@ -68,8 +68,8 @@ export default function AnimatedOrb({ isDark }: AnimatedOrbProps) {
   const getDynamicGlowClass = () => {
     if (!isHovered) {
       return isDark 
-        ? 'from-[#007AFF]/20 via-[#5AC8FA]/10 to-transparent opacity-25'
-        : 'from-[#007AFF]/30 via-slate-100 to-transparent opacity-25';
+        ? 'from-[#ff3b1d]/20 via-[#5AC8FA]/10 to-transparent opacity-25'
+        : 'from-[#ff3b1d]/30 via-slate-100 to-transparent opacity-25';
     }
     if (activeSector === 'SYS_SECTOR: EAST') {
       return 'from-pink-500 via-[#8A2BE2] to-transparent opacity-60 scale-[1.3]';
@@ -171,7 +171,7 @@ export default function AnimatedOrb({ isDark }: AnimatedOrbProps) {
                 ? 'bg-gradient-to-br from-neutral-700 via-[#1A0B2E] to-black border-2 border-[#00E5FF]/60 shadow-[inset_0_8px_32px_rgba(255,255,255,0.4),0_0_45px_rgba(0,229,255,0.5)]'
                 : 'bg-gradient-to-br from-neutral-800 via-slate-950 to-black border border-white/20 shadow-[inset_0_8px_32px_rgba(255,255,255,0.15)]' 
               : isHovered
-                ? 'bg-gradient-to-br from-white via-[#E8F0FE] to-neutral-200 border-2 border-[#007AFF]/60 shadow-[inset_0_12px_44px_rgba(255,255,255,1),0_15px_35px_rgba(0,122,255,0.3)]'
+                ? 'bg-gradient-to-br from-white via-[#E8F0FE] to-neutral-200 border-2 border-[#ff3b1d]/60 shadow-[inset_0_12px_44px_rgba(255,255,255,1),0_15px_35px_rgba(255,59,29,0.3)]'
                 : 'bg-gradient-to-br from-white via-slate-100 to-neutral-200 border border-black/10 shadow-[inset_0_12px_44px_rgba(255,255,255,1),0_15px_30px_rgba(0,0,0,0.06)]'
           }`}
         >
@@ -192,7 +192,7 @@ export default function AnimatedOrb({ isDark }: AnimatedOrbProps) {
           />
           {/* Secondary micro light pulse */}
           <div 
-            className={`absolute bottom-[10%] right-[10%] w-[35%] h-[35%] rounded-full blur-[14px] bg-[#007AFF]/25 transition-all duration-500 ${
+            className={`absolute bottom-[10%] right-[10%] w-[35%] h-[35%] rounded-full blur-[14px] bg-[#ff3b1d]/25 transition-all duration-500 ${
               isHovered ? 'scale-125 bg-[#00E5FF]/45' : 'animate-[glow-pulse_5s_ease-in-out_infinite]'
             }`}
           />
@@ -230,7 +230,7 @@ export default function AnimatedOrb({ isDark }: AnimatedOrbProps) {
             isHovered
               ? isDark 
                 ? 'animate-[spin-reverse_2s_linear_infinite] border-[#00E5FF] bg-white/[0.08] shadow-[0_0_35px_rgba(0,229,255,0.6),inset_0_0_15px_rgba(0,229,255,0.35)]' 
-                : 'animate-[spin-reverse_2s_linear_infinite] border-[#007AFF] bg-black/[0.04]'
+                : 'animate-[spin-reverse_2s_linear_infinite] border-[#ff3b1d] bg-black/[0.04]'
               : isDark 
                 ? 'animate-[spin-reverse_35s_linear_infinite] border-white/10 bg-white/[0.01]' 
                 : 'border-neutral-900/10 bg-black/[0.005] animate-[spin-reverse_35s_linear_infinite]'
@@ -250,7 +250,7 @@ export default function AnimatedOrb({ isDark }: AnimatedOrbProps) {
             isHovered
               ? isDark 
                 ? 'animate-[spin-slow_2.5s_linear_infinite] border-pink-400 shadow-[0_0_40px_rgba(244,63,94,0.65),inset_0_0_20px_rgba(244,63,94,0.35)]' 
-                : 'animate-[spin-slow_2.5s_linear_infinite] border-[#007AFF] bg-white/[0.02]'
+                : 'animate-[spin-slow_2.5s_linear_infinite] border-[#ff3b1d] bg-white/[0.02]'
               : isDark 
                 ? 'animate-[spin-slow_45s_linear_infinite] border-sky-500/20' 
                 : 'border-slate-400/30 animate-[spin-slow_45s_linear_infinite]'

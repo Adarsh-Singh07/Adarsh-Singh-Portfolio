@@ -67,7 +67,7 @@ export default class ErrorBoundary extends React.Component<
           <div className="flex items-center justify-center gap-3">
             <button
               onClick={() => this.setState({ hasError: false, message: '' })}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#007AFF] hover:bg-[#007AFF]/90 text-white text-xs font-semibold cursor-pointer transition-colors"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#ff3b1d] hover:bg-[#ff3b1d]/90 text-white text-xs font-semibold cursor-pointer transition-colors"
             >
               <RotateCcw className="w-4 h-4" />
               <span>Try again</span>

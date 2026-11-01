@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { ArrowLeft, Calendar, Clock, Edit } from 'lucide-react';
+import { ArrowLeft, Edit } from 'lucide-react';
 import { BlogNote, ProfileMode } from '../types';
 import SEO from '../components/SEO';
 import DetailEditModal from '../components/DetailEditModal';
 import PortfolioService from '../services/api';
 
-// New Blog Components
+// Blog Components
 import MarkdownRenderer from '../components/blog/MarkdownRenderer';
 import ArticleFooter from '../components/blog/Footer/ArticleFooter';
 import RelatedArticles from '../components/blog/RelatedArticles';
@@ -24,20 +24,17 @@ import { readingStore, useReadingState } from '../store/readingStore';
 interface BlogDetailProps {
   blogs: BlogNote[];
   currentMode?: ProfileMode;
-  isDark: boolean;
+  isDark?: boolean;
   onRefreshData?: () => void;
 }
 
-
-
-export default function BlogDetail({ blogs, currentMode = 'general', isDark, onRefreshData }: BlogDetailProps) {
+export default function BlogDetail({ blogs, currentMode = 'general', onRefreshData }: BlogDetailProps) {
   const { blogId } = useParams<{ blogId: string }>();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Resolve the active article from the backend-provided blog list (single source of truth).
+  // Resolve active article from backend-provided blog list
   const activeBlog: BlogNote | null = (Array.isArray(blogs) ? blogs : []).find(b => b.id === blogId) || null;
-
   const { isFocusMode } = useReadingState();
 
   const token = sessionStorage.getItem('admin-token') || localStorage.getItem('admin-token');
@@ -45,15 +42,35 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
 
   if (!activeBlog) {
     return (
-      <div className={`min-h-screen py-32 px-6 flex flex-col items-center justify-center text-center transition-colors duration-200 ${
-        isDark ? 'bg-[#121212] text-white' : 'bg-[#FDFBF7] text-neutral-900'
-      }`}>
-        <span className="text-sm font-mono text-red-500 mb-2">Error 404</span>
-        <h1 className="text-3xl font-bold font-sans mb-4">Article Not Found</h1>
-        <p className="text-sm opacity-60 mb-6 max-w-sm">The article you are looking for does not exist or has been archived.</p>
+      <div
+        className="min-h-screen py-32 px-6 flex flex-col items-center justify-center text-center"
+        style={{
+          backgroundColor: 'var(--background)',
+          color: 'var(--foreground)',
+        }}
+      >
+        <span className="text-sm font-mono text-[#ff3b1d] mb-2 uppercase tracking-widest">Error 404</span>
+        <h1
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '3rem',
+            textTransform: 'uppercase',
+            letterSpacing: '-0.01em',
+          }}
+          className="mb-4"
+        >
+          Article Not Found
+        </h1>
+        <p className="text-sm mb-6 max-w-sm" style={{ color: 'var(--muted)' }}>
+          The article you are looking for does not exist or has been archived.
+        </p>
         <Link 
           to="/blog" 
-          className="px-5 py-2.5 bg-[#007AFF] hover:bg-[#007AFF]/90 text-white rounded-full flex items-center gap-2 text-xs font-semibold"
+          className="px-6 py-3 rounded-full flex items-center gap-2 text-xs font-semibold uppercase tracking-wider transition-all duration-300"
+          style={{
+            backgroundColor: 'var(--accent)',
+            color: '#08080a',
+          }}
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Return to Blog</span>
@@ -64,7 +81,6 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
 
   React.useEffect(() => {
     if (activeBlog?.content) {
-      // Parse headings directly from markdown to guarantee stability and bypass DOM rendering issues
       const extractHeadings = (markdown: string) => {
         const extracted: any[] = [];
         const lines = markdown.split('\n');
@@ -174,12 +190,10 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
     }
   };
 
-  // Calculate actual reading time
   const wordCount = activeBlog.content?.trim().split(/\s+/).length || 0;
   const calculatedReadTime = Math.max(1, Math.ceil(wordCount / 200)) + ' min read';
   const displayReadTime = activeBlog.readTime || calculatedReadTime;
 
-  // Construct JSON-LD Schemas
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -212,16 +226,19 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
     }
   };
 
-  // Related Articles / search across the backend blog list.
   const safeBlogs = Array.isArray(blogs) ? blogs : [];
   const allArticlesList = safeBlogs.map(b => ({
     id: b.id, title: b.title, excerpt: b.excerpt, date: b.date, category: b.category, tags: b.tags, difficulty: b.difficulty
   }));
 
   return (
-    <div className={`min-h-screen transition-colors duration-200 ${
-      isDark ? 'bg-[#121212] text-white' : 'bg-[#FDFBF7] text-neutral-900'
-    }`}>
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundColor: 'var(--background)',
+        color: 'var(--foreground)',
+      }}
+    >
       <SEO 
         title={`${activeBlog.title} | Adarsh Singh`}
         description={activeBlog.excerpt}
@@ -230,37 +247,44 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
         schema={[breadcrumbSchema, blogPostingSchema]}
       />
 
-      <StickyHeader article={activeBlog} isDark={isDark} />
+      <StickyHeader article={activeBlog} isDark={true} />
       <ReadingMemory articleId={activeBlog.id} version={activeBlog.version} />
-      <ArticleSearch isDark={isDark} allArticles={allArticlesList} />
+      <ArticleSearch isDark={true} allArticles={allArticlesList} />
 
-      <div className={`pt-32 pb-24 px-6 md:px-12 max-w-[1200px] mx-auto w-full flex flex-col xl:flex-row gap-16 relative transition-all duration-500 ease-out ${isFocusMode ? 'justify-center' : ''}`}>
+      <div
+        className={`pt-32 pb-24 max-w-[1200px] mx-auto w-full flex flex-col xl:flex-row gap-16 relative transition-all duration-500 ease-out ${
+          isFocusMode ? 'justify-center' : ''
+        }`}
+        style={{
+          paddingLeft: 'var(--gutter)',
+          paddingRight: 'var(--gutter)',
+        }}
+      >
         {/* Main Content Area */}
         <div className={`flex-1 max-w-[820px] w-full transition-all duration-500 mx-auto ${isFocusMode ? 'xl:mx-auto' : 'xl:mx-0'}`}>
           {/* Navigation Row */}
           <div className="mb-12 flex justify-between items-center">
             <Link 
               to="/blog" 
-              className={`flex items-center gap-2 text-sm font-medium cursor-pointer transition-colors ${
-                isDark ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'
-              }`}
+              className="flex items-center gap-2 text-sm font-medium cursor-pointer transition-colors"
+              style={{ color: 'var(--muted)' }}
             >
-              <ArrowLeft className="w-4 h-4 text-[#007AFF]" />
-              <span>Blog</span>
+              <ArrowLeft className="w-4 h-4 text-[#ff3b1d]" />
+              <span>Back to Articles</span>
             </Link>
 
             <div className="flex items-center gap-3">
               <button
                 onClick={() => readingStore.toggleFocusMode()}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                  isFocusMode 
-                    ? 'bg-[#007AFF] text-white shadow-[0_0_15px_rgba(0,122,255,0.4)]' 
-                    : isDark ? 'bg-white/5 hover:bg-white/10 text-slate-300' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
-                }`}
+                className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer"
+                style={{
+                  backgroundColor: isFocusMode ? 'var(--accent)' : 'var(--surface)',
+                  color: isFocusMode ? '#08080a' : 'var(--foreground)',
+                  border: '1px solid var(--line)',
+                }}
                 aria-label={isFocusMode ? "Exit Focus Mode" : "Enter Focus Mode"}
                 title={isFocusMode ? "Exit Focus Mode (Esc)" : "Enter Focus Mode (Shift+F)"}
               >
-                {/* Maximize icon from lucide-react (we can just import it) */}
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   {isFocusMode ? (
                     <>
@@ -284,7 +308,11 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
               {isAdmin && (
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full flex items-center gap-1.5 text-xs font-semibold shadow-glow cursor-pointer transition-colors"
+                  className="px-4 py-2 rounded-full flex items-center gap-1.5 text-xs font-semibold cursor-pointer transition-colors"
+                  style={{
+                    backgroundColor: 'var(--accent)',
+                    color: '#08080a',
+                  }}
                 >
                   <Edit className="w-3.5 h-3.5" />
                   <span>Edit</span>
@@ -294,41 +322,56 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
           </div>
 
           {/* Article Header */}
-          <header className="mb-16 flex flex-col items-start text-left">
-            <div className="flex items-center gap-3 mb-6">
-              {activeBlog.logoUrl && (
-                <div 
-                  className="w-10 h-10 rounded-lg flex items-center justify-center border shadow-sm p-2"
-                  style={{ 
-                    backgroundColor: `${activeBlog.brandColor || '#007AFF'}15`,
-                    borderColor: `${activeBlog.brandColor || '#007AFF'}25`
-                  }}
-                >
-                  <img src={activeBlog.logoUrl} alt={activeBlog.category} className="w-full h-full object-contain" />
-                </div>
-              )}
-              <span className="text-[#007AFF] font-mono text-sm tracking-wider font-semibold uppercase">
-                {activeBlog.category}
-              </span>
+          <header className="mb-14 flex flex-col items-start text-left">
+            <div className="eyebrow mb-4">
+              <span className="eyebrow-dot" />
+              <span>{activeBlog.category}</span>
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.1] mb-6 max-w-3xl">
+            <h1
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 'clamp(2.5rem, 5vw, 4.25rem)',
+                textTransform: 'uppercase',
+                letterSpacing: '-0.01em',
+                lineHeight: 0.95,
+              }}
+              className="mb-6 max-w-3xl"
+            >
               {activeBlog.title}
             </h1>
             
-            <p className={`text-xl font-light leading-relaxed mb-8 max-w-2xl ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p
+              style={{
+                color: 'var(--muted)',
+                fontSize: '1.25rem',
+                lineHeight: 1.5,
+              }}
+              className="mb-8 max-w-2xl"
+            >
               {activeBlog.excerpt}
             </p>
 
             <div className="flex items-center gap-4 text-sm font-medium">
               <div className="flex items-center gap-3">
-                <div className="relative w-10 h-10 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden border border-slate-300 dark:border-white/20 flex items-center justify-center">
-                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400">AS</span>
-                  <img src="/api/v1/portfolio/assets/avatar.jpg" alt="Adarsh Singh" className="absolute inset-0 w-full h-full object-cover z-10" onError={(e) => e.currentTarget.style.display = 'none'} />
+                <div
+                  className="relative w-10 h-10 rounded-full overflow-hidden border flex items-center justify-center"
+                  style={{
+                    borderColor: 'var(--line)',
+                    backgroundColor: 'var(--surface-2)',
+                  }}
+                >
+                  <span className="text-xs font-bold text-neutral-400">AS</span>
+                  <img
+                    src="/assets/hero/adarsh-avatar.png"
+                    alt="Adarsh Singh"
+                    className="absolute inset-0 w-full h-full object-cover z-10"
+                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                  />
                 </div>
                 <div className="flex flex-col text-left">
-                  <span className={isDark ? 'text-white' : 'text-slate-900'}>Adarsh Singh</span>
-                  <div className={`flex items-center gap-2 text-xs ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>
+                  <span style={{ color: 'var(--foreground)' }}>Adarsh Singh</span>
+                  <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--muted)' }}>
                     <time dateTime={activeBlog.date}>{activeBlog.date}</time>
                     {activeBlog.lastUpdated && (
                       <span className="hidden sm:inline"> (Updated {activeBlog.lastUpdated})</span>
@@ -338,13 +381,16 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
                     {activeBlog.difficulty && (
                       <>
                         <span>·</span>
-                        <span className={`px-1.5 py-0.5 rounded-sm border ${
-                          activeBlog.difficulty === 'Advanced' 
-                            ? 'text-rose-500 border-rose-500/20 bg-rose-500/10' 
-                            : activeBlog.difficulty === 'Intermediate'
-                            ? 'text-amber-500 border-amber-500/20 bg-amber-500/10'
-                            : 'text-emerald-500 border-emerald-500/20 bg-emerald-500/10'
-                        }`}>{activeBlog.difficulty}</span>
+                        <span
+                          className="px-2 py-0.5 rounded-full border text-[10px] font-mono"
+                          style={{
+                            color: 'var(--accent)',
+                            borderColor: 'rgba(255, 59, 29, 0.3)',
+                            backgroundColor: 'rgba(255, 59, 29, 0.08)',
+                          }}
+                        >
+                          {activeBlog.difficulty}
+                        </span>
                       </>
                     )}
                   </div>
@@ -354,10 +400,10 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
           </header>
 
           {/* Tags */}
-          <TagList tags={activeBlog.tags} isDark={isDark} />
+          <TagList tags={activeBlog.tags} isDark={true} />
 
           {/* Markdown Content */}
-          <MarkdownRenderer content={activeBlog.content} title={activeBlog.title} isDark={isDark} />
+          <MarkdownRenderer content={activeBlog.content} title={activeBlog.title} isDark={true} />
 
           {!isFocusMode && (
             <motion.div
@@ -365,20 +411,20 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
             >
-              <ArticleFooter article={activeBlog} isDark={isDark} />
+              <ArticleFooter article={activeBlog} isDark={true} />
               <RelatedArticles 
                 currentArticleId={activeBlog.id} 
                 category={activeBlog.category} 
                 allArticles={allArticlesList} 
-                isDark={isDark} 
+                isDark={true} 
               />
             </motion.div>
           )}
         </div>
 
         {/* Sidebar TOC & Mobile FAB */}
-        <TableOfContents isDark={isDark} />
-        <MobileBottomSheet article={activeBlog} isDark={isDark} />
+        <TableOfContents isDark={true} />
+        <MobileBottomSheet article={activeBlog} isDark={true} />
       </div>
 
       {isAdmin && (
@@ -390,7 +436,7 @@ export default function BlogDetail({ blogs, currentMode = 'general', isDark, onR
           item={activeBlog}
           type="blog"
           isAdmin={isAdmin}
-          isDark={isDark}
+          isDark={true}
         />
       )}
     </div>

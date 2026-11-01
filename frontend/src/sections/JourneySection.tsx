@@ -35,8 +35,8 @@ export default function JourneySection({ journey, blogs, currentMode, philosophy
         {/* Step 4 Section Title */}
         <div className="mb-16 text-left max-w-3xl">
           <div className="flex items-center gap-2 mb-3">
-            <span className="w-8 h-[1px] bg-[#007AFF]" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#007AFF]">
+            <span className="w-8 h-[1px] bg-[#ff3b1d]" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#ff3b1d]">
               Origin Story & Continuous Growth
             </span>
           </div>
@@ -56,7 +56,7 @@ export default function JourneySection({ journey, blogs, currentMode, philosophy
             
             {/* Draw Horizontal Connecting Line */}
             <div className={`absolute top-1/2 left-0 right-0 h-[2px] z-0 -translate-y-1/2 ${
-              isDark ? 'bg-gradient-to-r from-[#007AFF]/10 via-[#007AFF]/30 to-transparent' : 'bg-gradient-to-r from-slate-200 via-slate-350 to-slate-200'
+              isDark ? 'bg-gradient-to-r from-[#ff3b1d]/10 via-[#ff3b1d]/30 to-transparent' : 'bg-gradient-to-r from-slate-200 via-slate-350 to-slate-200'
             }`} />
 
             {journey.map((item, index) => {
@@ -69,8 +69,8 @@ export default function JourneySection({ journey, blogs, currentMode, philosophy
                   className={`w-[260px] md:w-[320px] p-6 rounded-[28px] relative z-10 border transition-all duration-500 flex flex-col justify-between ${
                     isEmphasized
                       ? isDark 
-                        ? 'bg-[#151515] border-[#007AFF]/35 shadow-[0_15px_30px_rgba(0,122,255,0.15)]' 
-                        : 'bg-white border-[#007AFF]/30 shadow-[0_10px_25px_-5px_rgba(0,122,255,0.06)]'
+                        ? 'bg-[#151515] border-[#ff3b1d]/35 shadow-[0_15px_30px_rgba(255,59,29,0.15)]' 
+                        : 'bg-white border-[#ff3b1d]/30 shadow-[0_10px_25px_-5px_rgba(255,59,29,0.06)]'
                       : isDark
                         ? 'bg-[#121212]/90 border-white/5 hover:border-white/10'
                         : 'bg-[#FDFBF7]/80 border-slate-200/80 hover:border-slate-300'
@@ -79,7 +79,7 @@ export default function JourneySection({ journey, blogs, currentMode, philosophy
                   <div>
                     {/* Floating Step Badge */}
                     <div className="flex items-center justify-between gap-2 mb-4">
-                      <span className="text-[10px] font-serif italic font-bold text-[#007AFF]">
+                      <span className="text-[10px] font-serif italic font-bold text-[#ff3b1d]">
                         {item.era}
                       </span>
                       <span className={`text-[10px] font-sans font-bold tracking-wider ${isDark ? 'text-white/30' : 'text-neutral-400'}`}>
@@ -120,10 +120,10 @@ export default function JourneySection({ journey, blogs, currentMode, philosophy
             }`}>
               <div>
                 <div className="flex items-center justify-between gap-2 mb-4">
-                  <span className="text-[10px] font-serif italic font-bold text-[#007AFF]">
+                  <span className="text-[10px] font-serif italic font-bold text-[#ff3b1d]">
                     Vision
                   </span>
-                  <Target className="w-3.5 h-3.5 text-[#007AFF]" />
+                  <Target className="w-3.5 h-3.5 text-[#ff3b1d]" />
                 </div>
                 <h4 className="text-base font-semibold font-sans tracking-tight leading-snug mb-2">
                   Future Continuous
@@ -148,7 +148,7 @@ export default function JourneySection({ journey, blogs, currentMode, philosophy
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <BookOpen className="w-4 h-4 text-[#007AFF]" />
+                <BookOpen className="w-4 h-4 text-[#ff3b1d]" />
                 <h3 className="text-2xl font-sans font-semibold tracking-tight">Thoughts &amp; Engineering Notes</h3>
               </div>
               <p className={`text-sm font-light ${isDark ? 'text-white/50' : 'text-neutral-950/60'}`}>
@@ -156,7 +156,7 @@ export default function JourneySection({ journey, blogs, currentMode, philosophy
               </p>
             </div>
             <span className={`text-[9px] font-sans tracking-widest uppercase block mt-4 md:mt-0 font-bold ${
-              isDark ? 'text-white/30' : 'text-[#007AFF]'
+              isDark ? 'text-white/30' : 'text-[#ff3b1d]'
             }`}>
               {currentMode === 'data-engineer' ? 'RECOMMENDING DATA PAPERS FIRST' : 'RECOMMENDING RAG THEORIES FIRST'}
             </span>
@@ -169,7 +169,7 @@ export default function JourneySection({ journey, blogs, currentMode, philosophy
                 layout
                 className={`p-6 md:p-8 rounded-[32px] border flex flex-col justify-between transition-all duration-400 hover:shadow-xl ${
                   isDark 
-                    ? 'bg-[#151515]/60 hover:bg-[#151515] border-white/5 hover:border-[#007AFF]/20' 
+                    ? 'bg-[#151515]/60 hover:bg-[#151515] border-white/5 hover:border-[#ff3b1d]/20' 
                     : 'bg-white border-slate-200/80 hover:border-slate-350'
                 }`}
               >
@@ -185,7 +185,7 @@ export default function JourneySection({ journey, blogs, currentMode, philosophy
                     </span>
                   </div>
 
-                  <h4 className="text-lg md:text-xl font-semibold font-sans tracking-tight mb-3 hover:text-[#007AFF] transition-colors">
+                  <h4 className="text-lg md:text-xl font-semibold font-sans tracking-tight mb-3 hover:text-[#ff3b1d] transition-colors">
                     <a href={post.url}>{post.title}</a>
                   </h4>
 
@@ -202,7 +202,7 @@ export default function JourneySection({ journey, blogs, currentMode, philosophy
                   </span>
                   <a 
                     href={post.url}
-                    className="text-xs font-bold uppercase tracking-widest flex items-center gap-1.5 transition-colors text-[#007AFF] hover:text-[#5AC8FA]"
+                    className="text-xs font-bold uppercase tracking-widest flex items-center gap-1.5 transition-colors text-[#ff3b1d] hover:text-[#5AC8FA]"
                   >
                     <span>Read Article</span>
                     <ArrowUpRight className="w-3.5 h-3.5" />
@@ -216,7 +216,7 @@ export default function JourneySection({ journey, blogs, currentMode, philosophy
         {/* --- LUXURY CINEMATIC QUOTE OR PHILOSOPHY WORDING --- */}
         <div className="mt-32 pt-16 border-t border-dashed border-white/5 text-center">
           <div className="max-w-3xl mx-auto px-4 select-none">
-            <span className="text-[10px] uppercase font-sans tracking-[0.2em] block mb-4 font-bold text-[#007AFF]">
+            <span className="text-[10px] uppercase font-sans tracking-[0.2em] block mb-4 font-bold text-[#ff3b1d]">
               Personal Creed
             </span>
             <blockquote className={`text-xl md:text-3xl font-serif font-light italic leading-relaxed tracking-wide ${

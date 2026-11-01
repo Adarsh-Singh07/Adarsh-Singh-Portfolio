@@ -17,10 +17,10 @@ export default function ArticleFooter({ article, isDark }: ArticleFooterProps) {
       
       {/* Completion Celebration */}
       <div className={`p-8 rounded-3xl flex flex-col items-center text-center mb-16 ${
-        isDark ? 'bg-gradient-to-b from-[#007AFF]/10 to-transparent' : 'bg-gradient-to-b from-[#007AFF]/5 to-transparent'
+        isDark ? 'bg-gradient-to-b from-[#ff3b1d]/10 to-transparent' : 'bg-gradient-to-b from-[#ff3b1d]/5 to-transparent'
       }`}>
-        <div className="w-16 h-16 rounded-full bg-[#007AFF]/10 flex items-center justify-center mb-6">
-          <Sparkles className="w-8 h-8 text-[#007AFF]" />
+        <div className="w-16 h-16 rounded-full bg-[#ff3b1d]/10 flex items-center justify-center mb-6">
+          <Sparkles className="w-8 h-8 text-[#ff3b1d]" />
         </div>
         <h2 className={`text-2xl font-bold mb-3 ${isDark ? 'text-white' : 'text-slate-900'}`}>
           You've finished this article!

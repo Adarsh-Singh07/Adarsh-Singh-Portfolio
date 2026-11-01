@@ -1,209 +1,114 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@1,500;1,600;1,700&family=JetBrains+Mono:wght@400;500&display=swap');
-@import url('https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css');
-@import url('https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark-dimmed.min.css');
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-/* Enable class-based dark mode instead of media queries for Tailwind v4 */
+/* Enable class-based dark mode for Tailwind v4 */
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Space Grotesk", sans-serif;
-  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  --font-sans: "Onest", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Anton", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
-  /* Custom high-luxury theme transitions and animations */
   --animate-float-slow: float-slow 8s ease-in-out infinite;
-  --animate-glow-pulse: glow-pulse 6s ease-in-out infinite;
-  --animate-spin-slow: spin-slow 20s linear infinite;
-  --animate-spin-reverse: spin-reverse 25s linear infinite;
+  --animate-marquee: marquee 22s linear infinite;
 
   @keyframes float-slow {
-    0%, 100% {
-      transform: translateY(0px) rotate(0deg);
-    }
-    50% {
-      transform: translateY(-12px) rotate(2deg);
-    }
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
   }
 
-  @keyframes glow-pulse {
-    0%, 100% {
-      opacity: 0.35;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.65;
-      transform: scale(1.08);
-    }
-  }
-
-  @keyframes spin-slow {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
-  @keyframes spin-reverse {
-    0% { transform: rotate(360deg); }
-    100% { transform: rotate(0deg); }
+  @keyframes marquee {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
   }
 }
 
-/* Custom elite utility layers */
+/* ─── Design Tokens ─── */
+:root {
+  --background: #08080a;
+  --foreground: #f3f1ea;
+  --surface: #111114;
+  --surface-2: #17171b;
+  --muted: #807f78;
+  --line: rgba(243, 241, 234, 0.1);
+  --line-strong: rgba(243, 241, 234, 0.22);
+  --accent: #ff3b1d;
+  --accent-2: #ff6a3d;
+  --gutter: 2.5rem;
+  --section: 9rem;
+  --font-display: "Anton", sans-serif;
+  --font-sans: "Onest", sans-serif;
+}
+
+/* ─── Adaptive Rem Grid ─── */
+html {
+  font-size: 16px;
+  background: var(--background);
+}
+
+@media (max-width: 1920px) {
+  html { font-size: 0.833333vw; }
+}
+@media (max-width: 1440px) {
+  html { font-size: 1.111111vw; }
+}
+@media (max-width: 1024px) {
+  html { font-size: 1.5625vw; }
+}
+@media (max-width: 640px) {
+  html { font-size: 4.444444vw; }
+  :root { --gutter: 16px; }
+}
+
+/* ─── CSS Reset & Base ─── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+img, video {
+  display: block;
+  max-width: 100%;
+}
+
+ul, ol { list-style: none; }
+
+button, a, input, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button { cursor: pointer; background: none; border: none; }
+a { text-decoration: none; }
+
 @layer base {
   html {
-    scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
   }
 
   body {
     font-family: var(--font-sans);
-    transition: background-color 0.5s ease, color 0.3s ease;
+    background: var(--background);
+    color: var(--foreground);
   }
 
-  /* Prestige system selection styling */
   ::selection {
-    background-color: #007AFF;
-    color: #ffffff;
+    background: var(--accent);
+    color: var(--background);
   }
 
-  /* Elegant minimal scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: rgba(140, 140, 140, 0.2);
-    border-radius: 99px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(140, 140, 140, 0.4);
-  }
+  /* Minimal scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(243, 241, 234, 0.1); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(243, 241, 234, 0.2); }
 }
 
-/* Luxury glass reflections */
-@layer utilities {
-  .glass-card-light {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.05);
-  }
-
-  .glass-card-dark {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.8);
-  }
-
-  .text-glow-blue {
-    text-shadow: 0 0 30px rgba(0, 122, 255, 0.4);
-  }
-
-  .text-gradient-gold {
-    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4f46e5 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .text-gradient-titanium {
-    background: linear-gradient(135deg, #111827 0%, #374151 50%, #6b7280 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .text-gradient-silver {
-    background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 50%, #4b5563 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-}
-
-@layer components {
-  .markdown-content {
-    @apply text-[19px] leading-[1.9] max-w-[820px] mx-auto font-sans;
-  }
-  
-  .markdown-content p {
-    @apply my-8;
-  }
-
-  .markdown-content h1 {
-    @apply text-4xl font-bold mt-16 mb-8 tracking-tight;
-  }
-
-  .markdown-content h2 {
-    @apply text-3xl font-bold mt-16 mb-8 tracking-tight scroll-mt-24 relative;
-  }
-
-  .markdown-content h3 {
-    @apply text-2xl font-semibold mt-12 mb-6 tracking-tight scroll-mt-24 relative;
-  }
-
-  .markdown-content h4 {
-    @apply text-xl font-semibold mt-8 mb-4 tracking-tight scroll-mt-24 relative;
-  }
-  
-  .markdown-content ul {
-    @apply list-disc pl-6 my-6 space-y-2;
-  }
-  
-  .markdown-content ol {
-    @apply list-decimal pl-6 my-6 space-y-2;
-  }
-
-  .markdown-content li::marker {
-    @apply text-slate-400 dark:text-slate-500;
-  }
-
-  /* Custom anchor links */
-  .anchor-link {
-    @apply opacity-0 transition-opacity absolute -left-6 pr-2 text-slate-400 no-underline hover:text-[#007AFF];
-  }
-  
-  .markdown-content h2:hover .anchor-link,
-  .markdown-content h3:hover .anchor-link,
-  .markdown-content h4:hover .anchor-link {
-    @apply opacity-100;
-  }
-  .anchor-link::before {
-    content: "#";
-  }
-
-  /* Math */
-  .katex-display {
-    @apply overflow-x-auto overflow-y-hidden py-4 my-6;
-  }
-
-  /* Custom horizontal scrollbar for blocks */
-  .custom-scrollbar::-webkit-scrollbar,
-  .katex-display::-webkit-scrollbar {
-    height: 8px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track,
-  .katex-display::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb,
-  .katex-display::-webkit-scrollbar-thumb {
-    background: rgba(140, 140, 140, 0.3);
-    border-radius: 99px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover,
-  .katex-display::-webkit-scrollbar-thumb:hover {
-    background: rgba(140, 140, 140, 0.5);
-  }
-}
-
-/* Lenis Smooth Scroll Core Rules */
+/* ─── Lenis Smooth Scroll ─── */
 html.lenis, html.lenis body {
   height: auto;
 }
@@ -224,3 +129,191 @@ html.lenis, html.lenis body {
   pointer-events: none;
 }
 
+/* ─── Reduced Motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  .preloader { display: none !important; }
+  .marquee-track { animation: none !important; }
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ─── Typography Scale Utilities ─── */
+@layer utilities {
+  .text-hero {
+    font-family: var(--font-display);
+    font-size: 11rem;
+    line-height: 0.78;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+
+  .text-mega {
+    font-family: var(--font-display);
+    font-size: 13rem;
+    line-height: 0.86;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+
+  .text-display {
+    font-family: var(--font-display);
+    font-size: 7.5rem;
+    line-height: 0.9;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+
+  .text-h1 {
+    font-family: var(--font-display);
+    font-size: 5rem;
+    line-height: 0.95;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+
+  .text-h2 {
+    font-family: var(--font-display);
+    font-size: 3.25rem;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+
+  .text-h3 {
+    font-size: 1.75rem;
+    line-height: 1.15;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .text-lead {
+    font-size: 1.375rem;
+    line-height: 1.45;
+  }
+
+  .text-body {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+  }
+
+  .text-eyebrow {
+    font-size: 0.8125rem;
+    line-height: 1.2;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--muted);
+  }
+}
+
+/* ─── Reusable Eyebrow Component ─── */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--muted);
+}
+
+.eyebrow::before {
+  content: '';
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+/* ─── Section Heading Line Reveal ─── */
+.line-reveal {
+  overflow: hidden;
+}
+
+.line-reveal > span {
+  display: block;
+  transform: translateY(110%);
+  transition: transform 850ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.line-reveal.revealed > span {
+  transform: translateY(0);
+}
+
+/* ─── Markdown Content (preserved for blog) ─── */
+@layer components {
+  .markdown-content {
+    @apply text-[19px] leading-[1.9] max-w-[820px] mx-auto;
+    font-family: var(--font-sans);
+  }
+
+  .markdown-content p {
+    @apply my-8;
+  }
+
+  .markdown-content h1 {
+    @apply text-4xl font-bold mt-16 mb-8 tracking-tight;
+  }
+
+  .markdown-content h2 {
+    @apply text-3xl font-bold mt-16 mb-8 tracking-tight scroll-mt-24 relative;
+  }
+
+  .markdown-content h3 {
+    @apply text-2xl font-semibold mt-12 mb-6 tracking-tight scroll-mt-24 relative;
+  }
+
+  .markdown-content h4 {
+    @apply text-xl font-semibold mt-8 mb-4 tracking-tight scroll-mt-24 relative;
+  }
+
+  .markdown-content ul {
+    @apply list-disc pl-6 my-6 space-y-2;
+  }
+
+  .markdown-content ol {
+    @apply list-decimal pl-6 my-6 space-y-2;
+  }
+
+  .anchor-link {
+    @apply opacity-0 transition-opacity absolute -left-6 pr-2 no-underline;
+    color: var(--muted);
+  }
+
+  .anchor-link:hover {
+    color: var(--accent);
+  }
+
+  .markdown-content h2:hover .anchor-link,
+  .markdown-content h3:hover .anchor-link,
+  .markdown-content h4:hover .anchor-link {
+    @apply opacity-100;
+  }
+
+  .anchor-link::before {
+    content: "#";
+  }
+
+  .katex-display {
+    @apply overflow-x-auto overflow-y-hidden py-4 my-6;
+  }
+}
+
+/* ─── Responsive Typography at sm+ ─── */
+@media (min-width: 640px) {
+  .text-hero {
+    font-size: 24rem;
+  }
+
+  .text-h1 {
+    font-size: 5rem;
+  }
+
+  .text-h2 {
+    font-size: 5rem;
+  }
+}

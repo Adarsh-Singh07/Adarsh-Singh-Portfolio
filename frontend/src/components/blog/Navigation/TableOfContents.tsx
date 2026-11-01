@@ -120,14 +120,14 @@ export default function TableOfContents({ isDark }: TableOfContentsProps) {
                       heading.level === 3 ? 'ml-3 text-[13px]' : ''
                     } ${
                       isActive 
-                        ? 'text-[#007AFF] font-medium scale-[1.02] origin-left' 
+                        ? 'text-[#ff3b1d] font-medium scale-[1.02] origin-left' 
                         : isDark ? 'text-slate-400 hover:text-slate-200' : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
                     {isActive && (
                       <motion.span 
                         layoutId="active-indicator"
-                        className="absolute left-[-1px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-[#007AFF] rounded-full shadow-[0_0_8px_rgba(0,122,255,0.6)]" 
+                        className="absolute left-[-1px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-[#ff3b1d] rounded-full shadow-[0_0_8px_rgba(255,59,29,0.6)]" 
                       />
                     )}
                     <span className="line-clamp-2 block leading-snug">{heading.text}</span>
@@ -169,7 +169,7 @@ export default function TableOfContents({ isDark }: TableOfContentsProps) {
                 strokeDasharray={circumference} 
                 strokeDashoffset={strokeDashoffset} 
                 strokeLinecap="round"
-                className="stroke-[#007AFF] transition-all duration-300 ease-out" 
+                className="stroke-[#ff3b1d] transition-all duration-300 ease-out" 
               />
             </svg>
             <List className={`w-4 h-4 ${isDark ? 'text-slate-300 group-hover:text-white' : 'text-slate-600 group-hover:text-slate-900'}`} />

@@ -131,15 +131,15 @@ export default function Navbar({ isDark, toggleTheme, currentMode, onModeChange,
                 onClick={() => setMenuDropdownOpen(prev => !prev)}
                 className={`px-5 py-2 rounded-full flex items-center gap-2 text-xs font-semibold tracking-wider transition-all duration-300 focus:outline-none cursor-pointer border ${
                   isDark 
-                    ? 'bg-black/60 border-white/10 hover:border-[#007AFF]/45 text-slate-300 hover:text-white shadow-[0_4px_12px_rgba(0,0,0,0.5)]' 
-                    : 'bg-white border-slate-200 hover:border-[#007AFF]/35 text-slate-700 hover:text-neutral-950 shadow-sm'
+                    ? 'bg-black/60 border-white/10 hover:border-[#ff3b1d]/45 text-slate-300 hover:text-white shadow-[0_4px_12px_rgba(0,0,0,0.5)]' 
+                    : 'bg-white border-slate-200 hover:border-[#ff3b1d]/35 text-slate-700 hover:text-neutral-950 shadow-sm'
                 }`}
                 aria-expanded={menuDropdownOpen}
                 aria-haspopup="true"
               >
                 <Menu className="w-3.5 h-3.5" />
                 <span className="font-display tracking-widest uppercase">Menu</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${menuDropdownOpen ? 'rotate-180 text-[#007AFF]' : ''}`} />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${menuDropdownOpen ? 'rotate-180 text-[#ff3b1d]' : ''}`} />
               </button>
 
               <AnimatePresence>
@@ -171,15 +171,15 @@ export default function Navbar({ isDark, toggleTheme, currentMode, onModeChange,
                             className={`px-3 py-2 rounded-xl flex items-center justify-between text-xs font-semibold tracking-wider transition-colors duration-250 ${
                               isActive 
                                 ? isDark 
-                                  ? 'bg-[#007AFF]/10 text-[#007AFF] border border-[#007AFF]/20 shadow-[inset_0_1px_8px_rgba(0,122,255,0.05)]' 
-                                  : 'bg-[#007AFF]/5 text-[#007AFF] border border-[#007AFF]/10'
+                                  ? 'bg-[#ff3b1d]/10 text-[#ff3b1d] border border-[#ff3b1d]/20 shadow-[inset_0_1px_8px_rgba(255,59,29,0.05)]' 
+                                  : 'bg-[#ff3b1d]/5 text-[#ff3b1d] border border-[#ff3b1d]/10'
                                 : isDark
                                   ? 'hover:bg-white/5 text-slate-400 hover:text-white border border-transparent'
                                   : 'hover:bg-[#FDFBF7] text-slate-600 hover:text-neutral-900 border border-transparent'
                             }`}
                           >
                             <span className="font-display tracking-widest uppercase">{item.label}</span>
-                            {isActive && <span className="w-1 h-1 rounded-full bg-[#007AFF] animate-pulse" />}
+                            {isActive && <span className="w-1 h-1 rounded-full bg-[#ff3b1d] animate-pulse" />}
                           </Link>
                         );
                       })}
@@ -204,7 +204,7 @@ export default function Navbar({ isDark, toggleTheme, currentMode, onModeChange,
                               isActive 
                                 ? isDark 
                                   ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' 
-                                  : 'bg-[#007AFF]/5 text-[#007AFF] border border-[#007AFF]/10'
+                                  : 'bg-[#ff3b1d]/5 text-[#ff3b1d] border border-[#ff3b1d]/10'
                                 : isDark
                                   ? 'hover:bg-white/5 text-slate-400 hover:text-white border border-transparent'
                                   : 'hover:bg-[#FDFBF7] text-slate-600 hover:text-neutral-900 border border-transparent'
@@ -276,7 +276,7 @@ export default function Navbar({ isDark, toggleTheme, currentMode, onModeChange,
                         isActive
                           ? isDark
                             ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/40'
-                            : 'bg-[#007AFF] text-white border border-transparent shadow-sm'
+                            : 'bg-[#ff3b1d] text-white border border-transparent shadow-sm'
                           : isDark
                             ? 'bg-neutral-900 text-slate-400 border border-neutral-800'
                             : 'bg-slate-100 text-slate-600 border border-slate-200'

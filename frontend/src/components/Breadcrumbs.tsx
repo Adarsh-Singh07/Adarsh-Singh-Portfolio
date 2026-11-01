@@ -48,7 +48,7 @@ export default function Breadcrumbs({ isDark }: { isDark: boolean }) {
       <Link 
         to="/" 
         aria-label="Go to Home" 
-        className="hover:text-[#007AFF] flex items-center gap-1 transition-colors"
+        className="hover:text-[#ff3b1d] flex items-center gap-1 transition-colors"
       >
         <Home className="w-3.5 h-3.5" />
         <span>Home</span>
@@ -69,7 +69,7 @@ export default function Breadcrumbs({ isDark }: { isDark: boolean }) {
             ) : (
               <Link 
                 to={to} 
-                className="hover:text-[#007AFF] transition-colors"
+                className="hover:text-[#ff3b1d] transition-colors"
               >
                 {displayName}
               </Link>

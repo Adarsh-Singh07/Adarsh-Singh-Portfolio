@@ -89,8 +89,8 @@ export default function RelatedArticles({ currentArticleId, category, allArticle
           >
             <div className="flex items-center gap-3 mb-4">
               {idx === 0 && currentIndexInPath !== -1 && (
-                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded text-[#007AFF] ${
-                  isDark ? 'bg-[#007AFF]/10' : 'bg-[#007AFF]/10'
+                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded text-[#ff3b1d] ${
+                  isDark ? 'bg-[#ff3b1d]/10' : 'bg-[#ff3b1d]/10'
                 }`}>
                   Next in Path
                 </span>
@@ -99,7 +99,7 @@ export default function RelatedArticles({ currentArticleId, category, allArticle
                 {article.date}
               </div>
             </div>
-            <h4 className={`text-lg font-bold mb-2 group-hover:text-[#007AFF] transition-colors ${
+            <h4 className={`text-lg font-bold mb-2 group-hover:text-[#ff3b1d] transition-colors ${
               isDark ? 'text-slate-200' : 'text-slate-800'
             }`}>
               {article.title}

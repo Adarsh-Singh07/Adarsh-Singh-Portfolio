@@ -97,7 +97,7 @@ export default function StickyHeader({ article, isDark }: StickyHeaderProps) {
           {/* Progress Bar */}
           <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-transparent">
             <div 
-              className="h-full bg-[#007AFF] transition-all duration-150 ease-out"
+              className="h-full bg-[#ff3b1d] transition-all duration-150 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>

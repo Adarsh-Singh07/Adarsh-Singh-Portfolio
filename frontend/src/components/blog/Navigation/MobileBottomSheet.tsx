@@ -52,7 +52,7 @@ export default function MobileBottomSheet({ article, isDark }: MobileBottomSheet
               strokeDasharray={circumference} 
               strokeDashoffset={strokeDashoffset} 
               strokeLinecap="round"
-              className="stroke-[#007AFF] transition-all duration-300 ease-out" 
+              className="stroke-[#ff3b1d] transition-all duration-300 ease-out" 
             />
           </svg>
           <List className={`w-5 h-5 ${isDark ? 'text-white' : 'text-slate-900'}`} />
@@ -117,13 +117,13 @@ export default function MobileBottomSheet({ article, isDark }: MobileBottomSheet
                         }}
                         className={`relative pl-6 flex items-start gap-2 ${
                           isActive 
-                            ? 'text-[#007AFF] font-semibold' 
+                            ? 'text-[#ff3b1d] font-semibold' 
                             : isDark ? 'text-slate-300' : 'text-slate-600'
                         }`}
                       >
                         {isActive && (
-                          <div className="absolute left-[-4px] top-1.5 w-[22px] h-[22px] bg-[#007AFF]/20 rounded-full flex items-center justify-center">
-                            <div className="w-2 h-2 bg-[#007AFF] rounded-full shadow-[0_0_8px_rgba(0,122,255,0.8)]" />
+                          <div className="absolute left-[-4px] top-1.5 w-[22px] h-[22px] bg-[#ff3b1d]/20 rounded-full flex items-center justify-center">
+                            <div className="w-2 h-2 bg-[#ff3b1d] rounded-full shadow-[0_0_8px_rgba(255,59,29,0.8)]" />
                           </div>
                         )}
                         <span className={heading.level === 3 ? 'text-[14px] mt-0.5' : 'text-[15px]'}>
@@ -148,7 +148,7 @@ export default function MobileBottomSheet({ article, isDark }: MobileBottomSheet
                 </button>
                 <button 
                   onClick={handleShare}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-white shadow-lg transition-transform hover:scale-105 active:scale-95 bg-[#007AFF] hover:bg-[#007AFF]/90`}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-white shadow-lg transition-transform hover:scale-105 active:scale-95 bg-[#ff3b1d] hover:bg-[#ff3b1d]/90`}
                 >
                   <Share2 className="w-4 h-4" /> Share
                 </button>

@@ -53,7 +53,7 @@ export default function RoleToggle({ currentMode, onModeChange, isDark, rolesLis
         className={`px-4 py-2 rounded-full flex items-center gap-2 text-xs font-semibold tracking-wider transition-all duration-300 focus:outline-none cursor-pointer border ${
           isDark 
             ? 'bg-black/60 border-white/10 hover:border-cyan-400/40 text-slate-300 hover:text-white shadow-[0_4px_12px_rgba(0,0,0,0.5)]' 
-            : 'bg-white border-slate-200 hover:border-[#007AFF]/30 text-slate-700 hover:text-neutral-900 shadow-sm'
+            : 'bg-white border-slate-200 hover:border-[#ff3b1d]/30 text-slate-700 hover:text-neutral-900 shadow-sm'
         }`}
       >
         <ActiveIcon className="w-3.5 h-3.5" />
@@ -98,7 +98,7 @@ export default function RoleToggle({ currentMode, onModeChange, isDark, rolesLis
                       isActive 
                         ? isDark 
                           ? 'bg-[#00E5FF]/10 text-cyan-400 border border-[#00E5FF]/20 shadow-[inset_0_1px_8px_rgba(0,229,255,0.05)]' 
-                          : 'bg-[#007AFF]/5 text-[#007AFF] border border-[#007AFF]/10'
+                          : 'bg-[#ff3b1d]/5 text-[#ff3b1d] border border-[#ff3b1d]/10'
                         : isDark
                           ? 'hover:bg-white/5 text-slate-400 hover:text-white border border-transparent'
                           : 'hover:bg-[#FDFBF7] text-slate-600 hover:text-neutral-900 border border-transparent'
@@ -109,7 +109,7 @@ export default function RoleToggle({ currentMode, onModeChange, isDark, rolesLis
                     
                     {/* Corner indicator dots like gaming targeter */}
                     {isActive && (
-                      <span className={`ml-auto w-1 h-1 rounded-full ${isDark ? 'bg-cyan-400' : 'bg-[#007AFF]'} animate-pulse`} />
+                      <span className={`ml-auto w-1 h-1 rounded-full ${isDark ? 'bg-cyan-400' : 'bg-[#ff3b1d]'} animate-pulse`} />
                     )}
                   </button>
                 );

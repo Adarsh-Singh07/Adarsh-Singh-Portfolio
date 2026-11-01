@@ -48,7 +48,7 @@ export default function LearningPathRoadmap({ currentSlug, isDark }: LearningPat
               <div key={node.slug} className={`relative flex items-start gap-6 group`}>
                 <div className={`relative z-10 flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
                   isCompleted ? 'bg-emerald-500 text-white' :
-                  isCurrent ? 'bg-[#007AFF] text-white shadow-[0_0_15px_rgba(0,122,255,0.4)]' :
+                  isCurrent ? 'bg-[#ff3b1d] text-white shadow-[0_0_15px_rgba(255,59,29,0.4)]' :
                   isDark ? 'bg-neutral-800 border-2 border-white/10 text-slate-500' : 'bg-white border-2 border-slate-200 text-slate-400'
                 }`}>
                   {isCompleted ? <CheckCircle2 className="w-5 h-5" /> : 
@@ -60,7 +60,7 @@ export default function LearningPathRoadmap({ currentSlug, isDark }: LearningPat
                   <div className="flex items-center gap-3 mb-1">
                     <span className={`text-xs font-bold uppercase tracking-wider ${
                       isCompleted ? 'text-emerald-500' :
-                      isCurrent ? 'text-[#007AFF]' :
+                      isCurrent ? 'text-[#ff3b1d]' :
                       isDark ? 'text-slate-500' : 'text-slate-400'
                     }`}>
                       Step {nodeGlobalIndex + 1}

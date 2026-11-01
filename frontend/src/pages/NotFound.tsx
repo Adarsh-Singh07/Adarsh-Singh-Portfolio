@@ -1,84 +1,136 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Home, FolderGit2, Mail, Compass } from 'lucide-react';
+import { Home, FolderGit2, Mail, ArrowRight } from 'lucide-react';
 
 interface NotFoundProps {
-  isDark: boolean;
+  isDark?: boolean;
 }
 
-export default function NotFound({ isDark }: NotFoundProps) {
+export default function NotFound({}: NotFoundProps) {
   return (
-    <div className={`min-h-[80vh] flex items-center justify-center px-6 py-24 transition-colors duration-200 ${
-      isDark ? 'bg-transparent text-white' : 'bg-transparent text-neutral-900'
-    }`}>
-      {/* React 19 Native Head Metadata Hoisting */}
+    <div
+      className="min-h-[85vh] flex items-center justify-center relative overflow-hidden"
+      style={{
+        backgroundColor: 'var(--background)',
+        color: 'var(--foreground)',
+        padding: '8rem var(--gutter) 4rem',
+      }}
+    >
       <title>404: Page Not Found | Adarsh Singh</title>
       <meta name="robots" content="noindex, follow" />
 
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95, y: 15 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="max-w-md w-full text-center relative"
-      >
-        {/* Soft backlighting glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full filter blur-[100px] opacity-10 bg-indigo-500 pointer-events-none" />
+      {/* Ambient background glow */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+        style={{
+          width: '32rem',
+          height: '32rem',
+          borderRadius: '9999px',
+          background: 'radial-gradient(circle, rgba(255, 59, 29, 0.12) 0%, transparent 70%)',
+          filter: 'blur(60px)',
+        }}
+      />
 
-        {/* Dynamic Glowing icon container */}
-        <div className={`w-20 h-20 rounded-3xl mx-auto flex items-center justify-center mb-8 border ${
-          isDark 
-            ? 'bg-neutral-900/60 border-white/10 text-cyan-400 shadow-[0_8px_30px_rgba(0,229,255,0.1)]' 
-            : 'bg-white border-neutral-200 text-sky-600 shadow-[0_8px_20px_rgba(0,0,0,0.05)]'
-        }`}>
-          <Compass className="w-10 h-10 animate-[spin_20s_linear_infinite]" />
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        className="max-w-xl w-full text-center relative z-10"
+      >
+        <div className="eyebrow justify-center mb-6">
+          <span className="eyebrow-dot" />
+          <span>Error 404 · Unresolved Endpoint</span>
         </div>
 
-        <h1 className="text-8xl font-black font-mono tracking-tighter mb-4 bg-gradient-to-r from-sky-400 via-[#007AFF] to-indigo-500 bg-clip-text text-transparent">
+        <h1
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(6rem, 16vw, 12rem)',
+            lineHeight: 0.85,
+            color: 'var(--accent)',
+            textTransform: 'uppercase',
+            letterSpacing: '-0.02em',
+          }}
+          className="mb-4"
+        >
           404
         </h1>
-        <h2 className="text-xl font-bold font-sans tracking-tight mb-3">
+
+        <h2
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '2rem',
+            textTransform: 'uppercase',
+            letterSpacing: '-0.01em',
+            lineHeight: 1.1,
+          }}
+          className="mb-4"
+        >
           Lost in Data Space?
         </h2>
-        <p className={`text-sm font-light leading-relaxed mb-10 ${
-          isDark ? 'text-slate-400' : 'text-slate-650'
-        }`}>
+
+        <p
+          style={{
+            color: 'var(--muted)',
+            fontSize: '1.0625rem',
+            lineHeight: 1.6,
+            maxWidth: '28rem',
+            margin: '0 auto 2.5rem',
+          }}
+        >
           The endpoint you are trying to resolve doesn't exist or has been relocated. Let's redirect you back to a verified route.
         </p>
 
-        {/* Redirection Links Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {/* Links */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-md mx-auto">
           <Link
             to="/"
-            className={`flex items-center justify-center gap-2 p-3 rounded-2xl border text-xs font-semibold tracking-wider uppercase transition-all duration-300 ${
-              isDark 
-                ? 'bg-neutral-900/40 border-white/5 hover:border-white/15 hover:bg-neutral-900 text-slate-200' 
-                : 'bg-white border-neutral-200 hover:border-neutral-350 hover:bg-[#FDFBF7] text-neutral-800'
-            }`}
+            className="flex items-center justify-center gap-2 p-3.5 rounded-full border transition-all duration-300 group"
+            style={{
+              borderColor: 'var(--line)',
+              backgroundColor: 'var(--surface)',
+              color: 'var(--foreground)',
+              fontSize: '0.8125rem',
+              fontWeight: 500,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+            }}
           >
-            <Home className="w-4 h-4 text-[#007AFF]" />
+            <Home className="w-4 h-4 text-[#ff3b1d] transition-transform duration-300 group-hover:scale-110" />
             <span>Home</span>
           </Link>
+
           <Link
             to="/projects"
-            className={`flex items-center justify-center gap-2 p-3 rounded-2xl border text-xs font-semibold tracking-wider uppercase transition-all duration-300 ${
-              isDark 
-                ? 'bg-neutral-900/40 border-white/5 hover:border-white/15 hover:bg-neutral-900 text-slate-200' 
-                : 'bg-white border-neutral-200 hover:border-neutral-350 hover:bg-[#FDFBF7] text-neutral-800'
-            }`}
+            className="flex items-center justify-center gap-2 p-3.5 rounded-full border transition-all duration-300 group"
+            style={{
+              borderColor: 'var(--line)',
+              backgroundColor: 'var(--surface)',
+              color: 'var(--foreground)',
+              fontSize: '0.8125rem',
+              fontWeight: 500,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+            }}
           >
-            <FolderGit2 className="w-4 h-4 text-[#007AFF]" />
+            <FolderGit2 className="w-4 h-4 text-[#ff3b1d] transition-transform duration-300 group-hover:scale-110" />
             <span>Projects</span>
           </Link>
+
           <Link
             to="/contact"
-            className={`flex items-center justify-center gap-2 p-3 rounded-2xl border text-xs font-semibold tracking-wider uppercase transition-all duration-300 ${
-              isDark 
-                ? 'bg-neutral-900/40 border-white/5 hover:border-white/15 hover:bg-neutral-900 text-slate-200' 
-                : 'bg-white border-neutral-200 hover:border-neutral-350 hover:bg-[#FDFBF7] text-neutral-800'
-            }`}
+            className="flex items-center justify-center gap-2 p-3.5 rounded-full border transition-all duration-300 group"
+            style={{
+              borderColor: 'var(--line)',
+              backgroundColor: 'var(--surface)',
+              color: 'var(--foreground)',
+              fontSize: '0.8125rem',
+              fontWeight: 500,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+            }}
           >
-            <Mail className="w-4 h-4 text-[#007AFF]" />
+            <Mail className="w-4 h-4 text-[#ff3b1d] transition-transform duration-300 group-hover:scale-110" />
             <span>Contact</span>
           </Link>
         </div>

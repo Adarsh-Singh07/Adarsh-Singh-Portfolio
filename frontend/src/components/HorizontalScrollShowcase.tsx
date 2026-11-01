@@ -35,7 +35,7 @@ export default function HorizontalScrollShowcase({ projects, isDark }: Horizonta
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <span className="text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-[#007AFF] block mb-2">
+          <span className="text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-[#ff3b1d] block mb-2">
             Dual-Axis Experience
           </span>
           <h2 className="text-3xl md:text-5xl font-sans font-bold tracking-tight">
@@ -45,7 +45,7 @@ export default function HorizontalScrollShowcase({ projects, isDark }: Horizonta
 
         <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
           <span className="hidden sm:inline">Drag or scroll to explore projects</span>
-          <ChevronRight className="w-4 h-4 text-[#007AFF] animate-pulse" />
+          <ChevronRight className="w-4 h-4 text-[#ff3b1d] animate-pulse" />
         </div>
       </div>
 
@@ -69,17 +69,17 @@ export default function HorizontalScrollShowcase({ projects, isDark }: Horizonta
                 transition={{ duration: 0.3 }}
                 className={`w-[320px] sm:w-[420px] md:w-[480px] p-7 md:p-8 rounded-[32px] border flex flex-col justify-between select-none relative group overflow-hidden transition-all duration-500 ${
                   isDark 
-                    ? 'bg-neutral-900/60 border-white/10 hover:border-[#007AFF]/50 hover:shadow-[0_20px_40px_rgba(0,122,255,0.12)]' 
+                    ? 'bg-neutral-900/60 border-white/10 hover:border-[#ff3b1d]/50 hover:shadow-[0_20px_40px_rgba(255,59,29,0.12)]' 
                     : 'bg-white border-neutral-200 hover:border-sky-400 hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)]'
                 }`}
               >
                 {/* Subtle card ambient highlight */}
-                <div className="absolute -top-16 -right-16 w-36 h-36 bg-[#007AFF]/10 rounded-full blur-2xl group-hover:bg-[#007AFF]/20 transition-all duration-500" />
+                <div className="absolute -top-16 -right-16 w-36 h-36 bg-[#ff3b1d]/10 rounded-full blur-2xl group-hover:bg-[#ff3b1d]/20 transition-all duration-500" />
 
                 <div>
                   {/* Card Header Badge */}
                   <div className="flex items-center justify-between mb-6">
-                    <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#007AFF]/10 text-[#007AFF] border border-[#007AFF]/20">
+                    <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#ff3b1d]/10 text-[#ff3b1d] border border-[#ff3b1d]/20">
                       {project.status || 'Active'}
                     </span>
                     <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">
@@ -88,7 +88,7 @@ export default function HorizontalScrollShowcase({ projects, isDark }: Horizonta
                   </div>
 
                   {/* Title & Description */}
-                  <h3 className="text-xl md:text-2xl font-sans font-bold tracking-tight mb-3 group-hover:text-[#007AFF] transition-colors duration-300">
+                  <h3 className="text-xl md:text-2xl font-sans font-bold tracking-tight mb-3 group-hover:text-[#ff3b1d] transition-colors duration-300">
                     {project.title}
                   </h3>
 
@@ -123,7 +123,7 @@ export default function HorizontalScrollShowcase({ projects, isDark }: Horizonta
 
                   <Link 
                     to={`/projects/${project.id}`}
-                    className="inline-flex items-center gap-2 text-xs font-semibold text-[#007AFF] hover:underline cursor-pointer group/link"
+                    className="inline-flex items-center gap-2 text-xs font-semibold text-[#ff3b1d] hover:underline cursor-pointer group/link"
                   >
                     <span>View Case Study</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />

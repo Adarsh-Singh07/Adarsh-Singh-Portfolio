@@ -41,8 +41,8 @@ export default function SkillsSection({ categories, certifications, currentMode,
         {/* Step 3 Section Title */}
         <div className="mb-16 text-left max-w-3xl">
           <div className="flex items-center gap-2 mb-3">
-            <span className="w-8 h-[1px] bg-[#007AFF]" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#007AFF]">
+            <span className="w-8 h-[1px] bg-[#ff3b1d]" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#ff3b1d]">
               Capabilities & Verified Standards
             </span>
           </div>
@@ -68,23 +68,23 @@ export default function SkillsSection({ categories, certifications, currentMode,
                 className={`p-6 md:p-8 rounded-[32px] border transition-all duration-550 shadow-sm relative overflow-hidden ${
                   isFeatured 
                     ? isDark 
-                      ? 'bg-[#151515] border-[#007AFF]/25 shadow-[0_20px_45px_rgba(0,122,255,0.15)]' 
-                      : 'bg-white border-[#007AFF]/20 shadow-[0_15px_30px_rgba(0,122,255,0.05)]'
+                      ? 'bg-[#151515] border-[#ff3b1d]/25 shadow-[0_20px_45px_rgba(255,59,29,0.15)]' 
+                      : 'bg-white border-[#ff3b1d]/20 shadow-[0_15px_30px_rgba(255,59,29,0.05)]'
                     : isDark 
                       ? 'bg-[#151515]/60 border-white/5 hover:border-white/10' 
-                      : 'bg-white border-neutral-200/60 hover:border-[#007AFF]/10'
+                      : 'bg-white border-neutral-200/60 hover:border-[#ff3b1d]/10'
                 }`}
               >
                 {/* Active Highlight Glow for Top Category */}
                 {isFeatured && (
-                  <div className="absolute top-0 right-0 w-24 h-24 rounded-full filter blur-[40px] opacity-20 bg-[#007AFF]" />
+                  <div className="absolute top-0 right-0 w-24 h-24 rounded-full filter blur-[40px] opacity-20 bg-[#ff3b1d]" />
                 )}
 
                 <div className="flex items-center justify-between gap-3 mb-6 relative z-10">
                   <h3 className="text-lg font-semibold font-sans tracking-tight">{cat.title}</h3>
                   <span className={`text-[9px] uppercase font-sans tracking-widest font-bold px-2.5 py-1 rounded-full ${
                     isFeatured 
-                      ? 'bg-[#007AFF]/10 text-[#007AFF] border border-[#007AFF]/20'
+                      ? 'bg-[#ff3b1d]/10 text-[#ff3b1d] border border-[#ff3b1d]/20'
                       : isDark ? 'bg-white/5 text-slate-400 border border-white/5' : 'bg-slate-100 text-slate-500 border border-slate-200'
                   }`}>
                     {isFeatured ? 'Primary Domain' : `Rank #${cat.priority[currentMode]}`}
@@ -105,7 +105,7 @@ export default function SkillsSection({ categories, certifications, currentMode,
                       </span>
                       <span className={`text-[10px] font-sans font-bold tracking-wider transition-all duration-300 ${
                         skill.level === 'Expert' 
-                          ? 'text-[#007AFF]' 
+                          ? 'text-[#ff3b1d]' 
                           : skill.level === 'Advanced' 
                             ? 'text-[#5AC8FA]' 
                             : 'text-slate-400/80'
@@ -123,7 +123,7 @@ export default function SkillsSection({ categories, certifications, currentMode,
         {/* --- PREMIUM CERTIFICATIONS WALL --- */}
         <div className="mt-24">
           <div className="flex items-center gap-2 mb-3">
-            <Award className="w-4.5 h-4.5 text-[#007AFF]" />
+            <Award className="w-4.5 h-4.5 text-[#ff3b1d]" />
             <h3 className="text-2xl font-sans font-semibold tracking-tight">Verified Technical Credentials</h3>
           </div>
           <p className={`text-sm font-light mb-8 max-w-xl ${isDark ? 'text-white/50' : 'text-neutral-950/60'}`}>
@@ -150,7 +150,7 @@ export default function SkillsSection({ categories, certifications, currentMode,
 
                 <div className="flex flex-col justify-between h-full">
                   <div>
-                    <span className="text-[10px] font-serif italic block uppercase tracking-wider mb-2 text-[#007AFF]">
+                    <span className="text-[10px] font-serif italic block uppercase tracking-wider mb-2 text-[#ff3b1d]">
                       {cert.issuer}
                     </span>
                     <h4 className="text-sm font-semibold font-sans tracking-wide mb-4 leading-snug">

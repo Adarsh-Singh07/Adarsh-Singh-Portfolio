@@ -188,7 +188,7 @@ const CustomHeading = ({ as: Component, id, children, ...props }: any) => {
         <button 
           onClick={handleCopy}
           className={`opacity-0 group-hover:opacity-100 ml-3 p-1.5 rounded-md transition-all focus:opacity-100 outline-none ${
-            copied ? 'text-emerald-500 bg-emerald-500/10' : 'text-slate-400 hover:text-[#007AFF] hover:bg-[#007AFF]/10'
+            copied ? 'text-emerald-500 bg-emerald-500/10' : 'text-slate-400 hover:text-[#ff3b1d] hover:bg-[#ff3b1d]/10'
           }`}
           aria-label="Copy link to heading"
           title="Copy link"
@@ -252,7 +252,7 @@ export default function MarkdownRenderer({ content, title, isDark }: MarkdownRen
           tr: ({ node, ...props }) => <tr className="even:bg-[#FDFBF7] dark:even:bg-white/[0.02] hover:bg-[#FDFBF7]/80 dark:hover:bg-white/[0.04] transition-colors" {...props} />,
           th: ({ node, ...props }) => <th className="bg-slate-100 dark:bg-white/[0.05] px-4 py-3 font-semibold border-b border-slate-200 dark:border-white/10 text-slate-900 dark:text-white" {...props} />,
           td: ({ node, ...props }) => <td className="px-4 py-3 border-b border-slate-100 dark:border-white/5 last:border-0" {...props} />,
-          a: ({ node, ...props }) => <a className="text-[#007AFF] no-underline hover:underline underline-offset-4 decoration-2" target={props.href?.startsWith('http') ? '_blank' : undefined} rel={props.href?.startsWith('http') ? 'noopener noreferrer' : undefined} {...props} />
+          a: ({ node, ...props }) => <a className="text-[#ff3b1d] no-underline hover:underline underline-offset-4 decoration-2" target={props.href?.startsWith('http') ? '_blank' : undefined} rel={props.href?.startsWith('http') ? 'noopener noreferrer' : undefined} {...props} />
         }}
       >
         {content}

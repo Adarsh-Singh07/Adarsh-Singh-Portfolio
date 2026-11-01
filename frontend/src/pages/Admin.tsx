@@ -432,7 +432,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
     if (view === 'forgot') {
       return (
         <div className={`min-h-screen flex items-center justify-center py-24 px-6 transition-colors duration-200 ${
-          isDark ? 'bg-[#121212] text-white' : 'bg-[#FDFBF7] text-neutral-900'
+          isDark ? 'bg-[#08080a] text-white' : 'bg-[#FDFBF7] text-neutral-900'
         }`}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -442,7 +442,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
             }`}
           >
             <div className="flex flex-col items-center mb-6 text-center">
-              <div className="w-12 h-12 rounded-full bg-[#007AFF]/10 flex items-center justify-center text-[#007AFF] mb-4">
+              <div className="w-12 h-12 rounded-full bg-[#ff3b1d]/10 flex items-center justify-center text-[#ff3b1d] mb-4">
                 <MailOpen className="w-5 h-5" />
               </div>
               <h1 className="text-xl font-bold font-sans tracking-tight">Reset Admin Password</h1>
@@ -458,7 +458,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                   placeholder="you@example.com"
                   value={forgotEmail}
                   onChange={e => setForgotEmail(e.target.value)}
-                  className={`w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] ${
+                  className={`w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] ${
                     isDark ? 'border-neutral-800' : 'border-slate-200'
                   }`}
                 />
@@ -467,7 +467,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
               <button
                 type="submit"
                 disabled={forgotLoading}
-                className="w-full py-3 bg-[#007AFF] hover:bg-[#007AFF]/90 disabled:opacity-60 text-white rounded-xl flex items-center justify-center gap-2 text-xs font-semibold shadow-glow cursor-pointer transition-colors"
+                className="w-full py-3 bg-[#ff3b1d] hover:bg-[#ff3b1d]/90 disabled:opacity-60 text-white rounded-xl flex items-center justify-center gap-2 text-xs font-semibold shadow-glow cursor-pointer transition-colors"
               >
                 {forgotLoading ? <Loader2 className="w-4.5 h-4.5 animate-spin" /> : <MailOpen className="w-4.5 h-4.5" />}
                 <span>Send OTP Code</span>
@@ -488,7 +488,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                       placeholder="••••••"
                       value={otpCode}
                       onChange={e => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                      className={`w-full px-4 py-2.5 rounded-xl border bg-transparent text-center text-lg font-mono tracking-[0.5em] focus:outline-none focus:border-[#007AFF] ${
+                      className={`w-full px-4 py-2.5 rounded-xl border bg-transparent text-center text-lg font-mono tracking-[0.5em] focus:outline-none focus:border-[#ff3b1d] ${
                         isDark ? 'border-neutral-800' : 'border-slate-200'
                       }`}
                     />
@@ -502,7 +502,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                       placeholder="Minimum 8 characters"
                       value={newOtpPassword}
                       onChange={e => setNewOtpPassword(e.target.value)}
-                      className={`w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] ${
+                      className={`w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] ${
                         isDark ? 'border-neutral-800' : 'border-slate-200'
                       }`}
                     />
@@ -511,7 +511,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                     type="button"
                     onClick={handleVerifyOtp}
                     disabled={forgotLoading || otpCode.length < 6 || newOtpPassword.length < 8}
-                    className="w-full py-3 bg-[#007AFF] hover:bg-[#007AFF]/90 disabled:opacity-60 text-white rounded-xl flex items-center justify-center gap-2 text-xs font-semibold shadow-glow cursor-pointer transition-colors"
+                    className="w-full py-3 bg-[#ff3b1d] hover:bg-[#ff3b1d]/90 disabled:opacity-60 text-white rounded-xl flex items-center justify-center gap-2 text-xs font-semibold shadow-glow cursor-pointer transition-colors"
                   >
                     {forgotLoading ? <Loader2 className="w-4.5 h-4.5 animate-spin" /> : <Unlock className="w-4.5 h-4.5" />}
                     <span>Set New Password</span>
@@ -522,7 +522,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
               <button
                 type="button"
                 onClick={() => { setView('login'); setOtpSent(false); }}
-                className="text-[10px] font-mono uppercase tracking-wider text-slate-500 hover:text-[#007AFF] transition-colors cursor-pointer text-center"
+                className="text-[10px] font-mono uppercase tracking-wider text-slate-500 hover:text-[#ff3b1d] transition-colors cursor-pointer text-center"
               >
                 ← Back to login
               </button>
@@ -534,7 +534,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
 
     return (
       <div className={`min-h-screen flex items-center justify-center py-24 px-6 transition-colors duration-200 ${
-        isDark ? 'bg-[#121212] text-white' : 'bg-[#FDFBF7] text-neutral-900'
+        isDark ? 'bg-[#08080a] text-white' : 'bg-[#FDFBF7] text-neutral-900'
       }`}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -546,7 +546,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
           }`}
         >
           <div className="flex flex-col items-center mb-6 text-center">
-            <div className="w-12 h-12 rounded-full bg-[#007AFF]/10 flex items-center justify-center text-[#007AFF] mb-4">
+            <div className="w-12 h-12 rounded-full bg-[#ff3b1d]/10 flex items-center justify-center text-[#ff3b1d] mb-4">
               <Lock className="w-5 h-5 animate-pulse" />
             </div>
             <h1 className="text-xl font-bold font-sans tracking-tight">Admin Console Login</h1>
@@ -561,7 +561,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                 required
                 value={username}
                 onChange={e => setUsername(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
               />
             </div>
             <div>
@@ -571,7 +571,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                 required
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
               />
             </div>
 
@@ -584,7 +584,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-[#007AFF] hover:bg-[#007AFF]/90 disabled:opacity-60 text-white rounded-xl flex items-center justify-center gap-2 text-xs font-semibold shadow-glow cursor-pointer transition-colors mt-2"
+              className="w-full py-3 bg-[#ff3b1d] hover:bg-[#ff3b1d]/90 disabled:opacity-60 text-white rounded-xl flex items-center justify-center gap-2 text-xs font-semibold shadow-glow cursor-pointer transition-colors mt-2"
             >
               {loading ? <Loader2 className="w-4.5 h-4.5 animate-spin" /> : <Unlock className="w-4.5 h-4.5" />}
               <span>Verify Access Credentials</span>
@@ -595,7 +595,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
               <button
                 type="button"
                 onClick={() => setView('forgot')}
-                className="text-[10px] font-mono uppercase tracking-wider text-slate-500 hover:text-[#007AFF] transition-colors cursor-pointer"
+                className="text-[10px] font-mono uppercase tracking-wider text-slate-500 hover:text-[#ff3b1d] transition-colors cursor-pointer"
               >
                 Forgot password? Reset via email OTP
               </button>
@@ -608,14 +608,14 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
 
   return (
     <div className={`min-h-screen py-24 px-6 md:px-12 transition-colors duration-200 ${
-      isDark ? 'bg-[#121212] text-white' : 'bg-[#FDFBF7] text-neutral-900'
+      isDark ? 'bg-[#08080a] text-white' : 'bg-[#FDFBF7] text-neutral-900'
     }`}>
       <div className="max-w-7xl mx-auto w-full">
         
         {/* Header Console Row */}
         <div className="flex flex-col md:flex-row md:items-center justify-between border-b pb-6 mb-8 border-neutral-800/80 gap-4">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#007AFF] block mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#ff3b1d] block mb-1">
               Control Panel
             </span>
             <h1 className="text-3xl font-bold font-sans tracking-tight">Admin Portal</h1>
@@ -627,7 +627,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
               className={`px-5 py-2.5 rounded-full flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
                 publishSuccess
                   ? 'bg-emerald-600 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]'
-                  : 'bg-[#007AFF] hover:bg-[#007AFF]/90 text-white shadow-glow disabled:opacity-50'
+                  : 'bg-[#ff3b1d] hover:bg-[#ff3b1d]/90 text-white shadow-glow disabled:opacity-50'
               }`}
             >
               {publishing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
@@ -650,7 +650,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
             <button
               onClick={() => setActiveTab('unanswered')}
               className={`px-4 py-3 rounded-xl flex items-center gap-3 text-xs font-semibold tracking-wider text-left transition-colors cursor-pointer ${
-                activeTab === 'unanswered' ? 'bg-[#007AFF]/15 text-[#007AFF] border-l-2 border-[#007AFF]' : 'hover:bg-white/5 text-slate-400 hover:text-white'
+                activeTab === 'unanswered' ? 'bg-[#ff3b1d]/15 text-[#ff3b1d] border-l-2 border-[#ff3b1d]' : 'hover:bg-white/5 text-slate-400 hover:text-white'
               }`}
             >
               <MessageSquare className="w-4 h-4" />
@@ -659,7 +659,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
             <button
               onClick={() => setActiveTab('config')}
               className={`px-4 py-3 rounded-xl flex items-center gap-3 text-xs font-semibold tracking-wider text-left transition-colors cursor-pointer ${
-                activeTab === 'config' ? 'bg-[#007AFF]/15 text-[#007AFF] border-l-2 border-[#007AFF]' : 'hover:bg-white/5 text-slate-400 hover:text-white'
+                activeTab === 'config' ? 'bg-[#ff3b1d]/15 text-[#ff3b1d] border-l-2 border-[#ff3b1d]' : 'hover:bg-white/5 text-slate-400 hover:text-white'
               }`}
             >
               <User className="w-4 h-4" />
@@ -668,7 +668,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
             <button
               onClick={() => setActiveTab('roles')}
               className={`px-4 py-3 rounded-xl flex items-center gap-3 text-xs font-semibold tracking-wider text-left transition-colors cursor-pointer ${
-                activeTab === 'roles' ? 'bg-[#007AFF]/15 text-[#007AFF] border-l-2 border-[#007AFF]' : 'hover:bg-white/5 text-slate-400 hover:text-white'
+                activeTab === 'roles' ? 'bg-[#ff3b1d]/15 text-[#ff3b1d] border-l-2 border-[#ff3b1d]' : 'hover:bg-white/5 text-slate-400 hover:text-white'
               }`}
             >
               <Layers className="w-4 h-4" />
@@ -677,7 +677,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
             <button
               onClick={() => setActiveTab('uploads')}
               className={`px-4 py-3 rounded-xl flex items-center gap-3 text-xs font-semibold tracking-wider text-left transition-colors cursor-pointer ${
-                activeTab === 'uploads' ? 'bg-[#007AFF]/15 text-[#007AFF] border-l-2 border-[#007AFF]' : 'hover:bg-white/5 text-slate-400 hover:text-white'
+                activeTab === 'uploads' ? 'bg-[#ff3b1d]/15 text-[#ff3b1d] border-l-2 border-[#ff3b1d]' : 'hover:bg-white/5 text-slate-400 hover:text-white'
               }`}
             >
               <FileText className="w-4 h-4" />
@@ -686,7 +686,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
             <button
               onClick={() => setActiveTab('settings')}
               className={`px-4 py-3 rounded-xl flex items-center gap-3 text-xs font-semibold tracking-wider text-left transition-colors cursor-pointer ${
-                activeTab === 'settings' ? 'bg-[#007AFF]/15 text-[#007AFF] border-l-2 border-[#007AFF]' : 'hover:bg-white/5 text-slate-400 hover:text-white'
+                activeTab === 'settings' ? 'bg-[#ff3b1d]/15 text-[#ff3b1d] border-l-2 border-[#ff3b1d]' : 'hover:bg-white/5 text-slate-400 hover:text-white'
               }`}
             >
               <Settings className="w-4 h-4" />
@@ -698,7 +698,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
           <div className="lg:col-span-3">
             {loading ? (
               <div className="py-24 flex justify-center items-center">
-                <Loader2 className="w-8 h-8 animate-spin text-[#007AFF]" />
+                <Loader2 className="w-8 h-8 animate-spin text-[#ff3b1d]" />
               </div>
             ) : error ? (
               <div className="p-6 rounded-2xl border border-red-500/10 bg-red-500/5 text-center flex flex-col items-center gap-3">
@@ -739,7 +739,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                                 value={answersMap[q.id] || ''}
                                 onChange={e => setAnswersMap(prev => ({ ...prev, [q.id]: e.target.value }))}
                                 rows={3}
-                                className={`w-full px-4 py-3 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] resize-none ${
+                                className={`w-full px-4 py-3 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] resize-none ${
                                   isDark ? 'border-neutral-800 text-white' : 'border-slate-200 text-neutral-900'
                                 }`}
                               />
@@ -753,7 +753,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                                 <button
                                   disabled={!answersMap[q.id]?.trim()}
                                   onClick={() => handleAnswerQuestion(q.id, q.question, answersMap[q.id])}
-                                  className="px-4 py-2 bg-[#007AFF] hover:bg-[#007AFF]/90 text-white text-xs font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                                  className="px-4 py-2 bg-[#ff3b1d] hover:bg-[#ff3b1d]/90 text-white text-xs font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
                                 >
                                   Save Answer to DB & Train Chatbot
                                 </button>
@@ -783,7 +783,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                               }`}
                             >
                               <div className="flex items-center justify-between">
-                                <span className="text-xs font-semibold text-[#007AFF]">{l.name}</span>
+                                <span className="text-xs font-semibold text-[#ff3b1d]">{l.name}</span>
                                 <span className="text-[10px] font-mono text-slate-500">{l.created_at}</span>
                               </div>
                               <div className="text-xs font-mono text-slate-400">
@@ -826,7 +826,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                           key={r.id}
                           onClick={() => setSelectedHeroMode(r.id)}
                           className={`flex-1 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
-                            selectedHeroMode === r.id ? 'bg-[#007AFF] text-white shadow-glow' : 'text-slate-400 hover:text-white'
+                            selectedHeroMode === r.id ? 'bg-[#ff3b1d] text-white shadow-glow' : 'text-slate-400 hover:text-white'
                           }`}
                         >
                           {r.label}
@@ -847,7 +847,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                                 updated[selectedHeroMode].hero.badge = e.target.value;
                                 setAdminConfig(updated);
                               }}
-                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                             />
                           </div>
                           <div>
@@ -860,7 +860,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                                 updated[selectedHeroMode].hero.titleName = e.target.value;
                                 setAdminConfig(updated);
                               }}
-                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                             />
                           </div>
                         </div>
@@ -875,7 +875,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                               updated[selectedHeroMode].hero.headline = e.target.value;
                               setAdminConfig(updated);
                             }}
-                            className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800 resize-none"
+                            className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800 resize-none"
                           />
                         </div>
 
@@ -889,7 +889,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                               updated[selectedHeroMode].hero.subtext = e.target.value;
                               setAdminConfig(updated);
                             }}
-                            className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800 resize-none"
+                            className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800 resize-none"
                           />
                         </div>
 
@@ -903,7 +903,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                               updated[selectedHeroMode].hero.trustRow = e.target.value.split(',').map(s => s.trim()).filter(Boolean);
                               setAdminConfig(updated);
                             }}
-                            className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                            className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                           />
                         </div>
 
@@ -917,7 +917,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                               updated[selectedHeroMode].philosophy = e.target.value;
                               setAdminConfig(updated);
                             }}
-                            className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800 resize-none"
+                            className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800 resize-none"
                           />
                         </div>
                       </div>
@@ -948,14 +948,14 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                           }`}
                         >
                           <div className="flex items-center gap-3">
-                            <span className="px-2 py-1 rounded bg-[#007AFF]/15 text-[#007AFF] text-[10px] font-mono font-bold uppercase">{r.id}</span>
+                            <span className="px-2 py-1 rounded bg-[#ff3b1d]/15 text-[#ff3b1d] text-[10px] font-mono font-bold uppercase">{r.id}</span>
                             <span>{r.label} (Icon: {r.icon})</span>
                           </div>
                           
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleSelectRoleForEdit(r)}
-                              className="p-1.5 rounded-lg border border-slate-500/20 hover:border-[#007AFF]/40 hover:bg-[#007AFF]/10 text-slate-400 hover:text-[#007AFF] cursor-pointer transition-colors"
+                              className="p-1.5 rounded-lg border border-slate-500/20 hover:border-[#ff3b1d]/40 hover:bg-[#ff3b1d]/10 text-slate-400 hover:text-[#ff3b1d] cursor-pointer transition-colors"
                               title="Edit Role label and icon"
                             >
                               <Edit className="w-3.5 h-3.5" />
@@ -976,7 +976,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
 
                     {/* Create Role Form */}
                     <form onSubmit={handleCreateRole} className="border-t border-neutral-800 pt-6 flex flex-col gap-4 mt-2">
-                      <span className="block text-[10px] font-mono uppercase text-[#007AFF] tracking-wider font-bold mb-1">
+                      <span className="block text-[10px] font-mono uppercase text-[#ff3b1d] tracking-wider font-bold mb-1">
                         {isEditingRole ? 'Modify dynamic profile role metadata' : 'Create new dynamic profile role'}
                       </span>
                       
@@ -992,7 +992,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                             placeholder="e.g. ml-engineer"
                             value={newRoleId}
                             onChange={e => setNewRoleId(e.target.value)}
-                            className={`w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800 ${
+                            className={`w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800 ${
                               isEditingRole ? 'opacity-50 cursor-not-allowed' : ''
                             }`}
                           />
@@ -1005,7 +1005,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                             placeholder="e.g. Machine Learning Engineer"
                             value={newRoleLabel}
                             onChange={e => setNewRoleLabel(e.target.value)}
-                            className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                            className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                           />
                         </div>
                       </div>
@@ -1016,7 +1016,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                           <select
                             value={newRoleIcon}
                             onChange={e => setNewRoleIcon(e.target.value)}
-                            className="w-full px-4 py-2.5 rounded-xl border bg-neutral-900 text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                            className="w-full px-4 py-2.5 rounded-xl border bg-neutral-900 text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                           >
                             <option value="Layers">Layers (General)</option>
                             <option value="Database">Database (Data Engineering)</option>
@@ -1034,7 +1034,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                             value={copyFromRole}
                             disabled={isEditingRole}
                             onChange={e => setCopyFromRole(e.target.value)}
-                            className={`w-full px-4 py-2.5 rounded-xl border bg-neutral-900 text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800 ${
+                            className={`w-full px-4 py-2.5 rounded-xl border bg-neutral-900 text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800 ${
                               isEditingRole ? 'opacity-50 cursor-not-allowed' : ''
                             }`}
                           >
@@ -1055,7 +1055,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                         <button
                           type="submit"
                           disabled={creatingRole}
-                          className="px-6 py-2.5 bg-[#007AFF] hover:bg-[#007AFF]/90 disabled:opacity-60 text-white rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold shadow-glow cursor-pointer transition-colors"
+                          className="px-6 py-2.5 bg-[#ff3b1d] hover:bg-[#ff3b1d]/90 disabled:opacity-60 text-white rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold shadow-glow cursor-pointer transition-colors"
                         >
                           {creatingRole ? (
                             <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -1096,7 +1096,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
 
                     {/* Avatar Upload */}
                     <div className="flex flex-col gap-3 p-5 border rounded-2xl border-neutral-800 bg-neutral-900/20">
-                      <span className="text-[10px] font-mono uppercase text-[#007AFF] tracking-wider font-semibold">Homepage Photo (avatar.jpg)</span>
+                      <span className="text-[10px] font-mono uppercase text-[#ff3b1d] tracking-wider font-semibold">Homepage Photo (avatar.jpg)</span>
                       <div className="flex flex-col md:flex-row items-center gap-4">
                         <input
                           type="file"
@@ -1113,7 +1113,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                           <button
                             onClick={handleAvatarUpload}
                             disabled={uploadingAvatar}
-                            className="px-4 py-2 bg-[#007AFF] text-white rounded-xl text-xs font-semibold shadow-glow cursor-pointer transition-opacity"
+                            className="px-4 py-2 bg-[#ff3b1d] text-white rounded-xl text-xs font-semibold shadow-glow cursor-pointer transition-opacity"
                           >
                             {uploadingAvatar ? 'Uploading...' : 'Confirm Upload'}
                           </button>
@@ -1126,7 +1126,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
 
                     {/* CV PDF Upload */}
                     <div className="flex flex-col gap-3 p-5 border rounded-2xl border-neutral-800 bg-neutral-900/20">
-                      <span className="text-[10px] font-mono uppercase text-[#007AFF] tracking-wider font-semibold">Resume PDF (cv.pdf)</span>
+                      <span className="text-[10px] font-mono uppercase text-[#ff3b1d] tracking-wider font-semibold">Resume PDF (cv.pdf)</span>
                       <div className="flex flex-col md:flex-row items-center gap-4">
                         <input
                           type="file"
@@ -1143,7 +1143,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                           <button
                             onClick={handleCvUpload}
                             disabled={uploadingCv}
-                            className="px-4 py-2 bg-[#007AFF] text-white rounded-xl text-xs font-semibold shadow-glow cursor-pointer transition-opacity"
+                            className="px-4 py-2 bg-[#ff3b1d] text-white rounded-xl text-xs font-semibold shadow-glow cursor-pointer transition-opacity"
                           >
                             {uploadingCv ? 'Uploading...' : 'Confirm Upload'}
                           </button>
@@ -1173,7 +1173,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                               required
                               value={smtpConfig.SMTP_HOST || ''}
                               onChange={e => setSmtpConfig({ ...smtpConfig, SMTP_HOST: e.target.value })}
-                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                             />
                           </div>
                           <div>
@@ -1183,7 +1183,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                               required
                               value={smtpConfig.SMTP_PORT ?? 587}
                               onChange={e => setSmtpConfig({ ...smtpConfig, SMTP_PORT: parseInt(e.target.value) || 587 })}
-                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                             />
                           </div>
                           <div>
@@ -1193,7 +1193,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                               required
                               value={smtpConfig.SMTP_USER || ''}
                               onChange={e => setSmtpConfig({ ...smtpConfig, SMTP_USER: e.target.value })}
-                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                             />
                           </div>
                         </div>
@@ -1206,7 +1206,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                               required
                               value={smtpConfig.SMTP_PASSWORD || ''}
                               onChange={e => setSmtpConfig({ ...smtpConfig, SMTP_PASSWORD: e.target.value })}
-                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                             />
                           </div>
                           <div>
@@ -1216,7 +1216,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                               required
                               value={smtpConfig.SMTP_TO || ''}
                               onChange={e => setSmtpConfig({ ...smtpConfig, SMTP_TO: e.target.value })}
-                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                             />
                           </div>
                         </div>
@@ -1228,7 +1228,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                               type="password"
                               value={smtpConfig.RESEND_API_KEY || ''}
                               onChange={e => setSmtpConfig({ ...smtpConfig, RESEND_API_KEY: e.target.value })}
-                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                             />
                           </div>
                           <div>
@@ -1237,7 +1237,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                               type="text"
                               value={smtpConfig.RESEND_FROM || ''}
                               onChange={e => setSmtpConfig({ ...smtpConfig, RESEND_FROM: e.target.value })}
-                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                             />
                           </div>
                         </div>
@@ -1251,7 +1251,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                         <button
                           type="submit"
                           disabled={savingSmtp}
-                          className="px-6 py-2.5 bg-[#007AFF] hover:bg-[#007AFF]/90 disabled:opacity-60 text-white rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold shadow-glow cursor-pointer self-start transition-colors"
+                          className="px-6 py-2.5 bg-[#ff3b1d] hover:bg-[#ff3b1d]/90 disabled:opacity-60 text-white rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold shadow-glow cursor-pointer self-start transition-colors"
                         >
                           {savingSmtp ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
                           <span>Save SMTP Config</span>
@@ -1273,7 +1273,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                               required
                               value={newUsername}
                               onChange={e => setNewUsername(e.target.value)}
-                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                             />
                           </div>
                           <div>
@@ -1283,7 +1283,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                               required
                               value={currentPassword}
                               onChange={e => setCurrentPassword(e.target.value)}
-                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                             />
                           </div>
                         </div>
@@ -1296,7 +1296,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                               required
                               value={newPassword}
                               onChange={e => setNewPassword(e.target.value)}
-                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                             />
                           </div>
                           <div>
@@ -1306,7 +1306,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                               required
                               value={confirmPassword}
                               onChange={e => setConfirmPassword(e.target.value)}
-                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                              className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                             />
                           </div>
                         </div>
@@ -1326,7 +1326,7 @@ export default function Admin({ isDark, onRefreshData }: AdminProps) {
                         <button
                           type="submit"
                           disabled={changingCreds}
-                          className="px-6 py-2.5 bg-[#007AFF] hover:bg-[#007AFF]/90 disabled:opacity-60 text-white rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold shadow-glow cursor-pointer self-start transition-colors"
+                          className="px-6 py-2.5 bg-[#ff3b1d] hover:bg-[#ff3b1d]/90 disabled:opacity-60 text-white rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold shadow-glow cursor-pointer self-start transition-colors"
                         >
                           {changingCreds ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
                           <span>Save New Credentials</span>

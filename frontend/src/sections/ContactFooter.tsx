@@ -1,34 +1,43 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import React, { useState, ChangeEvent, FormEvent } from 'react';
-import { motion } from 'motion/react';
+import React, { useState, ChangeEvent, FormEvent, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PortfolioService from '../services/api';
-import { 
-  Send, 
-  Mail, 
-  Github, 
-  Linkedin, 
-  MapPin, 
-  FileText, 
-  ArrowUpRight, 
-  CheckCircle2, 
-  Loader2, 
-  Clock 
-} from 'lucide-react';
+import { Coordinates } from '../types';
 
 interface ContactFooterProps {
-  isDark: boolean;
+  isDark?: boolean;
+  coordinates?: Coordinates;
 }
 
-export default function ContactFooter({ isDark }: ContactFooterProps) {
-  // Form submission states
-  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
+export default function ContactFooter({ coordinates }: ContactFooterProps) {
+  const [formData, setFormData] = useState({ name: '', email: '', subject: 'Portfolio Outreach', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitResult, setSubmitResult] = useState<{ success: boolean; message: string } | null>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(false);
+
+  const coords = coordinates || {
+    email: 'hello@adarshsingh.in',
+    linkedin: 'https://linkedin.com/in/adarshsingh45',
+    github: 'https://github.com/Adarsh-Singh07',
+    location: 'Bengaluru, India',
+    hours: 'Mon – Fri, 9:00 AM – 6:00 PM IST',
+  };
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -44,319 +53,368 @@ export default function ContactFooter({ isDark }: ContactFooterProps) {
     try {
       const res = await PortfolioService.submitContactMessage(formData);
       setSubmitResult(res);
-      setFormData({ name: '', email: '', subject: '', message: '' });
-    } catch (err) {
-      setSubmitResult({ success: false, message: 'Your message could not be delivered to the gateway because of an error. Please retry.' });
+      setFormData({ name: '', email: '', subject: 'Portfolio Outreach', message: '' });
+    } catch {
+      setSubmitResult({
+        success: false,
+        message: 'Your message could not be delivered to the gateway. Please reach out directly via email.',
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const contactCards = [
-    {
-      title: "Direct Pipeline",
-      value: "hello@adarshsingh.in",
-      href: "mailto:hello@adarshsingh.in",
-      icon: Mail,
-      label: "Send direct request"
-    },
-    {
-      title: "Github Ledger",
-      value: "github.com/Adarsh-Singh07",
-      href: "https://github.com/Adarsh-Singh07",
-      icon: Github,
-      label: "Review source architectures"
-    },
-    {
-      title: "Professional Ledger",
-      value: "linkedin.com/in/adarshsingh45",
-      href: "https://linkedin.com/in/adarshsingh45",
-      icon: Linkedin,
-      label: "Forge corporate contract"
-    },
-    {
-      title: "Physical Location",
-      value: "Bengaluru, India",
-      icon: MapPin,
-      label: "Engineering Hub"
-    }
+  const socials = [
+    { label: 'GitHub', url: coords.github || 'https://github.com/Adarsh-Singh07' },
+    { label: 'LinkedIn', url: coords.linkedin || 'https://linkedin.com/in/adarshsingh45' },
+    { label: 'X / Twitter', url: 'https://x.com/adarshsingh_07' },
+    { label: 'Portfolio', url: 'https://adarshsingh.in' },
   ];
 
   return (
-    <section 
-      id="contact" 
-      className={`relative pt-24 pb-8 transition-colors duration-200 border-t ${
-        isDark 
-          ? 'bg-[#121212] text-white border-neutral-900' 
-          : 'bg-white text-neutral-900 border-slate-100'
-      }`}
+    <footer
+      id="contact"
+      ref={sectionRef}
+      style={{
+        paddingTop: 'var(--section)',
+        paddingInline: 'var(--gutter)',
+        background: 'var(--background)',
+      }}
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 w-full">
-        
-        {/* Step 5 Title Header */}
-        <div className="mb-16 text-left max-w-3xl">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="w-8 h-[1px] bg-[#007AFF]" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#007AFF]">
-              Secure Client Transmission Gateway
+      {/* Eyebrow */}
+      <div className="eyebrow" style={{ marginBottom: '1.5rem' }}>
+        Let's Build
+      </div>
+
+      {/* Heading with line reveal */}
+      <h2
+        style={{
+          fontFamily: 'var(--font-display)',
+          textTransform: 'uppercase',
+          lineHeight: 0.95,
+          color: 'var(--foreground)',
+          fontSize: '3.5rem',
+        }}
+        className="sm:text-[7.5rem]"
+      >
+        {'Need an AI system or platform built for scale?'.split(' ').map((word, i) => (
+          <span key={i} className="inline-block overflow-hidden mr-[0.25em]">
+            <span
+              className="inline-block"
+              style={{
+                transform: inView ? 'translateY(0)' : 'translateY(110%)',
+                transition: 'transform 850ms cubic-bezier(0.16, 1, 0.3, 1)',
+                transitionDelay: `${i * 50}ms`,
+              }}
+            >
+              {word}
             </span>
+          </span>
+        ))}
+      </h2>
+
+      {/* Sub-copy */}
+      <p
+        style={{
+          marginTop: '2rem',
+          maxWidth: '44ch',
+          fontSize: '1.375rem',
+          color: 'var(--muted)',
+          lineHeight: 1.45,
+          opacity: inView ? 1 : 0,
+          transform: inView ? 'translateY(0)' : 'translateY(20px)',
+          transition: 'opacity 520ms cubic-bezier(0.16, 1, 0.3, 1) 150ms, transform 520ms cubic-bezier(0.16, 1, 0.3, 1) 150ms',
+        }}
+      >
+        Whether it's enterprise AI architecture, multi-agent systems, or full-stack engineering — my inbox is open.
+      </p>
+
+      {/* Grid: Oversized Email Link + Direct Supabase Contact Form */}
+      <div
+        className="grid grid-cols-1 lg:grid-cols-12 mt-12 items-start"
+        style={{ gap: 'var(--gutter)' }}
+      >
+        {/* Left: Oversized CTA */}
+        <div className="lg:col-span-6">
+          <a
+            href={`mailto:${coords.email}`}
+            className="group inline-flex items-center gap-3 transition-transform duration-340 ease-out hover:translate-x-3.5"
+            style={{
+              fontSize: '1.75rem',
+              fontWeight: 600,
+              color: 'var(--foreground)',
+              transition: 'color 340ms ease-out, transform 340ms ease-out',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--foreground)')}
+          >
+            <span className="break-all sm:text-[3rem] lg:text-[4rem] leading-none font-sans font-bold">
+              {coords.email}
+            </span>
+            <span style={{ color: 'var(--accent)', fontSize: '2rem' }}>↗</span>
+          </a>
+
+          <div
+            className="mt-8 space-y-2"
+            style={{
+              fontSize: '0.8125rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.18em',
+              color: 'var(--muted)',
+            }}
+          >
+            <p>Direct Inquiries · Advisory · Technical Architecture</p>
+            <p>Based in {coords.location || 'Bengaluru, India'} · Worldwide Deployments</p>
           </div>
-          <h2 className="text-4xl md:text-5xl font-sans font-semibold tracking-tight">
-            Let’s Build Something Intelligent
-          </h2>
-          <p className={`mt-3.5 text-base md:text-lg font-light ${
-            isDark ? 'text-white/50' : 'text-neutral-950/60'
-          }`}>
-            Whether it’s AI integration, custom high-throughput Data Engineering, or distributed systems – let’s create meaningful impact.
+        </div>
+
+        {/* Right: Supabase Connected Minimal Contact Form */}
+        <div className="lg:col-span-6">
+          <form
+            onSubmit={handleFormSubmit}
+            className="p-6 md:p-8 rounded-[0.25rem]"
+            style={{
+              border: '1px solid var(--line)',
+              background: 'var(--surface)',
+            }}
+          >
+            <h3
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: '1.75rem',
+                textTransform: 'uppercase',
+                letterSpacing: '-0.01em',
+                color: 'var(--foreground)',
+                marginBottom: '1.5rem',
+              }}
+            >
+              Direct Transmission
+            </h3>
+
+            <div className="space-y-4">
+              <div>
+                <input
+                  required
+                  type="text"
+                  name="name"
+                  placeholder="Your Name / Organization *"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  style={{
+                    width: '100%',
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: '1px solid var(--line-strong)',
+                    padding: '1.25rem 0',
+                    color: 'var(--foreground)',
+                    fontSize: '1.0625rem',
+                    outline: 'none',
+                    transition: 'border-color 340ms ease-out',
+                  }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = 'var(--accent)')}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--line-strong)')}
+                />
+              </div>
+
+              <div>
+                <input
+                  required
+                  type="email"
+                  name="email"
+                  placeholder="Your Return Email Address *"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  style={{
+                    width: '100%',
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: '1px solid var(--line-strong)',
+                    padding: '1.25rem 0',
+                    color: 'var(--foreground)',
+                    fontSize: '1.0625rem',
+                    outline: 'none',
+                    transition: 'border-color 340ms ease-out',
+                  }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = 'var(--accent)')}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--line-strong)')}
+                />
+              </div>
+
+              <div>
+                <textarea
+                  required
+                  rows={4}
+                  name="message"
+                  placeholder="Brief overview of problem statement, architecture requirements, or timeline... *"
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  style={{
+                    width: '100%',
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: '1px solid var(--line-strong)',
+                    padding: '1.25rem 0',
+                    color: 'var(--foreground)',
+                    fontSize: '1.0625rem',
+                    outline: 'none',
+                    resize: 'none',
+                    transition: 'border-color 340ms ease-out',
+                  }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = 'var(--accent)')}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--line-strong)')}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="group relative overflow-hidden w-full mt-4"
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: '1.375rem',
+                  textTransform: 'uppercase',
+                  padding: '1.25rem 2rem',
+                  letterSpacing: '0.05em',
+                  background: 'var(--surface-2)',
+                  color: 'var(--foreground)',
+                  border: '1px solid var(--line-strong)',
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  transition: 'background 340ms ease-out, border-color 340ms ease-out',
+                }}
+                onMouseEnter={(e) => {
+                  if (!isSubmitting) {
+                    e.currentTarget.style.background = 'var(--accent)';
+                    e.currentTarget.style.borderColor = 'var(--accent)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isSubmitting) {
+                    e.currentTarget.style.background = 'var(--surface-2)';
+                    e.currentTarget.style.borderColor = 'var(--line-strong)';
+                  }
+                }}
+              >
+                <span>{isSubmitting ? 'Transmitting Data...' : 'Transmit Message →'}</span>
+              </button>
+
+              {submitResult && (
+                <div
+                  className="p-4 rounded text-xs mt-4"
+                  style={{
+                    background: submitResult.success ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                    color: submitResult.success ? '#4ade80' : '#f87171',
+                    border: submitResult.success ? '1px solid rgba(34, 197, 94, 0.2)' : '1px solid rgba(239, 68, 68, 0.2)',
+                  }}
+                >
+                  {submitResult.message}
+                </div>
+              )}
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {/* Footer Bar */}
+      <div
+        className="grid grid-cols-1 lg:grid-cols-12 items-center"
+        style={{
+          marginTop: 'var(--section)',
+          borderTop: '1px solid var(--line)',
+          padding: '3rem 0',
+          gap: '2rem',
+        }}
+      >
+        {/* Left */}
+        <div className="lg:col-span-6">
+          <span
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '3.25rem',
+              textTransform: 'uppercase',
+              lineHeight: 1,
+              color: 'var(--foreground)',
+              display: 'block',
+            }}
+          >
+            Adarsh Singh
+          </span>
+          <p
+            style={{
+              fontSize: '0.8125rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.18em',
+              color: 'var(--muted)',
+              marginTop: '0.5rem',
+            }}
+          >
+            Engineered in Bengaluru · Built with conviction.
           </p>
         </div>
 
-        {/* Form and Contact Cards Layout Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start" id="interactive-contact-anchor">
-          
-          {/* Left Side: Contact Cards */}
-          <div className="lg:col-span-5 space-y-4">
-            {contactCards.map((card) => {
-              const IconComp = card.icon;
-              const isLink = !!card.href;
-
-              const CardBody = (
-                <div 
-                  className={`p-5 rounded-[24px] border flex items-center gap-4 transition-all duration-300 w-full text-left h-full ${
-                    isDark 
-                      ? 'bg-[#151515]/60 border-white/5 text-white hover:bg-[#151515] hover:border-[#007AFF]/35' 
-                      : 'bg-[#FDFBF7] border-neutral-200/60 text-neutral-900 hover:bg-white hover:shadow-md'
-                  }`}
-                >
-                  <div className={`p-3 rounded-2xl ${
-                    isDark ? 'bg-white/5 border border-white/5 text-[#007AFF]' : 'bg-slate-100 border border-slate-250 text-[#007AFF]'
-                  }`}>
-                    <IconComp className="w-4 h-4" />
-                  </div>
-                  <div className="truncate">
-                    <span className={`text-[9px] uppercase font-sans tracking-widest font-bold block ${
-                      isDark ? 'text-white/30' : 'text-neutral-400'
-                    }`}>
-                      {card.title}
-                    </span>
-                    <span className="text-sm font-semibold truncate font-sans block mt-0.5">{card.value}</span>
-                    <span className={`text-[10px] font-serif italic mt-0.5 block ${
-                      isDark ? 'text-white/40' : 'text-neutral-500'
-                    }`}>
-                      {card.label}
-                    </span>
-                  </div>
-                </div>
-              );
-
-              if (isLink) {
-                return (
-                  <a 
-                    key={card.title} 
-                    href={card.href} 
-                    target="_blank" 
-                    rel="noreferrer" 
-                    className="block hover:-translate-y-0.5 transition-transform duration-300 select-none"
-                  >
-                    {CardBody}
-                  </a>
-                );
-              }
-
-              return (
-                <div key={card.title} className="select-none">
-                  {CardBody}
-                </div>
-              );
-            })}
-
-            {/* Resume button request box */}
-            <div className={`p-6 rounded-[24px] border ${
-              isDark ? 'bg-[#151515]/60 border-white/5' : 'bg-[#FDFBF7] border-neutral-200/60'
-            }`}>
-              <h4 className="text-sm font-semibold font-sans tracking-tight mb-2">Architectural Blueprint Ready</h4>
-              <p className={`text-xs font-light leading-relaxed mb-4 ${isDark ? 'text-white/50' : 'text-neutral-950/60'}`}>
-                Grab my comprehensive qualifications catalog containing custom performance indexes, cloud architectures and code bases.
-              </p>
-              <a
-                href="mailto:hello@adarshsingh.in?subject=Resume%20Request%20-%20AI%20%26%20Data%20Engineer"
-                className={`py-2 px-4 rounded-xl text-xs font-bold tracking-wider uppercase inline-flex items-center gap-1.5 transition-all duration-300 cursor-pointer ${
-                  isDark 
-                    ? 'bg-white/5 hover:bg-[#007AFF]/20 text-white border border-white/5 hover:border-[#007AFF]/30' 
-                    : 'bg-white hover:bg-slate-100 text-slate-800 border border-slate-300'
-                }`}
-              >
-                <FileText className="w-3.5 h-3.5" />
-                <span>View Full Blueprint Resume</span>
-                <ArrowUpRight className="w-3 h-3 text-[#007AFF]" />
-              </a>
-            </div>
-          </div>
-
-          {/* Right Side: Luxury Contact Form */}
-          <div className="lg:col-span-7">
-            <div className={`p-6 md:p-8 rounded-[32px] border ${
-              isDark 
-                ? 'bg-[#151515]/60 hover:bg-[#151515] border-white/5' 
-                : 'glass-card-light'
-            }`}>
-              <h3 className="text-xl font-sans font-semibold tracking-tight mb-6">
-                Transmit Secure Message
-              </h3>
-
-              <form onSubmit={handleFormSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1.5 text-left">
-                    <label htmlFor="name" className={`text-[10px] font-sans uppercase tracking-[0.15em] block font-bold ${
-                      isDark ? 'text-white/40' : 'text-neutral-500'
-                    }`}>
-                      Full Identity *
-                    </label>
-                    <input
-                      required
-                      type="text"
-                      name="name"
-                      id="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      placeholder="e.g. Recruiter, CTO"
-                      className={`w-full px-4 py-3 rounded-xl text-sm border focus:outline-none transition-all duration-300 ${
-                        isDark 
-                          ? 'bg-neutral-900 border-white/5 text-white placeholder-white/20 focus:border-[#007AFF] focus:ring-1 focus:ring-[#007AFF]/25' 
-                          : 'bg-white border-slate-200 text-neutral-900 placeholder-slate-400 focus:border-[#007AFF] focus:ring-1 focus:ring-[#007AFF]/20'
-                      }`}
-                    />
-                  </div>
-
-                  <div className="space-y-1.5 text-left">
-                    <label htmlFor="email" className={`text-[10px] font-sans uppercase tracking-[0.15em] block font-bold ${
-                      isDark ? 'text-white/40' : 'text-neutral-500'
-                    }`}>
-                      Secure Email *
-                    </label>
-                    <input
-                      required
-                      type="email"
-                      name="email"
-                      id="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      placeholder="e.g. contact@company.com"
-                      className={`w-full px-4 py-3 rounded-xl text-sm border focus:outline-none transition-all duration-300 ${
-                        isDark 
-                          ? 'bg-neutral-900 border-white/5 text-white placeholder-white/20 focus:border-[#007AFF] focus:ring-1 focus:ring-[#007AFF]/25' 
-                          : 'bg-white border-slate-200 text-neutral-900 placeholder-slate-400 focus:border-[#007AFF] focus:ring-1 focus:ring-[#007AFF]/20'
-                      }`}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5 text-left">
-                  <label htmlFor="subject" className={`text-[10px] font-sans uppercase tracking-[0.15em] block font-bold ${
-                    isDark ? 'text-white/40' : 'text-neutral-500'
-                  }`}>
-                    Subject Matter
-                  </label>
-                  <input
-                    type="text"
-                    name="subject"
-                    id="subject"
-                    value={formData.subject}
-                    onChange={handleInputChange}
-                    placeholder="e.g. System Integration Request"
-                    className={`w-full px-4 py-3 rounded-xl text-sm border focus:outline-none transition-all duration-300 ${
-                      isDark 
-                        ? 'bg-neutral-900 border-white/5 text-white placeholder-white/20 focus:border-[#007AFF] focus:ring-1 focus:ring-[#007AFF]/25' 
-                        : 'bg-white border-slate-200 text-neutral-900 placeholder-slate-400 focus:border-[#007AFF] focus:ring-1 focus:ring-[#007AFF]/20'
-                    }`}
-                  />
-                </div>
-
-                <div className="space-y-1.5 text-left">
-                  <label htmlFor="message" className={`text-[10px] font-sans uppercase tracking-[0.15em] block font-bold ${
-                    isDark ? 'text-white/40' : 'text-neutral-500'
-                  }`}>
-                    System Parameters (Message) *
-                  </label>
-                  <textarea
-                    required
-                    name="message"
-                    id="message"
-                    rows={4}
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    placeholder="Specify project architectures, timeline variables or corporate proposal requirements..."
-                    className={`w-full px-4 py-3 rounded-xl text-sm border focus:outline-none transition-all duration-300 resize-none ${
-                      isDark 
-                        ? 'bg-neutral-900 border-white/5 text-white placeholder-white/20 focus:border-[#007AFF] focus:ring-1 focus:ring-[#007AFF]/25' 
-                        : 'bg-white border-slate-200 text-neutral-900 placeholder-slate-400 focus:border-[#007AFF] focus:ring-1 focus:ring-[#007AFF]/20'
-                    }`}
-                  />
-                </div>
-
-                {/* Submit button with loading triggers */}
-                <button
-                  id="submit-contact-button"
-                  type="submit"
-                  disabled={isSubmitting}
-                  className={`w-full py-4 px-6 rounded-2xl text-[10px] font-bold tracking-widest uppercase flex items-center justify-center gap-2 cursor-pointer transition-all duration-300 border focus:outline-none ${
-                    isSubmitting 
-                      ? 'bg-neutral-800 border-neutral-700 text-slate-400 pointer-events-none' 
-                      : isDark 
-                        ? 'bg-white text-black border-transparent hover:bg-[#007AFF] hover:text-white' 
-                        : 'bg-neutral-900 text-white border-transparent hover:bg-[#007AFF]'
-                  }`}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Transmitting Blueprint Data...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-3.5 h-3.5" />
-                      <span>Send Transmission</span>
-                    </>
-                  )}
-                </button>
-
-                {/* Interactive Results Screen alert */}
-                {submitResult && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`p-4 rounded-xl text-xs flex items-start gap-2.5 border mt-4 ${
-                      submitResult.success
-                        ? 'bg-emerald-500/5 text-emerald-400 border-emerald-500/10'
-                        : 'bg-rose-500/5 text-rose-400 border-rose-500/10'
-                    }`}
-                  >
-                    <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
-                    <span>{submitResult.message}</span>
-                  </motion.div>
-                )}
-              </form>
-            </div>
-          </div>
-
+        {/* Middle — Social Links with expanding leading line */}
+        <div className="lg:col-span-3 flex flex-col gap-2.5">
+          {socials.map((s) => (
+            <a
+              key={s.label}
+              href={s.url}
+              target="_blank"
+              rel="noreferrer"
+              className="group flex items-center gap-2"
+              style={{
+                fontSize: '0.8125rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.18em',
+                color: 'var(--muted)',
+                transition: 'color 340ms ease-out',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--foreground)')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--muted)')}
+            >
+              <span
+                style={{
+                  height: '1px',
+                  background: 'var(--accent)',
+                  width: '0rem',
+                  transition: 'width 340ms ease-out',
+                }}
+                className="group-hover:!w-6"
+              />
+              <span>{s.label}</span>
+              <span style={{ fontSize: '0.75rem', opacity: 0.6 }}>↗</span>
+            </a>
+          ))}
         </div>
 
-        {/* Minimal Premium Footer */}
-        <div className={`mt-24 pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-4 select-none ${
-          isDark ? 'border-white/5 text-white/30' : 'border-slate-100 text-slate-400'
-        }`}>
-          <div className="text-xs font-sans font-medium flex items-center gap-2">
-            <span>© 2026 Adarsh Singh. All Systems Operational.</span>
-            <span>&bull;</span>
-            <Link to="/admin" className="hover:text-[#007AFF] transition-colors underline decoration-dotted decoration-neutral-700 hover:decoration-[#007AFF]">Admin Panel</Link>
-          </div>
-          <div className="flex items-center gap-2 text-[10px] font-sans tracking-widest uppercase font-bold">
-            <span>Crafted with precision</span>
-            <Clock className="w-3.5 h-3.5 text-[#007AFF] font-extrabold" />
+        {/* Right — Copyright & Admin link */}
+        <div className="lg:col-span-3 lg:text-right space-y-1">
+          <p
+            style={{
+              fontSize: '0.8125rem',
+              color: 'var(--muted)',
+              letterSpacing: '0.05em',
+            }}
+          >
+            © 2026 Adarsh Singh. All rights reserved.
+          </p>
+          <div className="text-xs">
+            <Link
+              to="/admin"
+              style={{
+                fontSize: '0.75rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.18em',
+                color: 'var(--muted)',
+                opacity: 0.5,
+                transition: 'opacity 340ms ease-out',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.5')}
+            >
+              Admin Access
+            </Link>
           </div>
         </div>
-
       </div>
-    </section>
+    </footer>
   );
 }

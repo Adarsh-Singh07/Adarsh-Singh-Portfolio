@@ -142,7 +142,7 @@ const getIssuerTheme = (issuer: string, isDark: boolean) => {
   
   return {
     logoBtn: (
-      <div className="w-20 h-20 rounded-3xl bg-[#007AFF]/10 border border-[#007AFF]/20 flex items-center justify-center text-[#007AFF] transition-all duration-300">
+      <div className="w-20 h-20 rounded-3xl bg-[#ff3b1d]/10 border border-[#ff3b1d]/20 flex items-center justify-center text-[#ff3b1d] transition-all duration-300">
         <Award className="w-10 h-10" />
       </div>
     )
@@ -337,7 +337,7 @@ export default function DetailEditModal({
         >
           {/* Top Actions Row */}
           <div className="flex items-center justify-between border-b pb-4 mb-6 border-neutral-800">
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#007AFF] font-bold">
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#ff3b1d] font-bold">
               {type} details
             </span>
             <div className="flex items-center gap-2">
@@ -385,7 +385,7 @@ export default function DetailEditModal({
                           required
                           value={formData.title || ''}
                           onChange={e => setFormData({ ...formData, title: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                         />
                       </div>
                       <div>
@@ -393,7 +393,7 @@ export default function DetailEditModal({
                         <select
                           value={formData.status || 'In Progress'}
                           onChange={e => setFormData({ ...formData, status: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-neutral-900 text-sm focus:outline-none focus:border-[#007AFF] border-neutral-850"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-neutral-900 text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-850"
                         >
                           <option value="Deployed">Deployed</option>
                           <option value="Beta">Beta</option>
@@ -409,7 +409,7 @@ export default function DetailEditModal({
                         rows={4}
                         value={formData.description || ''}
                         onChange={e => setFormData({ ...formData, description: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800 resize-none"
+                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800 resize-none"
                       />
                     </div>
 
@@ -420,7 +420,7 @@ export default function DetailEditModal({
                           type="url"
                           value={formData.githubUrl || ''}
                           onChange={e => setFormData({ ...formData, githubUrl: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                         />
                       </div>
                       <div>
@@ -429,7 +429,7 @@ export default function DetailEditModal({
                           type="url"
                           value={formData.demoUrl || ''}
                           onChange={e => setFormData({ ...formData, demoUrl: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                         />
                       </div>
                     </div>
@@ -441,7 +441,7 @@ export default function DetailEditModal({
                         placeholder="e.g. Python, PySpark, Azure Databricks"
                         value={formData.technologies ? formData.technologies.join(', ') : ''}
                         onChange={e => handleStringListChange('technologies', e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                       />
                     </div>
 
@@ -456,7 +456,7 @@ export default function DetailEditModal({
                             updated.push({ value: '', label: '' });
                             setFormData({ ...formData, metrics: updated });
                           }}
-                          className="px-2.5 py-1 bg-[#007AFF]/10 text-[#007AFF] hover:bg-[#007AFF]/20 text-[10px] font-bold rounded-lg border border-[#007AFF]/25 flex items-center gap-1 transition-all cursor-pointer"
+                          className="px-2.5 py-1 bg-[#ff3b1d]/10 text-[#ff3b1d] hover:bg-[#ff3b1d]/20 text-[10px] font-bold rounded-lg border border-[#ff3b1d]/25 flex items-center gap-1 transition-all cursor-pointer"
                         >
                           <Plus className="w-3 h-3" />
                           <span>Add Metric</span>
@@ -520,7 +520,7 @@ export default function DetailEditModal({
                           required
                           value={formData.title || ''}
                           onChange={e => setFormData({ ...formData, title: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                         />
                       </div>
                       <div>
@@ -528,7 +528,7 @@ export default function DetailEditModal({
                         <select
                           value={formData.issuer || ''}
                           onChange={e => setFormData({ ...formData, issuer: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-neutral-900 text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800 text-white"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-neutral-900 text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800 text-white"
                         >
                           <option value="">Select Issuer</option>
                           <option value="Microsoft">Microsoft</option>
@@ -546,7 +546,7 @@ export default function DetailEditModal({
                           type="text"
                           value={formData.code || ''}
                           onChange={e => setFormData({ ...formData, code: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                         />
                       </div>
                       <div>
@@ -557,7 +557,7 @@ export default function DetailEditModal({
                           placeholder="e.g. 2024-03"
                           value={formData.date || ''}
                           onChange={e => setFormData({ ...formData, date: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                         />
                       </div>
                     </div>
@@ -569,7 +569,7 @@ export default function DetailEditModal({
                           type="url"
                           value={formData.credentialUrl || ''}
                           onChange={e => setFormData({ ...formData, credentialUrl: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                         />
                       </div>
                       <div>
@@ -578,7 +578,7 @@ export default function DetailEditModal({
                           type="text"
                           value={formData.badgeUrl || ''}
                           onChange={e => setFormData({ ...formData, badgeUrl: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                         />
                       </div>
                     </div>
@@ -596,7 +596,7 @@ export default function DetailEditModal({
                           required
                           value={formData.title || ''}
                           onChange={e => setFormData({ ...formData, title: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                         />
                       </div>
                       <div>
@@ -607,7 +607,7 @@ export default function DetailEditModal({
                           placeholder="e.g. Data Lakes or Neural Networks"
                           value={formData.category || ''}
                           onChange={e => setFormData({ ...formData, category: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                         />
                       </div>
                     </div>
@@ -621,7 +621,7 @@ export default function DetailEditModal({
                           placeholder="e.g. 5 min read"
                           value={formData.readTime || ''}
                           onChange={e => setFormData({ ...formData, readTime: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                         />
                       </div>
                       <div>
@@ -631,7 +631,7 @@ export default function DetailEditModal({
                           required
                           value={formData.date || ''}
                           onChange={e => setFormData({ ...formData, date: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                         />
                       </div>
                       <div>
@@ -640,7 +640,7 @@ export default function DetailEditModal({
                           type="text"
                           value={formData.url || '#'}
                           onChange={e => setFormData({ ...formData, url: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                         />
                       </div>
                     </div>
@@ -652,7 +652,7 @@ export default function DetailEditModal({
                         required
                         value={formData.excerpt || ''}
                         onChange={e => setFormData({ ...formData, excerpt: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                       />
                     </div>
 
@@ -663,7 +663,7 @@ export default function DetailEditModal({
                         value={formData.content || ''}
                         onChange={e => setFormData({ ...formData, content: e.target.value })}
                         placeholder="Write the full blog post content here..."
-                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none font-mono focus:border-[#007AFF] border-neutral-800 resize-y"
+                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none font-mono focus:border-[#ff3b1d] border-neutral-800 resize-y"
                       />
                     </div>
                   </>
@@ -680,7 +680,7 @@ export default function DetailEditModal({
                           required
                           value={formData.title || ''}
                           onChange={e => setFormData({ ...formData, title: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                         />
                       </div>
                       <div>
@@ -690,7 +690,7 @@ export default function DetailEditModal({
                           required
                           value={formData.subtitle || ''}
                           onChange={e => setFormData({ ...formData, subtitle: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                         />
                       </div>
                     </div>
@@ -703,7 +703,7 @@ export default function DetailEditModal({
                           required
                           value={formData.badge || ''}
                           onChange={e => setFormData({ ...formData, badge: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                         />
                       </div>
                       <div>
@@ -713,7 +713,7 @@ export default function DetailEditModal({
                           required
                           value={formData.buttonText || ''}
                           onChange={e => setFormData({ ...formData, buttonText: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                         />
                       </div>
                     </div>
@@ -725,7 +725,7 @@ export default function DetailEditModal({
                         rows={3}
                         value={formData.description || ''}
                         onChange={e => setFormData({ ...formData, description: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800 resize-none"
+                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800 resize-none"
                       />
                     </div>
 
@@ -736,7 +736,7 @@ export default function DetailEditModal({
                         placeholder="e.g. Email: adarsh@gmail.com, Resume: Available"
                         value={formData.extra ? formData.extra.join(', ') : ''}
                         onChange={e => handleStringListChange('extra', e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                       />
                     </div>
                   </>
@@ -752,7 +752,7 @@ export default function DetailEditModal({
                         required
                         value={formData.email || ''}
                         onChange={e => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                       />
                     </div>
                     <div>
@@ -762,7 +762,7 @@ export default function DetailEditModal({
                         required
                         value={formData.linkedin || ''}
                         onChange={e => setFormData({ ...formData, linkedin: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                       />
                     </div>
                     <div>
@@ -772,7 +772,7 @@ export default function DetailEditModal({
                         required
                         value={formData.github || ''}
                         onChange={e => setFormData({ ...formData, github: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                       />
                     </div>
                     <div>
@@ -782,7 +782,7 @@ export default function DetailEditModal({
                         required
                         value={formData.location || ''}
                         onChange={e => setFormData({ ...formData, location: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                       />
                     </div>
                     <div>
@@ -792,7 +792,7 @@ export default function DetailEditModal({
                         required
                         value={formData.hours || ''}
                         onChange={e => setFormData({ ...formData, hours: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                       />
                     </div>
                   </>
@@ -809,7 +809,7 @@ export default function DetailEditModal({
                           required
                           value={formData.title || ''}
                           onChange={e => setFormData({ ...formData, title: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                         />
                       </div>
                       <div>
@@ -819,7 +819,7 @@ export default function DetailEditModal({
                           required
                           value={formData.signal || ''}
                           onChange={e => setFormData({ ...formData, signal: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                          className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                         />
                       </div>
                     </div>
@@ -829,7 +829,7 @@ export default function DetailEditModal({
                       <select
                         value={formData.icon || 'Database'}
                         onChange={e => setFormData({ ...formData, icon: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl border bg-neutral-900 text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800 text-white"
+                        className="w-full px-4 py-2.5 rounded-xl border bg-neutral-900 text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800 text-white"
                       >
                         <option value="Database">Database / Storage</option>
                         <option value="Cpu">CPU / AI Core</option>
@@ -847,7 +847,7 @@ export default function DetailEditModal({
                         rows={3}
                         value={formData.desc || ''}
                         onChange={e => setFormData({ ...formData, desc: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800 resize-none"
+                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800 resize-none"
                       />
                     </div>
                   </>
@@ -863,7 +863,7 @@ export default function DetailEditModal({
                         required
                         value={formData.title || ''}
                         onChange={e => setFormData({ ...formData, title: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#007AFF] border-neutral-800"
+                        className="w-full px-4 py-2.5 rounded-xl border bg-transparent text-sm focus:outline-none focus:border-[#ff3b1d] border-neutral-800"
                       />
                     </div>
 
@@ -881,7 +881,7 @@ export default function DetailEditModal({
                               newSkills[idx] = { ...newSkills[idx], name: e.target.value };
                               setFormData({ ...formData, skills: newSkills });
                             }}
-                            className="flex-grow px-3 py-2 text-xs rounded-xl border bg-transparent focus:outline-none focus:border-[#007AFF] border-neutral-850"
+                            className="flex-grow px-3 py-2 text-xs rounded-xl border bg-transparent focus:outline-none focus:border-[#ff3b1d] border-neutral-850"
                           />
                           <select
                             value={skill.level || 'Expert'}
@@ -890,7 +890,7 @@ export default function DetailEditModal({
                               newSkills[idx] = { ...newSkills[idx], level: e.target.value };
                               setFormData({ ...formData, skills: newSkills });
                             }}
-                            className="w-32 px-3 py-2 text-xs rounded-xl border bg-neutral-900 focus:outline-none focus:border-[#007AFF] border-neutral-850 text-white animate-none"
+                            className="w-32 px-3 py-2 text-xs rounded-xl border bg-neutral-900 focus:outline-none focus:border-[#ff3b1d] border-neutral-850 text-white animate-none"
                           >
                             <option value="Expert">Expert</option>
                             <option value="Proficient">Proficient</option>
@@ -914,7 +914,7 @@ export default function DetailEditModal({
                           const newSkills = [...(formData.skills || []), { name: '', level: 'Expert' }];
                           setFormData({ ...formData, skills: newSkills });
                         }}
-                        className="px-3 py-1.5 border border-dashed border-[#007AFF] text-[#007AFF] text-[10px] font-semibold rounded-lg hover:bg-[#007AFF]/10 cursor-pointer transition-colors flex items-center gap-1 w-fit"
+                        className="px-3 py-1.5 border border-dashed border-[#ff3b1d] text-[#ff3b1d] text-[10px] font-semibold rounded-lg hover:bg-[#ff3b1d]/10 cursor-pointer transition-colors flex items-center gap-1 w-fit"
                       >
                         <Plus className="w-3 h-3" />
                         <span>Add Skill Tag</span>
@@ -926,7 +926,7 @@ export default function DetailEditModal({
                 {/* Priority Configurations with Checkbox Keep/Hide filters */}
                 {type !== 'homeCard' && type !== 'coordinates' && type !== 'strength' && (
                   <div className="p-5 rounded-2xl border border-neutral-800 bg-neutral-900/30 flex flex-col gap-4">
-                    <span className="text-[10px] font-mono uppercase text-[#007AFF] tracking-wider font-bold">Keep or Hide per Switcher Profile Role</span>
+                    <span className="text-[10px] font-mono uppercase text-[#ff3b1d] tracking-wider font-bold">Keep or Hide per Switcher Profile Role</span>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       
                       {/* General Column */}
@@ -941,7 +941,7 @@ export default function DetailEditModal({
                               updated.general = isChecked ? 1 : 99;
                               setFormData({ ...formData, priority: updated });
                             }}
-                            className="w-4 h-4 rounded accent-[#007AFF]"
+                            className="w-4 h-4 rounded accent-[#ff3b1d]"
                           />
                           <span className="text-xs font-semibold text-slate-300">Show in General</span>
                         </label>
@@ -974,7 +974,7 @@ export default function DetailEditModal({
                               updated['data-engineer'] = isChecked ? 1 : 99;
                               setFormData({ ...formData, priority: updated });
                             }}
-                            className="w-4 h-4 rounded accent-[#007AFF]"
+                            className="w-4 h-4 rounded accent-[#ff3b1d]"
                           />
                           <span className="text-xs font-semibold text-slate-300">Show in Data Eng</span>
                         </label>
@@ -1007,7 +1007,7 @@ export default function DetailEditModal({
                               updated['ai-engineer'] = isChecked ? 1 : 99;
                               setFormData({ ...formData, priority: updated });
                             }}
-                            className="w-4 h-4 rounded accent-[#007AFF]"
+                            className="w-4 h-4 rounded accent-[#ff3b1d]"
                           />
                           <span className="text-xs font-semibold text-slate-300">Show in Gen AI</span>
                         </label>
@@ -1061,7 +1061,7 @@ export default function DetailEditModal({
                     <button
                       type="submit"
                       disabled={loading}
-                      className="px-6 py-2 bg-[#007AFF] hover:bg-[#007AFF]/90 disabled:opacity-60 text-white rounded-xl flex items-center gap-1.5 text-xs font-semibold shadow-glow cursor-pointer"
+                      className="px-6 py-2 bg-[#ff3b1d] hover:bg-[#ff3b1d]/90 disabled:opacity-60 text-white rounded-xl flex items-center gap-1.5 text-xs font-semibold shadow-glow cursor-pointer"
                     >
                       {loading ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -1099,7 +1099,7 @@ export default function DetailEditModal({
 
                     {item.technologies && item.technologies.length > 0 && (
                       <div>
-                        <span className="block text-[10px] uppercase font-mono tracking-widest text-[#007AFF] font-bold mb-3">Technologies Showcase</span>
+                        <span className="block text-[10px] uppercase font-mono tracking-widest text-[#ff3b1d] font-bold mb-3">Technologies Showcase</span>
                         <div className="flex flex-wrap gap-2">
                           {item.technologies.map((tech: string) => (
                             <span 
@@ -1119,7 +1119,7 @@ export default function DetailEditModal({
 
                     {item.metrics && item.metrics.length > 0 && (
                       <div>
-                        <span className="block text-[10px] uppercase font-mono tracking-widest text-[#007AFF] font-bold mb-3">Operational Impact Metrics</span>
+                        <span className="block text-[10px] uppercase font-mono tracking-widest text-[#ff3b1d] font-bold mb-3">Operational Impact Metrics</span>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                           {item.metrics.map((met: any) => (
                             <div 
@@ -1128,7 +1128,7 @@ export default function DetailEditModal({
                                 isDark ? 'bg-neutral-900/40 border-white/5' : 'bg-[#FDFBF7] border-neutral-200/50'
                               }`}
                             >
-                              <span className="block text-2xl font-bold tracking-tight text-[#007AFF]">{met.value}</span>
+                              <span className="block text-2xl font-bold tracking-tight text-[#ff3b1d]">{met.value}</span>
                               <span className="block text-[10px] font-mono uppercase tracking-wider text-slate-500 mt-1">{met.label}</span>
                             </div>
                           ))}
@@ -1153,7 +1153,7 @@ export default function DetailEditModal({
                           href={item.demoUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-5 py-2.5 bg-[#007AFF] hover:bg-[#007AFF]/90 rounded-xl flex items-center gap-2 text-xs font-semibold text-white transition-colors cursor-pointer"
+                          className="px-5 py-2.5 bg-[#ff3b1d] hover:bg-[#ff3b1d]/90 rounded-xl flex items-center gap-2 text-xs font-semibold text-white transition-colors cursor-pointer"
                         >
                           <ExternalLink className="w-4 h-4" />
                           <span>Launch Live Demo</span>
@@ -1189,7 +1189,7 @@ export default function DetailEditModal({
                     )}
 
                     <h2 className="text-xl font-bold font-sans tracking-tight mb-2">{item.title}</h2>
-                    <span className="text-sm font-semibold text-[#007AFF] mb-1">{item.issuer}</span>
+                    <span className="text-sm font-semibold text-[#ff3b1d] mb-1">{item.issuer}</span>
                     
                     {item.code && (
                       <span className="text-xs font-mono text-slate-500 mb-6">
@@ -1201,7 +1201,7 @@ export default function DetailEditModal({
                       isDark ? 'bg-neutral-900/50 border-white/5 text-slate-300' : 'bg-[#FDFBF7] border-neutral-200 text-neutral-800'
                     }`}>
                       <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-[#007AFF]" />
+                        <Calendar className="w-4 h-4 text-[#ff3b1d]" />
                         <span>Issued On</span>
                       </div>
                       <span className="font-semibold">{item.date}</span>
@@ -1212,7 +1212,7 @@ export default function DetailEditModal({
                         href={item.credentialUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-6 py-3 bg-[#007AFF] hover:bg-[#007AFF]/90 text-xs font-bold uppercase tracking-widest text-white rounded-xl shadow-glow transition-all duration-300 cursor-pointer"
+                        className="px-6 py-3 bg-[#ff3b1d] hover:bg-[#ff3b1d]/90 text-xs font-bold uppercase tracking-widest text-white rounded-xl shadow-glow transition-all duration-300 cursor-pointer"
                       >
                         Verify Credential Authenticity
                       </a>
@@ -1225,7 +1225,7 @@ export default function DetailEditModal({
                   <>
                     <div className="border-b border-neutral-800/50 pb-5">
                       <div className="flex items-center gap-2 mb-3">
-                        <span className="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider bg-[#007AFF]/15 text-[#007AFF] border border-[#007AFF]/25">
+                        <span className="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider bg-[#ff3b1d]/15 text-[#ff3b1d] border border-[#ff3b1d]/25">
                           {item.category}
                         </span>
                         <span className="text-xs text-slate-500 font-mono">{item.readTime}</span>
@@ -1239,7 +1239,7 @@ export default function DetailEditModal({
                     <div className={`p-5 rounded-2xl border italic text-sm ${
                       isDark ? 'bg-neutral-900/40 border-white/5 text-slate-300' : 'bg-[#FDFBF7] border-neutral-200 text-neutral-800'
                     }`}>
-                      <span className="font-mono text-[9px] block uppercase text-[#007AFF] font-bold not-italic tracking-wider mb-2">Executive Summary</span>
+                      <span className="font-mono text-[9px] block uppercase text-[#ff3b1d] font-bold not-italic tracking-wider mb-2">Executive Summary</span>
                       "{item.excerpt}"
                     </div>
 
@@ -1269,14 +1269,14 @@ export default function DetailEditModal({
                 {type === 'homeCard' && (
                   <div className="flex flex-col items-center py-6 text-center">
                     {/* Glowing Accent Icon */}
-                    <div className="w-20 h-20 rounded-3xl bg-[#007AFF]/10 border border-[#007AFF]/25 flex items-center justify-center text-[#007AFF] mb-6 shadow-[0_8px_30px_rgba(0,122,255,0.15)]">
+                    <div className="w-20 h-20 rounded-3xl bg-[#ff3b1d]/10 border border-[#ff3b1d]/25 flex items-center justify-center text-[#ff3b1d] mb-6 shadow-[0_8px_30px_rgba(255,59,29,0.15)]">
                       {item.id === 'ai-assistant' ? <Cpu className="w-10 h-10" /> :
                        item.id === 'availability' ? <Award className="w-10 h-10" /> :
                        item.id === 'featured-stack' ? <Database className="w-10 h-10" /> :
                        <Mail className="w-10 h-10" />}
                     </div>
 
-                    <span className="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider bg-[#007AFF]/15 text-[#007AFF] border border-[#007AFF]/20 mb-3">
+                    <span className="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider bg-[#ff3b1d]/15 text-[#ff3b1d] border border-[#ff3b1d]/20 mb-3">
                       {item.badge}
                     </span>
 
@@ -1291,7 +1291,7 @@ export default function DetailEditModal({
                     <button
                       type="button"
                       onClick={handleHomeCardAction}
-                      className="px-8 py-3.5 bg-gradient-to-r from-sky-500 to-[#007AFF] hover:from-sky-600 hover:to-[#007AFF]/90 text-white text-xs font-bold uppercase tracking-widest rounded-xl shadow-[0_4px_20px_rgba(0,229,255,0.25)] hover:shadow-[0_4px_30px_rgba(0,229,255,0.4)] transition-all duration-300 flex items-center gap-2 cursor-pointer"
+                      className="px-8 py-3.5 bg-gradient-to-r from-sky-500 to-[#ff3b1d] hover:from-sky-600 hover:to-[#ff3b1d]/90 text-white text-xs font-bold uppercase tracking-widest rounded-xl shadow-[0_4px_20px_rgba(0,229,255,0.25)] hover:shadow-[0_4px_30px_rgba(0,229,255,0.4)] transition-all duration-300 flex items-center gap-2 cursor-pointer"
                     >
                       <span>{item.buttonText || 'Explore Detail'}</span>
                       <ArrowRight className="w-4 h-4" />
@@ -1301,10 +1301,10 @@ export default function DetailEditModal({
                       <div className={`w-full max-w-md p-5 rounded-2xl border flex flex-col gap-2.5 mt-8 text-left ${
                         isDark ? 'bg-neutral-900/40 border-white/5' : 'bg-[#FDFBF7] border-neutral-200'
                       }`}>
-                        <span className="text-[9px] font-mono uppercase text-[#007AFF] tracking-wider font-bold mb-1">Key Context Parameters</span>
+                        <span className="text-[9px] font-mono uppercase text-[#ff3b1d] tracking-wider font-bold mb-1">Key Context Parameters</span>
                         {item.extra.map((ext: string, idx: number) => (
                           <div key={idx} className="flex items-center gap-2 text-xs font-mono text-slate-300">
-                            <ArrowRight className="w-3.5 h-3.5 text-[#007AFF]" />
+                            <ArrowRight className="w-3.5 h-3.5 text-[#ff3b1d]" />
                             <span>{ext}</span>
                           </div>
                         ))}
@@ -1316,7 +1316,7 @@ export default function DetailEditModal({
                 {/* 5. COORDINATES VIEW */}
                 {type === 'coordinates' && (
                   <div className="flex flex-col items-center py-6 text-center">
-                    <div className="w-16 h-16 rounded-full bg-[#007AFF]/10 border border-[#007AFF]/25 flex items-center justify-center text-[#007AFF] mb-4">
+                    <div className="w-16 h-16 rounded-full bg-[#ff3b1d]/10 border border-[#ff3b1d]/25 flex items-center justify-center text-[#ff3b1d] mb-4">
                       {renderDynamicIcon('map-pin', "w-7 h-7")}
                     </div>
                     <h3 className="text-xl font-bold font-sans tracking-tight mb-2">Direct Contact Coordinates</h3>
@@ -1326,7 +1326,7 @@ export default function DetailEditModal({
                       {/* Email coordinate */}
                       <div className="flex items-center justify-between p-3.5 rounded-xl border border-neutral-800 bg-neutral-900/25">
                         <div className="flex items-center gap-3">
-                          {renderDynamicIcon('mail', "w-4.5 h-4.5 text-[#007AFF]")}
+                          {renderDynamicIcon('mail', "w-4.5 h-4.5 text-[#ff3b1d]")}
                           <div className="text-left">
                             <span className="text-[9px] uppercase font-mono text-slate-500 block leading-none mb-1">Email Endpoint</span>
                             <span className="text-xs font-semibold">{item.email}</span>
@@ -1344,7 +1344,7 @@ export default function DetailEditModal({
                       {/* LinkedIn coordinate */}
                       <div className="flex items-center justify-between p-3.5 rounded-xl border border-neutral-800 bg-neutral-900/25">
                         <div className="flex items-center gap-3">
-                          {renderDynamicIcon('linkedin', "w-4.5 h-4.5 text-[#007AFF]")}
+                          {renderDynamicIcon('linkedin', "w-4.5 h-4.5 text-[#ff3b1d]")}
                           <div className="text-left">
                             <span className="text-[9px] uppercase font-mono text-slate-500 block leading-none mb-1">Professional Link</span>
                             <span className="text-xs font-semibold">{item.linkedin}</span>
@@ -1363,7 +1363,7 @@ export default function DetailEditModal({
                       {/* GitHub coordinate */}
                       <div className="flex items-center justify-between p-3.5 rounded-xl border border-neutral-800 bg-neutral-900/25">
                         <div className="flex items-center gap-3">
-                          {renderDynamicIcon('github', "w-4.5 h-4.5 text-[#007AFF]")}
+                          {renderDynamicIcon('github', "w-4.5 h-4.5 text-[#ff3b1d]")}
                           <div className="text-left">
                             <span className="text-[9px] uppercase font-mono text-slate-500 block leading-none mb-1">Source Repository</span>
                             <span className="text-xs font-semibold">{item.github}</span>
@@ -1382,7 +1382,7 @@ export default function DetailEditModal({
                       {/* Location coordinate */}
                       <div className="flex items-center justify-between p-3.5 rounded-xl border border-neutral-800 bg-neutral-900/25">
                         <div className="flex items-center gap-3">
-                          {renderDynamicIcon('mappin', "w-4.5 h-4.5 text-[#007AFF]")}
+                          {renderDynamicIcon('mappin', "w-4.5 h-4.5 text-[#ff3b1d]")}
                           <div className="text-left">
                             <span className="text-[9px] uppercase font-mono text-slate-500 block leading-none mb-1">Operational Location</span>
                             <span className="text-xs font-semibold">{item.location}</span>
@@ -1400,7 +1400,7 @@ export default function DetailEditModal({
                       {/* Hours coordinate */}
                       <div className="flex items-center justify-between p-3.5 rounded-xl border border-neutral-800 bg-neutral-900/25">
                         <div className="flex items-center gap-3">
-                          {renderDynamicIcon('clock', "w-4.5 h-4.5 text-[#007AFF]")}
+                          {renderDynamicIcon('clock', "w-4.5 h-4.5 text-[#ff3b1d]")}
                           <div className="text-left">
                             <span className="text-[9px] uppercase font-mono text-slate-500 block leading-none mb-1">Response Hours</span>
                             <span className="text-xs font-semibold">{item.hours}</span>
@@ -1421,10 +1421,10 @@ export default function DetailEditModal({
                 {/* 6. STRENGTH VIEW */}
                 {type === 'strength' && (
                   <div className="flex flex-col items-center py-6 text-center">
-                    <div className="w-20 h-20 rounded-3xl bg-[#007AFF]/10 border border-[#007AFF]/25 flex items-center justify-center text-[#007AFF] mb-6 shadow-[0_8px_30px_rgba(0,122,255,0.15)]">
+                    <div className="w-20 h-20 rounded-3xl bg-[#ff3b1d]/10 border border-[#ff3b1d]/25 flex items-center justify-center text-[#ff3b1d] mb-6 shadow-[0_8px_30px_rgba(255,59,29,0.15)]">
                       {renderDynamicIcon(item.icon, "w-10 h-10")}
                     </div>
-                    <span className="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider bg-[#007AFF]/15 text-[#007AFF] border border-[#007AFF]/20 mb-3">
+                    <span className="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider bg-[#ff3b1d]/15 text-[#ff3b1d] border border-[#ff3b1d]/20 mb-3">
                       {item.signal}
                     </span>
                     <h2 className="text-2xl font-bold font-sans tracking-tight mb-4">{item.title}</h2>
@@ -1438,7 +1438,7 @@ export default function DetailEditModal({
                 {type === 'skills' && (
                   <div className="flex flex-col gap-6">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-2xl bg-[#007AFF]/10 border border-[#007AFF]/25 flex items-center justify-center text-[#007AFF]">
+                      <div className="w-12 h-12 rounded-2xl bg-[#ff3b1d]/10 border border-[#ff3b1d]/25 flex items-center justify-center text-[#ff3b1d]">
                         {renderDynamicIcon('award', "w-6 h-6")}
                       </div>
                       <h2 className="text-2xl font-bold font-sans tracking-tight">{item.title}</h2>
@@ -1457,7 +1457,7 @@ export default function DetailEditModal({
                             skill.level === 'Expert'
                               ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
                               : skill.level === 'Proficient'
-                                ? 'bg-[#007AFF]/10 border-[#007AFF]/20 text-[#007AFF]'
+                                ? 'bg-[#ff3b1d]/10 border-[#ff3b1d]/20 text-[#ff3b1d]'
                                 : 'bg-[#FDFBF7]0/10 border-slate-500/20 text-slate-400'
                           }`}>
                             {skill.level}

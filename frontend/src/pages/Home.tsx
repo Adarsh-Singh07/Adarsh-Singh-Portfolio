@@ -1,490 +1,273 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
-import { Link } from 'react-router-dom';
-import { HeroConfig, HomeCard, ProfileMode, Project } from '../types';
-import Hero from '../sections/Hero';
+import { HeroConfig, HomeCard, ProfileMode, Project, Certification, Coordinates } from '../types';
 import SEO from '../components/SEO';
-import HorizontalScrollShowcase from '../components/HorizontalScrollShowcase';
-import { Sparkles, Award, Database, Cpu, MessageSquare, Mail, Layers, ArrowRight } from 'lucide-react';
-import DetailEditModal from '../components/DetailEditModal';
-import PortfolioService from '../services/api';
+import Preloader from '../components/Preloader';
+import CinematicHero from '../sections/CinematicHero';
+import Marquee from '../components/Marquee';
+import StorySection from '../sections/StorySection';
+import VenturesSection from '../sections/VenturesSection';
+import ImpactSection from '../sections/ImpactSection';
+import CredentialsSection from '../sections/CredentialsSection';
+import ContactFooter from '../sections/ContactFooter';
+import { MessageSquare, ArrowRight } from 'lucide-react';
 
 interface HomeProps {
   config: HeroConfig;
   homeCards?: HomeCard[];
   projects?: Project[];
+  certifications?: Certification[];
+  coordinates?: Coordinates;
   currentMode: ProfileMode;
   isDark: boolean;
   onRefreshData?: () => void;
 }
 
-export default function Home({ config, homeCards = [], projects = [], currentMode, isDark, onRefreshData }: HomeProps) {
-  const [selectedCard, setSelectedCard] = useState<HomeCard | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+export default function Home({
+  config,
+  projects = [],
+  certifications = [],
+  coordinates,
+  isDark,
+}: HomeProps) {
+  const [preloaderDone, setPreloaderDone] = useState(false);
   const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(null);
 
-  const token = sessionStorage.getItem('admin-token') || localStorage.getItem('admin-token');
-  const isAdmin = !!token;
-
-  // Map icon strings to Lucide components
-  const getCardIcon = (id: string) => {
-    switch (id) {
-      case 'ai-assistant': return Cpu;
-      case 'availability': return Award;
-      case 'featured-stack': return Database;
-      case 'quick-connect': return Mail;
-      default: return Layers;
-    }
-  };
-
-  const handleCardClick = (card: HomeCard) => {
-    setSelectedCard(card);
-    setIsModalOpen(true);
-  };
-
-  const handleSave = async (updatedCard: HomeCard) => {
-    if (!token) return;
-    try {
-      const fullConfig = await PortfolioService.getAdminConfig(token);
-      const activeProfile = fullConfig[currentMode];
-      if (!activeProfile) return;
-
-      if (!activeProfile.homeCards) {
-        activeProfile.homeCards = [];
-      }
-
-      const existingIndex = activeProfile.homeCards.findIndex(c => c.id === updatedCard.id);
-      if (existingIndex >= 0) {
-        activeProfile.homeCards[existingIndex] = updatedCard;
-      } else {
-        activeProfile.homeCards.push(updatedCard);
-      }
-
-      await PortfolioService.saveAdminConfig(token, fullConfig);
-      if (onRefreshData) onRefreshData();
-      setIsModalOpen(false);
-    } catch (err) {
-      console.error('Failed to save home card details:', err);
-      alert('Failed to save card config.');
-    }
-  };
-
-  // Container animation variants for stagger entry
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.8,
-        ease: [0.16, 1, 0.3, 1] as any
-      }
-    }
-  };
-
   const homeSchema = {
-    "@context": "https://schema.org",
-    "@graph": [
+    '@context': 'https://schema.org',
+    '@graph': [
       {
-        "@type": "WebSite",
-        "@id": "https://adarshsingh.in/#website",
-        "url": "https://adarshsingh.in",
-        "name": "Adarsh Singh | AI & Data Engineering",
-        "description": "Portfolio of Adarsh Singh, showcasing advanced machine learning, RAG pipelines, and cloud analytics platforms.",
-        "publisher": {
-          "@id": "https://adarshsingh.in/#person"
-        },
-        "potentialAction": {
-          "@type": "SearchAction",
-          "target": "https://adarshsingh.in/projects?q={search_term_string}",
-          "query-input": "required name=search_term_string"
-        }
+        '@type': 'WebSite',
+        '@id': 'https://adarshsingh.in/#website',
+        url: 'https://adarshsingh.in',
+        name: 'Adarsh Singh | Enterprise AI Analyst · Cloud & AI Architect',
+        description:
+          'Portfolio of Adarsh Singh — architecting autonomous AI systems, enterprise data pipelines, and high-scale platforms.',
+        publisher: { '@id': 'https://adarshsingh.in/#person' },
       },
       {
-        "@type": "Person",
-        "@id": "https://adarshsingh.in/#person",
-        "name": "Adarsh Singh",
-        "jobTitle": "AI & Data Engineer",
-        "url": "https://adarshsingh.in",
-        "sameAs": [
-          "https://github.com/Adarsh-Singh07",
-          "https://www.linkedin.com/in/adarsh-singh07"
-        ]
+        '@type': 'Person',
+        '@id': 'https://adarshsingh.in/#person',
+        name: 'Adarsh Singh',
+        jobTitle: 'Enterprise AI Analyst · Cloud & AI Architect · Full-Stack Builder',
+        url: 'https://adarshsingh.in',
+        sameAs: [
+          'https://github.com/Adarsh-Singh07',
+          'https://www.linkedin.com/in/adarsh-singh07',
+        ],
       },
-      {
-        "@type": "Organization",
-        "@id": "https://adarshsingh.in/#organization",
-        "name": "Adarsh Singh Engineering Solutions",
-        "url": "https://adarshsingh.in",
-        "logo": "https://adarshsingh.in/favicon.png",
-        "contactPoint": {
-          "@type": "ContactPoint",
-          "contactType": "hire",
-          "url": "https://adarshsingh.in/contact"
-        }
-      },
-      {
-        "@type": "FAQPage",
-        "@id": "https://adarshsingh.in/#faq",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "Who is Adarsh Singh?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Adarsh Singh is an AI & Data Engineer specializing in building robust, scalable generative AI applications, retrieval-augmented generation (RAG) systems, distributed data engineering pipelines, and cloud database architectures."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "What technical stack does Adarsh use?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "His primary stack includes Python (FastAPI, PySpark, PyTorch), TypeScript/React, SQL, Docker, Google Cloud Platform (Cloud Run, BigQuery), and Azure (Databricks, Delta Lake, ADF) for enterprise deployments."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "What major AI systems has he engineered?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Key systems include an On-Demand Service Platform utilizing Agentic AI and multi-agent RAG pipelines for dynamic real-time updates, and an automated Indian Sign Language ML translation pipeline built with TensorFlow and OpenCV."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Is Adarsh available for contract consulting or freelance work?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Yes, Adarsh is available for consulting on AI system design, enterprise RAG integration, data warehouse migrations, and FastAPI/React pipeline engineering. You can connect via the contact form or LinkedIn."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "How can I contact him directly?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "You can send an encrypted message directly through the secure contact form on this website or reach out via his verified LinkedIn profile."
-            }
-          }
-        ]
-      }
-    ]
+    ],
   };
 
   const faqData = [
     {
-      q: "Who is Adarsh Singh?",
-      a: "Adarsh Singh is an AI & Data Engineer specializing in building robust, scalable generative AI applications, retrieval-augmented generation (RAG) systems, distributed data engineering pipelines, and cloud database architectures."
+      q: 'Who is Adarsh Singh?',
+      a: 'Adarsh Singh is an Enterprise AI Analyst and Cloud & AI Architect specializing in autonomous agent architectures, multi-agent RAG pipelines, distributed enterprise data engineering (Databricks, Delta Lake), and resilient full-stack systems.',
     },
     {
-      q: "What technical stack does Adarsh use?",
-      a: "His primary stack includes Python (FastAPI, PySpark, PyTorch), TypeScript/React, SQL, Docker, Google Cloud Platform (Cloud Run, BigQuery), and Azure (Databricks, Delta Lake, ADF) for enterprise deployments."
+      q: 'What technical stack does Adarsh master?',
+      a: 'His core stack includes Python (FastAPI, PySpark, LangGraph, PyTorch), TypeScript & React/Next.js, PostgreSQL/Supabase, Docker, Azure (Databricks, ADF), Google Cloud Platform, and AWS.',
     },
     {
-      q: "What major AI systems has he engineered?",
-      a: "Key systems include an On-Demand Service Platform utilizing Agentic AI and multi-agent RAG pipelines for dynamic real-time updates, and an automated Indian Sign Language ML translation pipeline built with TensorFlow and OpenCV."
+      q: 'What flagship systems has he built?',
+      a: 'Key architectures include EMIVO (Full-Stack Commerce & EMI Platform with 17 locked ADRs), InterviewOS (real-time low-latency AI interview copilot), OfferShield (AI career authenticity verification platform), and Autonomous Voice AI Operations Agents.',
     },
     {
-      q: "Is Adarsh available for contract consulting or freelance work?",
-      a: "Yes, Adarsh is available for consulting on AI system design, enterprise RAG integration, data warehouse migrations, and FastAPI/React pipeline engineering. You can connect via the contact form or LinkedIn."
+      q: 'Is Adarsh available for consulting or full-time engagements?',
+      a: 'Yes. Adarsh engages with teams on enterprise AI architecture, high-scale data pipeline engineering, and multi-agent LLM systems. Connect via the direct transmission form below.',
     },
-    {
-      q: "How can I contact him directly?",
-      a: "You can send an encrypted message directly through the secure contact form on this website or reach out via his verified LinkedIn profile."
-    }
   ];
 
   return (
-    <div className="w-full">
-      <SEO 
-        title="Adarsh Singh | AI & Data Engineering Portfolio"
-        description="Explore the AI & Data Engineering portfolio of Adarsh Singh. Featuring production-ready RAG systems, LLM fine-tuning, and scalable data streaming architectures."
-        keywords="Adarsh Singh, AI Engineer, Data Engineer, Generative AI, RAG, LLMs, Big Data, FastAPI, React"
+    <div className="w-full bg-[var(--background)] text-[var(--foreground)] selection:bg-[var(--accent)] selection:text-[var(--background)]">
+      <SEO
+        title="Adarsh Singh | Enterprise AI Analyst · Cloud & AI Architect"
+        description="Cinematic portfolio of Adarsh Singh — Enterprise AI Analyst, Cloud & AI Architect, and Full-Stack Builder. Architecting autonomous AI systems and distributed data pipelines."
+        keywords="Adarsh Singh, AI Engineer, Cloud Architect, Data Architect, LangGraph, RAG, Databricks, FastAPI, React, Supabase"
         schema={homeSchema}
       />
-      {/* Spotlight Hero V2 */}
-      <Hero config={config} isDark={isDark} />
 
-      {/* CTA Card — Talk to Addy */}
-      <section className={`py-10 border-t relative ${
-        isDark ? 'bg-[#0A0A0F] border-white/5' : 'bg-[#FDFBF7] border-black/5'
-      }`}>
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-            <a
-              href="https://addy.adarshsingh.in"
-              target="_blank"
-              rel="noopener noreferrer"
-            className={`group block p-6 md:p-8 rounded-[24px] border transition-all duration-300 hover:shadow-lg ${
-              isDark
-                ? 'bg-gradient-to-br from-neutral-900 to-neutral-950 border-cyan-500/20 hover:border-cyan-400/50 hover:shadow-cyan-500/10'
-                : 'bg-white border-slate-200 hover:border-[#007AFF]/40 hover:shadow-[#007AFF]/10'
-            }`}
+      {/* 1. Cinematic Preloader (Runs 0-100% over 2000ms + curtain wipe) */}
+      <Preloader onComplete={() => setPreloaderDone(true)} />
+
+      {/* 2. Hero Section (#top) */}
+      <CinematicHero bio={config?.subtext} />
+
+      {/* 3. Infinite Marquee Operating Principles */}
+      <Marquee />
+
+      {/* 4. Story Section (#story) */}
+      <StorySection />
+
+      {/* 5. Ventures / Selected Projects (#projects — Supabase Dynamic) */}
+      <VenturesSection projects={projects} />
+
+      {/* 6. Live AI Twin CTA Card */}
+      <section
+        style={{
+          padding: '4rem var(--gutter)',
+          borderTop: '1px solid var(--line)',
+          borderBottom: '1px solid var(--line)',
+          background: 'var(--surface)',
+        }}
+      >
+        <div className="max-w-7xl mx-auto">
+          <a
+            href="https://addy.adarshsingh.in"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group block p-8 rounded-[0.25rem] transition-all duration-340"
+            style={{
+              border: '1px solid var(--line-strong)',
+              background: 'var(--surface-2)',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--accent)')}
+            onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--line-strong)')}
           >
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
               <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className={`w-2 h-2 rounded-full ${isDark ? 'bg-cyan-400' : 'bg-[#007AFF]'} animate-pulse`} />
-                  <span className={`text-[10px] font-mono uppercase tracking-widest font-bold ${
-                    isDark ? 'text-cyan-400' : 'text-[#007AFF]'
-                  }`}>Live AI Assistant</span>
+                <div className="flex items-center gap-2 mb-2">
+                  <span
+                    className="inline-block w-2 h-2 rounded-full animate-pulse"
+                    style={{ background: 'var(--accent)' }}
+                  />
+                  <span
+                    style={{
+                      fontSize: '0.8125rem',
+                      fontFamily: 'var(--font-sans)',
+                      fontWeight: 600,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.22em',
+                      color: 'var(--accent)',
+                    }}
+                  >
+                    Autonomous AI Twin
+                  </span>
                 </div>
-                <h3 className={`text-lg md:text-xl font-sans font-bold tracking-tight mb-1 ${
-                  isDark ? 'text-white' : 'text-neutral-900'
-                }`}>
-                  Wanna know about me?
+                <h3
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: '2.5rem',
+                    textTransform: 'uppercase',
+                    color: 'var(--foreground)',
+                    lineHeight: 1,
+                  }}
+                >
+                  Query Addy — My AI Twin
                 </h3>
-                <p className={`text-xs md:text-sm font-light ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                  Talk to Addy — Adarsh's AI twin. Ask about projects, experience, anything.
+                <p
+                  style={{
+                    marginTop: '0.5rem',
+                    fontSize: '1.0625rem',
+                    color: 'var(--muted)',
+                    maxWidth: '48ch',
+                  }}
+                >
+                  Interrogate my production knowledge base, verify architectural decisions, or test real-time RAG synthesis.
                 </p>
               </div>
-              <span className={`px-4 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all duration-300 ${
-                isDark
-                  ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 group-hover:bg-cyan-500/20'
-                  : 'bg-[#007AFF]/10 text-[#007AFF] border border-[#007AFF]/20 group-hover:bg-[#007AFF]/20'
-              }`}>
-                <MessageSquare className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Talk to Addy</span>
-                <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
-              </span>
+
+              <div
+                className="shrink-0 flex items-center gap-2 py-3 px-6 rounded-full"
+                style={{
+                  background: 'var(--accent)',
+                  color: 'var(--background)',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '0.8125rem',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.18em',
+                }}
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>Launch Addy Copilot</span>
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </div>
             </div>
           </a>
         </div>
       </section>
 
-      {/* Premium Teaser Navigation Section */}
-      <section className={`py-16 md:py-24 border-t relative overflow-hidden transition-colors duration-200 ${
-        isDark ? 'bg-[#121212] border-white/5' : 'bg-[#FDFBF7] border-black/5'
-      }`}>
-        {/* Soft atmospheric gradient */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] rounded-full filter blur-[150px] opacity-10 bg-[#007AFF]/20 pointer-events-none" />
+      {/* 7. Impact (#impact — By The Numbers) */}
+      <ImpactSection />
 
-        <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 w-full">
-          
-          {/* Flagship Featured Showcase: EMIVO */}
-          <div className="mb-14">
-            <Link to="/projects/emivo">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                whileHover={{ scale: 1.01, y: -4 }}
-                transition={{ duration: 0.4 }}
-                className={`relative p-8 md:p-10 rounded-[36px] border overflow-hidden cursor-pointer group transition-all duration-500 ${
-                  isDark 
-                    ? 'bg-gradient-to-br from-neutral-900/90 via-neutral-950/90 to-slate-950 border-cyan-500/25 hover:border-cyan-400/60 shadow-[0_0_50px_rgba(0,229,255,0.08)]' 
-                    : 'bg-gradient-to-br from-white via-sky-50/50 to-slate-50 border-sky-300 hover:border-sky-500 shadow-[0_20px_40px_rgba(0,122,255,0.06)]'
-                }`}
-              >
-                {/* Background ambient glow */}
-                <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-cyan-500/10 filter blur-[80px] pointer-events-none group-hover:bg-cyan-500/20 transition-all duration-500" />
-                
-                <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                  <div className="max-w-2xl">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                        <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                        Building EMIVO
-                      </span>
-                      <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest font-semibold">
-                        Flagship AI Project
-                      </span>
-                    </div>
+      {/* 8. Credentials (#credentials — Interactive Split Panel) */}
+      <CredentialsSection certifications={certifications} />
 
-                    <h3 className="text-2xl md:text-3xl font-sans font-bold tracking-tight mb-3 group-hover:text-cyan-400 transition-colors duration-300">
-                      EMIVO — AI-Native Enterprise eCommerce SaaS Platform
-                    </h3>
-
-                    <p className={`text-sm font-light leading-relaxed mb-5 ${isDark ? 'text-slate-300' : 'text-slate-650'}`}>
-                      An enterprise-grade eCommerce platform combining AI product management, conversational shopping assistants, vector search, and cloud-native microservices for modern online retail.
-                    </p>
-
-                    <div className="flex flex-wrap gap-2 text-[10px] font-mono">
-                      {['FastAPI', 'Python', 'PostgreSQL', 'Redis', 'Qdrant', 'Docker', 'AI Agents', 'Stripe'].map(tech => (
-                        <span key={tech} className={`px-2.5 py-1 rounded-lg border ${
-                          isDark ? 'bg-white/5 border-white/10 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
-                        }`}>
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 self-end md:self-center">
-                    <span className="px-6 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg group-hover:shadow-cyan-500/30 transition-all duration-300 flex items-center gap-2">
-                      <span>Explore EMIVO</span>
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-            </Link>
+      {/* FAQ Accordion Section for SEO & AEO */}
+      <section
+        style={{
+          padding: 'var(--section) var(--gutter)',
+          borderTop: '1px solid var(--line)',
+        }}
+      >
+        <div className="max-w-4xl mx-auto">
+          <div className="eyebrow" style={{ marginBottom: '1.5rem' }}>
+            AEO Knowledge Base
           </div>
-
-          {/* Section Heading */}
-          <div className="mb-12 text-left">
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#007AFF] block mb-2">
-              System Console
-            </span>
-            <h2 className="text-3xl md:text-4xl font-sans font-semibold tracking-tight">
-              Interactive Spotlights
-            </h2>
-          </div>
-
-          {/* Cards Grid */}
-          {homeCards.length > 0 ? (
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-            >
-              {homeCards.map((card) => {
-                const Icon = getCardIcon(card.id);
-                return (
-                  <motion.div
-                    key={card.id}
-                    variants={cardVariants}
-                    onClick={() => handleCardClick(card)}
-                    whileHover={{ y: -6, scale: 1.01 }}
-                    className="h-full"
-                  >
-                    <div
-                      className={`h-full flex flex-col justify-between p-6 md:p-7 rounded-[30px] border transition-all duration-500 bg-gradient-to-br hover:border-[#007AFF]/30 ${
-                        isDark 
-                          ? 'bg-neutral-900/40 border-white/5 hover:shadow-[0_20px_40px_rgba(0,122,255,0.08)]' 
-                          : 'bg-white border-neutral-200/60 hover:shadow-[0_15px_30px_rgba(0,0,0,0.03)]'
-                      } group cursor-pointer`}
-                    >
-                      <div>
-                        <div className="flex items-center justify-between mb-6">
-                          <div className={`p-3 rounded-2xl ${
-                            isDark ? 'bg-white/5 text-white/80' : 'bg-slate-100 text-neutral-800'
-                          } transition-colors group-hover:bg-[#007AFF] group-hover:text-white`}>
-                            <Icon className="w-5 h-5" />
-                          </div>
-                          <span className={`text-[10px] uppercase font-mono tracking-widest ${
-                            isDark ? 'text-slate-400' : 'text-slate-600'
-                          }`}>
-                            {card.badge}
-                          </span>
-                        </div>
-
-                        <h3 className="text-lg font-sans font-semibold tracking-tight mb-2 group-hover:text-[#007AFF] transition-colors duration-300">
-                          {card.title}
-                        </h3>
-                        <p className={`text-xs font-light leading-relaxed mb-6 ${
-                          isDark ? 'text-slate-300' : 'text-slate-600'
-                        }`}>
-                          {card.description}
-                        </p>
-                      </div>
-
-                      {card.id === 'ai-assistant' ? (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            window.dispatchEvent(new CustomEvent('open-chatbot'));
-                          }}
-                          className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#007AFF] self-start mt-auto hover:text-[#007AFF]/80 transition-colors"
-                        >
-                          <span>{card.buttonText || 'Explore'}</span>
-                          <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
-                        </button>
-                      ) : (
-                        <Link
-                          to={card.id === 'availability' ? '/timeline' : card.id === 'featured-stack' ? '/skills' : '/contact'}
-                          onClick={(e) => e.stopPropagation()}
-                          className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#007AFF] self-start mt-auto hover:text-[#007AFF]/80 transition-colors"
-                        >
-                          <span>{card.buttonText || 'Explore'}</span>
-                          <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                      )}
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </motion.div>
-          ) : (
-            <div className="text-center py-10">
-              <span className="text-xs text-slate-500 font-mono">No spotlight cards loaded from profile configurations.</span>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Dual-Axis Lenis Horizontal Smooth Scroll Showcase */}
-      {projects && projects.length > 0 && (
-        <HorizontalScrollShowcase projects={projects} isDark={isDark} />
-      )}
-
-      {/* FAQ Accordion Section for SEO & LLM Scraping */}
-      <section className={`py-16 md:py-24 border-t relative overflow-hidden transition-colors duration-200 ${
-        isDark ? 'bg-[#121212] border-white/5' : 'bg-[#FDFBF7] border-black/5'
-      }`}>
-        <div className="max-w-4xl mx-auto px-6 md:px-12 relative z-10 w-full text-left">
-          <div className="mb-12">
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#007AFF] block mb-2">
-              Common Inquiries
-            </span>
-            <h2 className="text-3xl md:text-4xl font-sans font-semibold tracking-tight">
-              Frequently Asked Questions
-            </h2>
-          </div>
+          <h2
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '3.25rem',
+              textTransform: 'uppercase',
+              lineHeight: 1,
+              color: 'var(--foreground)',
+              marginBottom: '3rem',
+            }}
+          >
+            Frequently Clarified Architectures.
+          </h2>
 
           <div className="space-y-4">
             {faqData.map((faq, idx) => {
               const isOpen = openFaqIdx === idx;
               return (
-                <div 
+                <div
                   key={idx}
-                  className={`border rounded-2xl transition-all duration-300 overflow-hidden ${
-                    isDark 
-                      ? 'border-white/5 bg-neutral-900/20' 
-                      : 'border-slate-200 bg-white'
-                  }`}
+                  style={{
+                    border: '1px solid var(--line)',
+                    background: 'var(--surface)',
+                    borderRadius: '0.125rem',
+                  }}
                 >
                   <button
                     onClick={() => setOpenFaqIdx(isOpen ? null : idx)}
-                    className="w-full py-5 px-6 flex items-center justify-between text-left font-semibold text-sm md:text-base cursor-pointer focus:outline-none"
-                    aria-expanded={isOpen}
-                    aria-controls={`faq-answer-${idx}`}
+                    className="w-full py-5 px-6 flex items-center justify-between text-left cursor-pointer"
                   >
-                    <span>{faq.q}</span>
-                    <span className={`text-[#007AFF] transform transition-transform duration-300 font-mono ${
-                      isOpen ? 'rotate-45' : ''
-                    }`}>
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: '1.1875rem',
+                        fontWeight: 600,
+                        color: 'var(--foreground)',
+                      }}
+                    >
+                      {faq.q}
+                    </span>
+                    <span
+                      style={{
+                        color: 'var(--accent)',
+                        fontSize: '1.5rem',
+                        transform: isOpen ? 'rotate(45deg)' : 'none',
+                        transition: 'transform 300ms ease-out',
+                      }}
+                    >
                       +
                     </span>
                   </button>
-                  <div 
-                    id={`faq-answer-${idx}`}
-                    className={`transition-all duration-500 ease-in-out ${
-                      isOpen ? 'max-h-40 opacity-100 border-t border-white/5' : 'max-h-0 opacity-0 pointer-events-none'
-                    }`}
-                  >
-                    <p className={`p-6 text-xs md:text-sm font-light leading-relaxed ${
-                      isDark ? 'text-slate-300' : 'text-slate-650'
-                    }`}>
+                  {isOpen && (
+                    <div
+                      style={{
+                        padding: '0 1.5rem 1.5rem',
+                        borderTop: '1px solid var(--line)',
+                        paddingTop: '1rem',
+                        fontSize: '1.0625rem',
+                        color: 'var(--muted)',
+                        lineHeight: 1.6,
+                      }}
+                    >
                       {faq.a}
-                    </p>
-                  </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -492,18 +275,8 @@ export default function Home({ config, homeCards = [], projects = [], currentMod
         </div>
       </section>
 
-      {/* Detail Edit Modal */}
-      {selectedCard && (
-        <DetailEditModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          type="homeCard"
-          item={selectedCard}
-          onSave={handleSave}
-          isAdmin={isAdmin}
-          isDark={isDark}
-        />
-      )}
+      {/* 9. ContactFooter (#contact — Supabase Integrated) */}
+      <ContactFooter coordinates={coordinates} isDark={isDark} />
     </div>
   );
 }

@@ -5,8 +5,9 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Link } from 'react-router-dom';
 import { JourneyMilestone, ProfileMode } from '../types';
-import { Briefcase, GraduationCap, Calendar, Zap, ChevronRight, MapPin } from 'lucide-react';
+import { Briefcase, GraduationCap, ChevronRight, MapPin } from 'lucide-react';
 import SEO from '../components/SEO';
 
 interface TimelineProps {
@@ -20,7 +21,6 @@ type EraFilter = 'all' | 'professional' | 'academic';
 export default function Timeline({ journey, currentMode, isDark }: TimelineProps) {
   const [filter, setFilter] = useState<EraFilter>('all');
 
-  // Filter and sort journey milestones (assuming chronological order in profile.json)
   const filteredJourney = journey.filter(item => {
     const eraLower = item.era.toLowerCase();
     if (filter === 'professional') {
@@ -41,12 +41,11 @@ export default function Timeline({ journey, currentMode, isDark }: TimelineProps
   };
 
   const cardVariants = {
-    hidden: { opacity: 0, y: 30, filter: 'blur(4px)' },
+    hidden: { opacity: 0, y: 24 },
     visible: {
       opacity: 1,
       y: 0,
-      filter: 'blur(0px)',
-      transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] as any }
+      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as any }
     }
   };
 
@@ -64,7 +63,7 @@ export default function Timeline({ journey, currentMode, isDark }: TimelineProps
   };
 
   return (
-    <div className="min-h-screen py-28 px-6 md:px-12 max-w-7xl mx-auto w-full select-none">
+    <div className="min-h-screen py-28 px-6 md:px-12 max-w-7xl mx-auto w-full bg-[var(--background)] text-[var(--foreground)]">
       <SEO 
         title="Professional Journey & Experience | Adarsh Singh"
         description="Chronological career timeline of Adarsh Singh detailing positions, technical milestones, and project contributions in data systems and intelligence development."
@@ -75,51 +74,43 @@ export default function Timeline({ journey, currentMode, isDark }: TimelineProps
       
       {/* 1. HERO HEADER */}
       <div className="mb-16 text-left max-w-3xl">
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-[10px] font-bold tracking-[0.2em] font-sans uppercase w-fit mb-6 ${
-            isDark 
-              ? 'bg-[#007AFF15] border-[#007AFF30] text-[#007AFF]' 
-              : 'bg-[#007AFF10] border-[#007AFF20] text-[#007AFF]'
-          }`}
-        >
-          <Calendar className="w-3.5 h-3.5" />
-          <span>CHRONICLE OF CAPABILITIES</span>
-        </motion.div>
+        <div className="eyebrow" style={{ marginBottom: '1.25rem' }}>
+          Chronicle of Capabilities
+        </div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="text-4xl md:text-6xl font-sans font-semibold tracking-tight leading-none mb-6"
+        <h1
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '4rem',
+            textTransform: 'uppercase',
+            lineHeight: 0.95,
+            color: 'var(--foreground)',
+            letterSpacing: '-0.01em',
+            marginBottom: '1.5rem',
+          }}
+          className="sm:text-[5.5rem]"
         >
           Career Chronology<br />
-          <span className={`text-transparent bg-clip-text bg-gradient-to-r ${
-            isDark 
-              ? 'from-white via-white/80 to-white/40' 
-              : 'from-neutral-950 via-neutral-900 to-neutral-500'
-          } italic font-serif font-medium`}>Engineering Path &amp; Milestones</span>
-        </motion.h1>
+          <span style={{ color: 'var(--accent)' }}>Engineering Path &amp; Milestones</span>
+        </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className={`text-base md:text-lg font-light leading-relaxed ${
-            isDark ? 'text-slate-300' : 'text-slate-600'
-          }`}
+        <p
+          style={{
+            fontSize: '1.25rem',
+            color: 'var(--muted)',
+            lineHeight: 1.45,
+          }}
         >
-          A historical record of technical engagements, academic foundations, and enterprise contributions.
-        </motion.p>
+          A historical record of technical engagements, academic foundations, and enterprise contributions across Capgemini, autonomous AI research, and cloud architecture.
+        </p>
       </div>
 
       {/* 2. ERA FILTER CONTROLS */}
       <div className="mb-16 flex justify-start items-center relative z-20">
-        <div className={`p-1 rounded-2xl border flex items-center gap-1.5 backdrop-blur-xl ${
-          isDark ? 'bg-white/5 border-white/[0.08]' : 'bg-slate-100 border-slate-200'
-        }`}>
+        <div
+          className="p-1 rounded-full border flex items-center gap-1.5"
+          style={{ background: 'var(--surface)', borderColor: 'var(--line-strong)' }}
+        >
           {(['all', 'professional', 'academic'] as const).map((era) => {
             const isActive = filter === era;
             const label = era === 'all' ? 'All Epochs' : era === 'professional' ? 'Professional' : 'Academics';
@@ -127,21 +118,12 @@ export default function Timeline({ journey, currentMode, isDark }: TimelineProps
               <button
                 key={era}
                 onClick={() => setFilter(era)}
-                className={`relative px-4 py-2 rounded-xl text-xs font-mono font-medium tracking-wide transition-all duration-300 ${
-                  isActive 
-                    ? isDark ? 'text-black' : 'text-white'
-                    : isDark ? 'text-white/60 hover:text-white' : 'text-neutral-600 hover:text-neutral-950'
-                }`}
+                className="px-5 py-2 rounded-full text-xs font-semibold tracking-wider transition-all duration-300"
+                style={{
+                  background: isActive ? 'var(--accent)' : 'transparent',
+                  color: isActive ? 'var(--background)' : 'var(--muted)',
+                }}
               >
-                {isActive && (
-                  <motion.div
-                    layoutId="timeline-era-pill"
-                    className={`absolute inset-0 rounded-xl -z-10 ${
-                      isDark ? 'bg-white' : 'bg-neutral-950'
-                    }`}
-                    transition={{ type: 'spring' as any, stiffness: 380, damping: 30 }}
-                  />
-                )}
                 <span>{label}</span>
               </button>
             );
@@ -153,11 +135,10 @@ export default function Timeline({ journey, currentMode, isDark }: TimelineProps
       <div className="relative">
         
         {/* Glow Path Light (Global background vertical axis line) */}
-        <div className={`absolute left-4 md:left-1/2 top-4 bottom-4 w-[1.5px] -translate-x-[0.75px] ${
-          isDark 
-            ? 'bg-gradient-to-b from-[#007AFF]/30 via-white/10 to-transparent' 
-            : 'bg-gradient-to-b from-[#007AFF]/30 via-slate-200 to-transparent'
-        }`} />
+        <div
+          className="absolute left-4 md:left-1/2 top-4 bottom-4 w-px -translate-x-1/2"
+          style={{ background: 'linear-gradient(to bottom, var(--accent), var(--line), transparent)' }}
+        />
 
         <motion.div
           variants={containerVariants}
@@ -171,25 +152,6 @@ export default function Timeline({ journey, currentMode, isDark }: TimelineProps
               const isEmphasized = milestone.emphasis && (milestone.emphasis[currentMode] || milestone.emphasis.general);
               const isEven = idx % 2 === 0;
 
-              // Theme configuration for Professional vs Academic eras
-              const eraTheme = isProfessional
-                ? {
-                    glow: 'from-[#007AFF]/6 to-transparent',
-                    borderHover: 'group-hover:border-[#007AFF]/30',
-                    dotColor: 'bg-[#007AFF]',
-                    icon: <Briefcase className="w-3.5 h-3.5 text-[#007AFF]" />,
-                    badgeClass: isDark ? 'bg-[#007AFF]/10 text-[#90CAF9] border-[#007AFF]/20' : 'bg-[#007AFF]/5 text-[#1565C0] border-[#007AFF]/10',
-                    pulseGlow: 'bg-[#007AFF]/20'
-                  }
-                : {
-                    glow: 'from-[#8A2BE2]/6 to-transparent',
-                    borderHover: 'group-hover:border-[#8A2BE2]/30',
-                    dotColor: 'bg-[#8A2BE2]',
-                    icon: <GraduationCap className="w-3.5 h-3.5 text-[#8A2BE2]" />,
-                    badgeClass: isDark ? 'bg-[#8A2BE2]/10 text-[#E040FB] border-[#8A2BE2]/20' : 'bg-[#8A2BE2]/5 text-[#6A1B9A] border-[#8A2BE2]/10',
-                    pulseGlow: 'bg-[#8A2BE2]/20'
-                  };
-
               const isPresent = milestone.period.toLowerCase().includes('present');
 
               return (
@@ -201,9 +163,8 @@ export default function Timeline({ journey, currentMode, isDark }: TimelineProps
                     isEven ? 'md:flex-row-reverse' : ''
                   }`}
                 >
-                  
-                  {/* Left Column: Date / Time Period */}
-                  <div className={`w-full md:w-1/2 px-12 pb-2 md:pb-0 flex items-center md:justify-end ${
+                  {/* Date Column */}
+                  <div className={`w-full md:w-1/2 px-12 pb-2 md:pb-0 flex items-center ${
                     isEven ? 'md:justify-start' : 'md:justify-end'
                   }`}>
                     <div className={`flex flex-col gap-1.5 ${
@@ -211,108 +172,134 @@ export default function Timeline({ journey, currentMode, isDark }: TimelineProps
                     }`}>
                       <div className="flex items-center gap-2">
                         {isPresent && (
-                          <span className="flex h-2 w-2 relative">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                          </span>
+                          <span
+                            className="inline-block w-2 h-2 rounded-full animate-pulse"
+                            style={{ background: 'var(--accent)' }}
+                          />
                         )}
-                        <span className={`font-mono text-xs md:text-sm font-bold tracking-wider uppercase ${
-                          isDark ? 'text-slate-300' : 'text-slate-600'
-                        }`}>
+                        <span
+                          className="font-mono text-xs md:text-sm font-bold tracking-wider uppercase"
+                          style={{ color: 'var(--foreground)' }}
+                        >
                           {milestone.period}
                         </span>
                       </div>
                       
                       {isEmphasized && (
-                        <span className={`text-[8px] font-mono font-bold tracking-widest uppercase px-2 py-0.5 rounded border select-none ${
-                          isDark ? 'bg-[#007AFF]/10 border-[#007AFF]/25 text-[#007AFF]' : 'bg-[#007AFF]/5 border-[#007AFF]/15 text-[#1565C0]'
-                        }`}>
+                        <span
+                          className="text-[9px] font-mono font-bold tracking-widest uppercase px-2 py-0.5 rounded-sm border"
+                          style={{
+                            background: 'rgba(255, 59, 29, 0.1)',
+                            borderColor: 'rgba(255, 59, 29, 0.25)',
+                            color: 'var(--accent)',
+                          }}
+                        >
                           Featured Milestone
                         </span>
                       )}
                     </div>
                   </div>
 
-                  {/* Vertical Axis Dot Marker */}
-                  <div className="absolute left-4 md:left-1/2 top-1 md:top-1/2 -translate-y-1/2 md:-translate-x-[8px] flex items-center justify-center z-10">
-                    <div className="relative flex items-center justify-center">
-                      <span className={`animate-ping absolute inline-flex h-6 w-6 rounded-full opacity-35 ${eraTheme.pulseGlow}`} />
-                      <div className={`w-4 h-4 rounded-full border-2 border-neutral-950 ${eraTheme.dotColor} ${
-                        isEmphasized ? 'scale-[1.2] shadow-[0_0_15px_#007AFF]' : ''
-                      }`} />
-                    </div>
+                  {/* Vertical Axis Marker */}
+                  <div className="absolute left-4 md:left-1/2 top-1 md:top-1/2 -translate-y-1/2 md:-translate-x-1/2 flex items-center justify-center z-10">
+                    <div
+                      className="w-3.5 h-3.5 rounded-full border-2"
+                      style={{
+                        borderColor: 'var(--background)',
+                        background: isEmphasized ? 'var(--accent)' : 'var(--foreground)',
+                      }}
+                    />
                   </div>
 
-                  {/* Right Column: Glassmorphic Card content */}
+                  {/* Card content */}
                   <div className="w-full md:w-1/2 px-12">
-                    <motion.div
-                      whileHover={{ y: -4, scale: 1.01 }}
-                      transition={{ type: 'spring' as any, stiffness: 450, damping: 20 }}
-                      className={`p-6 md:p-8 rounded-[32px] border relative group overflow-hidden flex flex-col justify-between h-full transition-all duration-300 ${
-                        isDark 
-                          ? `bg-gradient-to-b from-[#141416]/90 to-[#09090b]/95 border-white/[0.08] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] ${eraTheme.borderHover} ${
-                              isEmphasized ? 'shadow-[0_15px_40px_rgba(0,122,255,0.1)] border-[#007AFF]/25' : ''
-                            }` 
-                          : 'bg-white border-neutral-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.05)] hover:border-[#007AFF]/15'
-                      }`}
+                    <div
+                      className="p-6 md:p-8 rounded-[0.25rem] border relative group flex flex-col justify-between h-full transition-all duration-340"
+                      style={{
+                        background: 'var(--surface)',
+                        borderColor: isEmphasized ? 'var(--accent)' : 'var(--line)',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--accent)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.borderColor = isEmphasized ? 'var(--accent)' : 'var(--line)')}
                     >
-                      {/* Ambient background glow inside card */}
-                      <div className={`absolute -top-16 -right-16 w-48 h-48 bg-gradient-to-br ${eraTheme.glow} rounded-bl-full filter blur-[50px] opacity-20 group-hover:opacity-40 transition-opacity duration-500 pointer-events-none`} />
-
                       <div className="relative z-10 flex flex-col justify-between h-full">
                         <div>
-                          
                           {/* Card Header row */}
                           <div className="flex items-center justify-between gap-4 mb-4">
-                            <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[9px] font-mono tracking-widest uppercase w-fit leading-none ${eraTheme.badgeClass}`}>
-                              {eraTheme.icon}
+                            <div
+                              className="flex items-center gap-1.5 px-3 py-1 rounded-sm border text-[9px] font-mono tracking-widest uppercase"
+                              style={{
+                                background: 'var(--surface-2)',
+                                borderColor: 'var(--line)',
+                                color: 'var(--muted)',
+                              }}
+                            >
+                              {isProfessional ? <Briefcase className="w-3.5 h-3.5" style={{ color: 'var(--accent)' }} /> : <GraduationCap className="w-3.5 h-3.5" style={{ color: 'var(--accent)' }} />}
                               <span>{milestone.era}</span>
                             </div>
                             
-                            {/* Accent tag */}
                             {isPresent && (
-                              <div className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full select-none text-[8px] font-mono font-bold tracking-wider text-emerald-400">
+                              <div
+                                className="px-2.5 py-0.5 rounded-sm text-[8px] font-mono font-bold tracking-wider uppercase border"
+                                style={{
+                                  background: 'rgba(255, 59, 29, 0.1)',
+                                  borderColor: 'rgba(255, 59, 29, 0.25)',
+                                  color: 'var(--accent)',
+                                }}
+                              >
                                 ACTIVE
                               </div>
                             )}
                           </div>
 
-                          <h3 className={`text-lg md:text-xl font-bold font-display tracking-tight leading-snug transition-colors duration-300 group-hover:text-[#007AFF] ${
-                            isDark ? 'text-white' : 'text-neutral-900'
-                          }`}>
+                          <h3
+                            style={{
+                              fontFamily: 'var(--font-sans)',
+                              fontSize: '1.25rem',
+                              fontWeight: 600,
+                              lineHeight: 1.3,
+                              color: 'var(--foreground)',
+                              transition: 'color 340ms ease-out',
+                            }}
+                            className="group-hover:!text-[var(--accent)]"
+                          >
                             {milestone.title}
                           </h3>
 
                           {/* Company / Subtitle Info */}
-                          <div className={`flex items-center gap-2 mt-2 font-mono text-[10px] tracking-wider uppercase font-semibold ${
-                            isDark ? 'text-slate-300' : 'text-slate-600'
-                          }`}>
+                          <div
+                            className="flex items-center gap-2 mt-2 font-mono text-[10px] tracking-wider uppercase font-semibold"
+                            style={{ color: 'var(--muted)' }}
+                          >
                             <span>{milestone.subtitle}</span>
                             <span className="w-1 h-1 rounded-full bg-white/20" />
                             <div className="flex items-center gap-1">
-                              <MapPin className="w-3 h-3 text-[#007AFF]" />
+                              <MapPin className="w-3 h-3" style={{ color: 'var(--accent)' }} />
                               <span>IN</span>
                             </div>
                           </div>
 
-                          <p className={`text-xs font-light leading-relaxed mt-5 ${
-                            isDark ? 'text-slate-200' : 'text-slate-700'
-                          }`}>
+                          <p
+                            style={{
+                              fontSize: '0.9375rem',
+                              color: 'var(--muted)',
+                              lineHeight: 1.5,
+                              marginTop: '1.25rem',
+                            }}
+                          >
                             {milestone.description}
                           </p>
-
                         </div>
 
-                        {/* Stately footer */}
-                        <div className={`border-t border-solid pt-4 mt-6 flex items-center justify-between ${
-                          isDark ? 'border-white/[0.06] text-slate-400' : 'border-neutral-100 text-slate-600'
-                        }`}>
-                          <span className="text-[8px] font-mono tracking-widest uppercase">Chronicle Verified</span>
-                          <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1 text-[#007AFF]" />
+                        <div
+                          className="pt-4 mt-6 flex items-center justify-between"
+                          style={{ borderTop: '1px solid var(--line)', color: 'var(--muted)' }}
+                        >
+                          <span className="text-[9px] font-mono tracking-widest uppercase">Chronicle Verified</span>
+                          <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" style={{ color: 'var(--accent)' }} />
                         </div>
-
                       </div>
-                    </motion.div>
+                    </div>
                   </div>
 
                 </motion.div>
@@ -324,28 +311,35 @@ export default function Timeline({ journey, currentMode, isDark }: TimelineProps
       </div>
 
       {/* 4. CALL TO ACTION CONTACT TEASER */}
-      <div className="mt-28 border-t border-white/5 pt-16 text-center">
-        <span className={`text-[10px] uppercase font-mono tracking-[0.3em] font-bold block mb-4 ${
-          isDark ? 'text-slate-400' : 'text-slate-500'
-        }`}>
-          Secure Operational Logistics
-        </span>
-        <h2 className="text-2xl font-sans font-semibold tracking-tight mb-6">
-          Ready to start a professional engagement?
-        </h2>
-        <motion.a
-          href="/contact"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className={`px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest inline-flex items-center gap-2 transition-all duration-300 border ${
-            isDark 
-              ? 'bg-white text-black border-white hover:bg-neutral-200' 
-              : 'bg-neutral-950 text-white border-neutral-950 hover:bg-neutral-800'
-          }`}
+      <div
+        className="mt-28 pt-16 text-center"
+        style={{ borderTop: '1px solid var(--line)' }}
+      >
+        <div className="eyebrow justify-center mb-4">
+          Professional Engagements
+        </div>
+        <h2
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '2.5rem',
+            textTransform: 'uppercase',
+            color: 'var(--foreground)',
+            marginBottom: '1.5rem',
+          }}
         >
-          <span>Establish Connection</span>
+          Ready to architect a high-scale platform?
+        </h2>
+        <Link
+          to="/contact"
+          className="px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest inline-flex items-center gap-2 transition-all duration-300"
+          style={{
+            background: 'var(--accent)',
+            color: 'var(--background)',
+          }}
+        >
+          <span>Establish Transmission</span>
           <ChevronRight className="w-4 h-4" />
-        </motion.a>
+        </Link>
       </div>
 
     </div>

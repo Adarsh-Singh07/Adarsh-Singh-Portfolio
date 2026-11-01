@@ -69,11 +69,11 @@ export default function Hero({ config, isDark }: HeroProps) {
               variants={itemVariants} 
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-[10px] font-bold tracking-[0.2em] font-sans uppercase ${
                 isDark 
-                  ? 'bg-[#007AFF15] border-[#007AFF30] text-[#007AFF]' 
-                  : 'bg-[#007AFF10] border-[#007AFF20] text-[#007AFF] shadow-sm'
+                  ? 'bg-[#ff3b1d15] border-[#ff3b1d30] text-[#ff3b1d]' 
+                  : 'bg-[#ff3b1d10] border-[#ff3b1d20] text-[#ff3b1d] shadow-sm'
               }`}
             >
-              <div className="w-1.5 h-1.5 rounded-full bg-[#007AFF] animate-pulse"></div>
+              <div className="w-1.5 h-1.5 rounded-full bg-[#ff3b1d] animate-pulse"></div>
               <span>{config.badge}</span>
             </motion.div>
 

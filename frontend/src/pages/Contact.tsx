@@ -11,15 +11,14 @@ import {
   Linkedin, 
   Clock, 
   MapPin, 
-  ShieldCheck, 
   Copy, 
   Check, 
-  ExternalLink,
-  Loader2,
-  Terminal,
-  Send,
-  Github,
-  Edit
+  ExternalLink, 
+  Loader2, 
+  Terminal, 
+  Send, 
+  Github, 
+  Edit 
 } from 'lucide-react';
 import { Coordinates, ProfileMode } from '../types';
 import DetailEditModal from '../components/DetailEditModal';
@@ -34,7 +33,7 @@ interface ContactProps {
 
 type SubmissionStatus = 'idle' | 'validating' | 'encrypting' | 'handshake' | 'dispatching' | 'success' | 'error';
 
-export default function Contact({ isDark, coordinates, currentMode, onRefreshData }: ContactProps) {
+export default function Contact({ coordinates, currentMode, onRefreshData, isDark }: ContactProps) {
   const [formState, setFormState] = useState({
     name: '',
     email: '',
@@ -50,23 +49,21 @@ export default function Contact({ isDark, coordinates, currentMode, onRefreshDat
   const token = sessionStorage.getItem('admin-token') || localStorage.getItem('admin-token');
   const isAdmin = !!token;
 
-  // Use dynamic coordinates or default fallbacks
   const coords = coordinates || {
     email: 'hello@adarshsingh.in',
     linkedin: 'linkedin.com/in/adarshsingh45',
     github: 'github.com/Adarsh-Singh07',
-    location: 'Noida, Uttar Pradesh, India',
+    location: 'Bengaluru, India',
     hours: 'Mon – Fri, 9:00 AM – 6:00 PM IST'
   };
 
   const copyEmailToClipboard = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Avoid triggering modal click
+    e.stopPropagation();
     navigator.clipboard.writeText(coords.email);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Simulate secure terminal handshake logs
   useEffect(() => {
     if (status === 'encrypting') {
       setTerminalLogs(['[SYSTEM] Initializing secure socket handshake...']);
@@ -140,15 +137,6 @@ export default function Contact({ isDark, coordinates, currentMode, onRefreshDat
     }
   };
 
-  const formVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as any } 
-    }
-  };
-
   const contactSchema = {
     "@context": "https://schema.org",
     "@graph": [
@@ -163,7 +151,7 @@ export default function Contact({ isDark, coordinates, currentMode, onRefreshDat
   };
 
   return (
-    <div className="min-h-screen py-28 px-6 md:px-12 max-w-7xl mx-auto w-full select-none">
+    <div className="min-h-screen py-28 px-6 md:px-12 max-w-7xl mx-auto w-full bg-[var(--background)] text-[var(--foreground)]">
       <SEO 
         title="Connect & Collaborate | Adarsh Singh"
         description="Get in touch with Adarsh Singh for AI system design consulting, big data pipeline contracts, or professional collaborations."
@@ -173,61 +161,48 @@ export default function Contact({ isDark, coordinates, currentMode, onRefreshDat
       />
       
       {/* 1. HERO HEADER */}
-      <div className="mb-20 text-left max-w-3xl">
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-[10px] font-bold tracking-[0.2em] font-sans uppercase w-fit mb-6 ${
-            isDark 
-              ? 'bg-[#007AFF15] border-[#007AFF30] text-[#007AFF]' 
-              : 'bg-[#007AFF10] border-[#007AFF20] text-[#007AFF]'
-          }`}
-        >
-          <ShieldCheck className="w-3.5 h-3.5" />
-          <span>OUTREACH LINK STACKED</span>
-        </motion.div>
+      <div className="mb-16 text-left max-w-3xl">
+        <div className="eyebrow" style={{ marginBottom: '1.25rem' }}>
+          Direct Outreach
+        </div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="text-4xl md:text-6xl font-sans font-semibold tracking-tight leading-none mb-6"
+        <h1
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '4rem',
+            textTransform: 'uppercase',
+            lineHeight: 0.95,
+            color: 'var(--foreground)',
+            letterSpacing: '-0.01em',
+            marginBottom: '1.5rem',
+          }}
+          className="sm:text-[5.5rem]"
         >
           Operational Outreach<br />
-          <span className={`text-transparent bg-clip-text bg-gradient-to-r ${
-            isDark 
-              ? 'from-white via-white/80 to-white/40' 
-              : 'from-neutral-950 via-neutral-900 to-neutral-500'
-          } italic font-serif font-medium`}>Secure Form Gateway</span>
-        </motion.h1>
+          <span style={{ color: 'var(--accent)' }}>Secure Form Gateway</span>
+        </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className={`text-base md:text-lg font-light leading-relaxed ${
-            isDark ? 'text-slate-300' : 'text-slate-600'
-          }`}
+        <p
+          style={{
+            fontSize: '1.25rem',
+            color: 'var(--muted)',
+            lineHeight: 1.45,
+          }}
         >
-          Establish encrypted communication lines for enterprise proposals, ML opportunities, or project queries.
-        </motion.p>
+          Establish encrypted communication lines for enterprise proposals, ML opportunities, or cloud architecture reviews.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
         
         {/* 2. SECURE MESSAGE CONSOLE (FORM) */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={formVariants}
-          className={`lg:col-span-7 p-8 md:p-10 rounded-[32px] border relative overflow-hidden flex flex-col ${
-            isDark 
-              ? 'bg-gradient-to-b from-[#141416]/90 to-[#09090b]/95 border-white/[0.08] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] shadow-2xl' 
-              : 'bg-white border-neutral-200/80 shadow-[0_15px_40px_rgba(0,0,0,0.03)]'
-          }`}
+        <div
+          className="lg:col-span-7 p-8 md:p-10 rounded-[0.25rem] border relative overflow-hidden flex flex-col"
+          style={{
+            background: 'var(--surface)',
+            borderColor: 'var(--line-strong)',
+          }}
         >
-          
           {/* Animated Overlay for Secure Transmit Handshake */}
           <AnimatePresence>
             {(status === 'encrypting' || status === 'handshake' || status === 'dispatching') && (
@@ -235,10 +210,17 @@ export default function Contact({ isDark, coordinates, currentMode, onRefreshDat
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-[#121212]/95 z-30 flex flex-col items-center justify-center p-8 text-center"
+                className="absolute inset-0 z-30 flex flex-col items-center justify-center p-8 text-center"
+                style={{ background: 'rgba(8, 8, 10, 0.95)' }}
               >
-                <div className="w-full max-w-md bg-black border border-white/10 rounded-2xl p-6 text-left font-mono text-xs">
-                  <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4 text-[#007AFF]">
+                <div
+                  className="w-full max-w-md border rounded-sm p-6 text-left font-mono text-xs"
+                  style={{ background: 'var(--surface)', borderColor: 'var(--line-strong)' }}
+                >
+                  <div
+                    className="flex items-center justify-between border-b pb-3 mb-4"
+                    style={{ borderColor: 'var(--line)', color: 'var(--accent)' }}
+                  >
                     <div className="flex items-center gap-2">
                       <Terminal className="w-4 h-4" />
                       <span className="font-bold tracking-wider">SECURE SHIELD DISPATCH</span>
@@ -253,7 +235,7 @@ export default function Contact({ isDark, coordinates, currentMode, onRefreshDat
                       </div>
                     ))}
                     {status === 'dispatching' && (
-                      <div className="animate-pulse text-[#007AFF] font-bold">
+                      <div className="animate-pulse font-bold" style={{ color: 'var(--accent)' }}>
                         [SYSTEM] Transmitting packet to secure uvicorn handler...
                       </div>
                     )}
@@ -263,79 +245,164 @@ export default function Contact({ isDark, coordinates, currentMode, onRefreshDat
             )}
           </AnimatePresence>
 
-          <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#007AFF] block mb-2">
-            Secure Outpost
+          <span
+            style={{
+              fontSize: '0.8125rem',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.22em',
+              color: 'var(--accent)',
+              display: 'block',
+              marginBottom: '0.5rem',
+            }}
+          >
+            Direct Outpost
           </span>
-          <h2 className="text-xl font-bold font-sans tracking-tight mb-8">Send Operational Message</h2>
+          <h2
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '2rem',
+              textTransform: 'uppercase',
+              color: 'var(--foreground)',
+              marginBottom: '2rem',
+            }}
+          >
+            Send Operational Message
+          </h2>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className={`block text-[10px] uppercase font-mono tracking-widest mb-2 font-bold ${
-                  isDark ? 'text-slate-400' : 'text-slate-500'
-                }`}>Sender Identity</label>
+                <label
+                  style={{
+                    fontSize: '0.75rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.14em',
+                    color: 'var(--muted)',
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                  }}
+                >
+                  Sender Identity *
+                </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Recruiters / Tech Leads"
+                  placeholder="e.g. Recruiter / VP of Eng"
                   value={formState.name}
                   onChange={e => setFormState({ ...formState, name: e.target.value })}
-                  className={`w-full px-5 py-3 rounded-2xl border text-sm transition-all focus:outline-none focus:border-[#007AFF] bg-transparent ${
-                    isDark ? 'border-white/[0.08] text-white' : 'border-slate-200 text-neutral-900'
-                  }`}
+                  style={{
+                    width: '100%',
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: '1px solid var(--line-strong)',
+                    padding: '0.75rem 0',
+                    color: 'var(--foreground)',
+                    fontSize: '1rem',
+                    outline: 'none',
+                  }}
                 />
               </div>
               <div>
-                <label className={`block text-[10px] uppercase font-mono tracking-widest mb-2 font-bold ${
-                  isDark ? 'text-slate-400' : 'text-slate-500'
-                }`}>Return Address</label>
+                <label
+                  style={{
+                    fontSize: '0.75rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.14em',
+                    color: 'var(--muted)',
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                  }}
+                >
+                  Return Address *
+                </label>
                 <input
                   type="email"
                   required
                   placeholder="e.g. contact@enterprise.com"
                   value={formState.email}
                   onChange={e => setFormState({ ...formState, email: e.target.value })}
-                  className={`w-full px-5 py-3 rounded-2xl border text-sm transition-all focus:outline-none focus:border-[#007AFF] bg-transparent ${
-                    isDark ? 'border-white/[0.08] text-white' : 'border-slate-200 text-neutral-900'
-                  }`}
+                  style={{
+                    width: '100%',
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: '1px solid var(--line-strong)',
+                    padding: '0.75rem 0',
+                    color: 'var(--foreground)',
+                    fontSize: '1rem',
+                    outline: 'none',
+                  }}
                 />
               </div>
             </div>
 
             <div>
-              <label className={`block text-[10px] uppercase font-mono tracking-widest mb-2 font-bold ${
-                isDark ? 'text-slate-400' : 'text-slate-500'
-              }`}>Subject Line</label>
+              <label
+                style={{
+                  fontSize: '0.75rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.14em',
+                  color: 'var(--muted)',
+                  display: 'block',
+                  marginBottom: '0.5rem',
+                }}
+              >
+                Subject Line *
+              </label>
               <input
                 type="text"
                 required
-                placeholder="e.g. AI Architecture Consultancy"
+                placeholder="e.g. Enterprise AI Architecture Consultancy"
                 value={formState.subject}
                 onChange={e => setFormState({ ...formState, subject: e.target.value })}
-                className={`w-full px-5 py-3 rounded-2xl border text-sm transition-all focus:outline-none focus:border-[#007AFF] bg-transparent ${
-                  isDark ? 'border-white/[0.08] text-white' : 'border-slate-200 text-neutral-900'
-                }`}
+                style={{
+                  width: '100%',
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: '1px solid var(--line-strong)',
+                  padding: '0.75rem 0',
+                  color: 'var(--foreground)',
+                  fontSize: '1rem',
+                  outline: 'none',
+                }}
               />
             </div>
 
             <div>
-              <label className={`block text-[10px] uppercase font-mono tracking-widest mb-2 font-bold ${
-                isDark ? 'text-slate-400' : 'text-slate-500'
-              }`}>Message Payload</label>
+              <label
+                style={{
+                  fontSize: '0.75rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.14em',
+                  color: 'var(--muted)',
+                  display: 'block',
+                  marginBottom: '0.5rem',
+                }}
+              >
+                Message Payload *
+              </label>
               <textarea
                 required
                 rows={5}
-                placeholder="Compose your outreach inquiry..."
+                placeholder="Compose your inquiry or specify architecture variables..."
                 value={formState.message}
                 onChange={e => setFormState({ ...formState, message: e.target.value })}
-                className={`w-full px-5 py-4 rounded-2xl border text-sm transition-all focus:outline-none focus:border-[#007AFF] bg-transparent resize-none ${
-                  isDark ? 'border-white/[0.08] text-white' : 'border-slate-200 text-neutral-900'
-                }`}
+                style={{
+                  width: '100%',
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: '1px solid var(--line-strong)',
+                  padding: '0.75rem 0',
+                  color: 'var(--foreground)',
+                  fontSize: '1rem',
+                  outline: 'none',
+                  resize: 'none',
+                }}
               />
             </div>
 
             {status === 'error' && (
-              <div className="text-xs text-rose-500 font-mono flex items-center gap-1.5 animate-shake">
+              <div className="text-xs text-rose-500 font-mono flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                 <span>{errorMessage}</span>
               </div>
@@ -344,13 +411,11 @@ export default function Contact({ isDark, coordinates, currentMode, onRefreshDat
             <button
               type="submit"
               disabled={status === 'success'}
-              className={`w-full py-4 rounded-2xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer transition-all duration-300 border ${
-                status === 'success'
-                  ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
-                  : isDark
-                    ? 'bg-white text-black hover:bg-neutral-200 border-transparent hover:shadow-glow'
-                    : 'bg-neutral-950 text-white hover:bg-neutral-900 border-transparent hover:shadow-md'
-              }`}
+              className="w-full py-4 rounded-sm text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer transition-all duration-300"
+              style={{
+                background: status === 'success' ? 'rgba(34, 197, 94, 0.2)' : 'var(--accent)',
+                color: status === 'success' ? '#4ade80' : 'var(--background)',
+              }}
             >
               {status === 'success' ? (
                 <>
@@ -359,75 +424,79 @@ export default function Contact({ isDark, coordinates, currentMode, onRefreshDat
                 </>
               ) : (
                 <>
-                  <Send className="w-4.5 h-4.5" />
+                  <Send className="w-4 h-4" />
                   <span>Transmit Encrypted Packet</span>
                 </>
               )}
             </button>
           </form>
-        </motion.div>
+        </div>
         
         {/* 3. ACCESS COORDINATES (SIDEBAR) */}
         <div className="lg:col-span-5 space-y-8">
-          
-          {/* Coordinates container */}
           <div 
             onClick={handleCoordinatesClick}
-            className={`p-8 rounded-[32px] border cursor-pointer relative transition-all duration-300 group ${
-              isDark 
-                ? 'bg-gradient-to-b from-[#141416]/90 to-[#09090b]/95 border-white/[0.08] hover:border-[#007AFF]/35 shadow-md' 
-                : 'bg-white border-slate-200 hover:border-[#007AFF]/25 shadow-sm'
-            }`}
+            className="p-8 rounded-[0.25rem] border cursor-pointer relative transition-all duration-300 group"
+            style={{
+              background: 'var(--surface)',
+              borderColor: 'var(--line-strong)',
+            }}
           >
-            <div className="absolute right-6 top-6 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Edit className="w-4 h-4 text-[#007AFF]" />
-            </div>
+            {isAdmin && (
+              <div className="absolute right-6 top-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Edit className="w-4 h-4" style={{ color: 'var(--accent)' }} />
+              </div>
+            )}
 
-            <h2 className="text-base font-bold font-display mb-6 tracking-wide group-hover:text-[#007AFF] transition-colors">Direct Address Coordinates</h2>
+            <h2
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: '1.75rem',
+                textTransform: 'uppercase',
+                color: 'var(--foreground)',
+                marginBottom: '1.5rem',
+              }}
+            >
+              Direct Address Coordinates
+            </h2>
             
             <div className="space-y-6">
               
               {/* Email Copier */}
               <div className="flex flex-col gap-1.5">
-                <span className={`text-[9px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--muted)' }}>
                   Direct Mail Endpoint
                 </span>
-                <div className={`flex items-center justify-between p-3.5 rounded-xl border font-mono text-xs ${
-                  isDark ? 'bg-white/5 border-white/[0.08]' : 'bg-[#FDFBF7] border-slate-200'
-                }`}>
-                  <span className={isDark ? 'text-white/80' : 'text-neutral-800'}>{coords.email}</span>
+                <div
+                  className="flex items-center justify-between p-3.5 rounded-sm border font-mono text-xs"
+                  style={{ background: 'var(--surface-2)', borderColor: 'var(--line)' }}
+                >
+                  <span style={{ color: 'var(--foreground)' }}>{coords.email}</span>
                   <button
                     onClick={copyEmailToClipboard}
-                    className={`p-1.5 rounded-lg transition-colors border ${
-                      copied 
-                        ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
-                        : isDark ? 'hover:bg-white/10 border-transparent text-white/50 hover:text-white' : 'hover:bg-slate-200 border-transparent text-slate-500 hover:text-neutral-800'
-                    }`}
+                    className="p-1.5 rounded transition-colors"
                     title="Copy to clipboard"
                   >
-                    {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
                   </button>
                 </div>
               </div>
 
               {/* LinkedIn Gateway */}
               <div className="flex flex-col gap-1.5">
-                <span className={`text-[9px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--muted)' }}>
                   Professional Network
                 </span>
                 <a
                   href={coords.linkedin.startsWith('http') ? coords.linkedin : `https://${coords.linkedin}`}
                   target="_blank"
                   rel="noreferrer"
-                  onClick={e => e.stopPropagation()} // Avoid modal
-                  className={`flex items-center justify-between p-3.5 rounded-xl border font-mono text-xs transition-colors ${
-                    isDark 
-                      ? 'bg-white/5 border-white/[0.08] hover:bg-white/10 hover:border-white/20 text-white/80 hover:text-white' 
-                      : 'bg-[#FDFBF7] border-slate-200 hover:bg-slate-100 hover:border-slate-350 text-neutral-800'
-                  }`}
+                  onClick={e => e.stopPropagation()}
+                  className="flex items-center justify-between p-3.5 rounded-sm border font-mono text-xs transition-colors"
+                  style={{ background: 'var(--surface-2)', borderColor: 'var(--line)', color: 'var(--foreground)' }}
                 >
                   <div className="flex items-center gap-2">
-                    <Linkedin className="w-4 h-4 text-[#007AFF]" />
+                    <Linkedin className="w-4 h-4" style={{ color: 'var(--accent)' }} />
                     <span>{coords.linkedin.replace('https://', '').replace('www.', '')}</span>
                   </div>
                   <ExternalLink className="w-3.5 h-3.5 text-white/40" />
@@ -436,22 +505,19 @@ export default function Contact({ isDark, coordinates, currentMode, onRefreshDat
 
               {/* GitHub Gateway */}
               <div className="flex flex-col gap-1.5">
-                <span className={`text-[9px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--muted)' }}>
                   Source Repository
                 </span>
                 <a
                   href={coords.github.startsWith('http') ? coords.github : `https://${coords.github}`}
                   target="_blank"
                   rel="noreferrer"
-                  onClick={e => e.stopPropagation()} // Avoid modal
-                  className={`flex items-center justify-between p-3.5 rounded-xl border font-mono text-xs transition-colors ${
-                    isDark 
-                      ? 'bg-white/5 border-white/[0.08] hover:bg-white/10 hover:border-white/20 text-white/80 hover:text-white' 
-                      : 'bg-[#FDFBF7] border-slate-200 hover:bg-slate-100 hover:border-slate-350 text-neutral-800'
-                  }`}
+                  onClick={e => e.stopPropagation()}
+                  className="flex items-center justify-between p-3.5 rounded-sm border font-mono text-xs transition-colors"
+                  style={{ background: 'var(--surface-2)', borderColor: 'var(--line)', color: 'var(--foreground)' }}
                 >
                   <div className="flex items-center gap-2">
-                    <Github className="w-4 h-4 text-[#007AFF]" />
+                    <Github className="w-4 h-4" style={{ color: 'var(--accent)' }} />
                     <span>{coords.github.replace('https://', '').replace('www.', '')}</span>
                   </div>
                   <ExternalLink className="w-3.5 h-3.5 text-white/40" />
@@ -460,26 +526,28 @@ export default function Contact({ isDark, coordinates, currentMode, onRefreshDat
 
               {/* Operating Location */}
               <div className="flex flex-col gap-1.5">
-                <span className={`text-[9px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--muted)' }}>
                   Operational Location
                 </span>
-                <div className={`flex items-center gap-2 p-3.5 rounded-xl border font-mono text-xs ${
-                  isDark ? 'bg-white/5 border-white/[0.08] text-white/80' : 'bg-[#FDFBF7] border-slate-200 text-neutral-800'
-                }`}>
-                  <MapPin className="w-4 h-4 text-[#007AFF]" />
+                <div
+                  className="flex items-center gap-2 p-3.5 rounded-sm border font-mono text-xs"
+                  style={{ background: 'var(--surface-2)', borderColor: 'var(--line)', color: 'var(--foreground)' }}
+                >
+                  <MapPin className="w-4 h-4" style={{ color: 'var(--accent)' }} />
                   <span>{coords.location}</span>
                 </div>
               </div>
 
               {/* Availability Hours */}
               <div className="flex flex-col gap-1.5">
-                <span className={`text-[9px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--muted)' }}>
                   Response Hours
                 </span>
-                <div className={`flex items-center gap-2 p-3.5 rounded-xl border font-mono text-xs ${
-                  isDark ? 'bg-white/5 border-white/[0.08] text-white/80' : 'bg-[#FDFBF7] border-slate-200 text-neutral-800'
-                }`}>
-                  <Clock className="w-4 h-4 text-[#007AFF]" />
+                <div
+                  className="flex items-center gap-2 p-3.5 rounded-sm border font-mono text-xs"
+                  style={{ background: 'var(--surface-2)', borderColor: 'var(--line)', color: 'var(--foreground)' }}
+                >
+                  <Clock className="w-4 h-4" style={{ color: 'var(--accent)' }} />
                   <span>{coords.hours}</span>
                 </div>
               </div>
